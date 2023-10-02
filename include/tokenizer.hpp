@@ -1,5 +1,6 @@
-#ifndef TOKENIZER_H
-#define TOKENIZER_H
+#ifndef __TOKENIZER_H__
+#define __TOKENIZER_H__
+
 
 #include <iostream>
 #include <vector>
@@ -70,4 +71,4 @@ private:
     Token getNextToken(std::ifstream &file);
 };
 
-#endif // TOKENIZER_H
+#endif // __TOKENIZER_H__
