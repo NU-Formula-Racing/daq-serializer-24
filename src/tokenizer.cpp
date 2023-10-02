@@ -4,6 +4,9 @@
 #include <string>
 #include <map>
 #include <variant>
+#include <sstream>
+#include <exception>
+#include <regex>
 
 #include "tokenizer.hpp"
 
@@ -13,8 +16,9 @@ std::vector<Token> Tokenizer::tokenize()
     std::ifstream file(_fileName);
     if (!file.is_open())
     {
-        std::cerr << "Error opening file: " << _fileName << std::endl;
-        return tokens; // return empty vector
+        std::stringstream err;
+        err << "Error opening file: " << _fileName << std::endl;
+        throw std::invalid_argument(err.str());
     }
 
     while (file.good())
@@ -78,17 +82,76 @@ Token Tokenizer::getNextToken(std::ifstream &file)
     return token;
 }
 
-bool Tokenizer::isKeyword(const std::string& word, TokenType& type) {
-    static std::map<std::string, TokenType> keywords {
+bool Tokenizer::isKeyword(const std::string &word, TokenType &type)
+{
+    static std::map<std::string, TokenType> keywords{
         {"meta", META},
         {"def", DEF},
         {"frame", FRAME},
     };
-    
+
     auto it = keywords.find(word);
-    if (it != keywords.end()) {
+    if (it != keywords.end())
+    {
         type = it->second;
         return true;
     }
+    return false;
+}
+
+bool Tokenizer::isSymbol(const std::string &word, TokenType &type)
+{
+    static std::map<std::string, TokenType> keywords{
+        {"{", L_BRACE},
+        {"}", R_BRACE},
+        {";", SEMICOLON},
+    };
+
+    auto it = keywords.find(word);
+    if (it != keywords.end())
+    {
+        type = it->second;
+        return true;
+    }
+    return false;
+}
+
+bool Tokenizer::isLiteral(const std::string &word, TokenType &type)
+{
+    // Integer Literal
+    if (std::regex_match(word, std::regex("^-?[0-9]+$")))
+    {
+        type = INT_LITERAL;
+        return true;
+    }
+
+    // Float/Double Literal
+    if (std::regex_match(word, std::regex("^-?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?$")))
+    {
+        type = FLOAT_LITERAL; // or DOUBLE_LITERAL depending on your requirement
+        return true;
+    }
+
+    // Boolean Literal
+    if (word == "true" || word == "false")
+    {
+        type = BOOL_LITERAL;
+        return true;
+    }
+
+    // String Literal
+    if (std::regex_match(word, std::regex("^\".*\"$")))
+    {
+        type = STRING_LITERAL;
+        return true;
+    }
+
+    // Version Literal
+    if (std::regex_match(word, std::regex("^[0-9]+\\.[0-9]+\\.[0-9]+$")))
+    {
+        type = VERSION_LITERAL;
+        return true;
+    }
+
     return false;
 }

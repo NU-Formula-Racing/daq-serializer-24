@@ -1,0 +1,8 @@
+[
+    {
+        "command": "C:\\TDM-GCC-64\\bin\\g++.exe -o .pio\\build\\native\\src\\tokenizer.o -c -DPLATFORMIO=60111 -Iinclude -Isrc src\\tokenizer.cpp",
+        "directory": "D:\\Documents\\Code\\School\\NFR_23-24\\daq-serializer-24",
+        "file": "src\\tokenizer.cpp",
+        "output": ".pio\\build\\native\\src\\tokenizer.o"
+    }
+]

@@ -21,7 +21,7 @@ enum TokenType
     L_BRACE,
     R_BRACE,
     SEMICOLON,
-    END_OF_FILE, 
+    END_OF_FILE,
 
     // Identifiers
     DATA_TYPE,  // data type names
@@ -30,7 +30,6 @@ enum TokenType
     // Literals
     INT_LITERAL,
     FLOAT_LITERAL,
-    DOUBLE_LITERAL,
     BOOL_LITERAL,
     STRING_LITERAL,
     VERSION_LITERAL,
@@ -61,14 +60,14 @@ public:
     }
 
     std::vector<Token> tokenize();
+    bool isSymbol(const std::string &word, TokenType &type);
+    bool isKeyword(const std::string &word, TokenType &type);
+    bool isLiteral(const std::string &word, TokenType &type);
 
 private:
     std::string _fileName;
 
     Token getNextToken(std::ifstream &file);
-    bool isSymbol(const std::string &word, TokenType &type);
-    bool isKeyword(const std::string &word, TokenType &type);
-    bool isLiteral(const std::string &word, TokenType &type);
 };
 
 #endif // TOKENIZER_H
