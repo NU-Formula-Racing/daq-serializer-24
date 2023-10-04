@@ -21,6 +21,7 @@ enum TokenType
     // Symbols
     L_BRACE,
     R_BRACE,
+    COLON,
     SEMICOLON,
     END_OF_FILE,
 

@@ -1,0 +1,5 @@
+meta
+{
+    .schema : "valid-test-schema";
+    .meta : 1.0.1;
+}

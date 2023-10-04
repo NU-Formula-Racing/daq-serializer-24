@@ -1,6 +1,7 @@
 #define NATIVE
 #include <unity.h>
 #include <string>
+#include <sstream>
 
 #include "tokenizer.hpp"
 
@@ -143,6 +144,21 @@ void test_isKeyword_invalid(void)
     // Test for other invalid keywords...
 }
 
+void test_valid_meta(void)
+{
+    char* fileName = "./test_drive_files/test_valid_meta.drive";
+    Tokenizer Tokenizer(fileName);
+    TokenType expected[] = {
+        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, R_BRACE
+    };
+
+    std::vector<Token> tokens  = Tokenizer.tokenize();
+    for (int i = 0; i < tokens.size(); i++)
+    {
+        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expected[i], "Expected ");
+    }
+}
+
 int main(int argc, char **argv)
 {
     UNITY_BEGIN();
@@ -155,6 +171,7 @@ int main(int argc, char **argv)
     RUN_TEST(test_isSymbol_invalid);
     RUN_TEST(test_isKeyword_valid);
     RUN_TEST(test_isKeyword_invalid);
+    RUN_TEST(test_valid_meta);
     UNITY_END();
     return 0;
 }
