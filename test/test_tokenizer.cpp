@@ -2,6 +2,7 @@
 #include <unity.h>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "tokenizer.hpp"
 
@@ -146,7 +147,7 @@ void test_isKeyword_invalid(void)
 
 void test_valid_meta(void)
 {
-    char* fileName = "./test_drive_files/test_valid_meta.drive";
+    std::string fileName = std::string("./test/static/test_valid_meta.drive");
     Tokenizer Tokenizer(fileName);
     TokenType expected[] = {
         META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, R_BRACE
@@ -155,7 +156,10 @@ void test_valid_meta(void)
     std::vector<Token> tokens  = Tokenizer.tokenize();
     for (int i = 0; i < tokens.size(); i++)
     {
-        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expected[i], "Expected ");
+        std::stringstream message;
+        message << "Expected " << expected[i] << " but got " << tokens[i].type;
+        std::string messageStr = message.str();
+        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expected[i], messageStr.c_str());
     }
 }
 
