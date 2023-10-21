@@ -163,6 +163,27 @@ void test_valid_meta(void)
     }
 }
 
+void test_full(void)
+{
+    std::string filename = std::string("./test/static/test_full.drive");
+    Tokenizer Tokenizer(filename);
+    TokenType expected[] = {
+        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE, // meta
+        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def DateTime
+        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def CarData
+        FRAME, L_PARENTHESES, IDENTIFIER, R_PARENTHESES, // frame (CarData)
+    };
+
+    std::vector<Token> tokens = Tokenizer.tokenize();
+    for (int i = 0; i < tokens.size(); i++)
+    {
+        std::stringstream message;
+        message << "Expected " << expected[i] << " but got " << tokens[i].type << " at token " << i;
+        std::string messageStr = message.str();
+        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expected[i], messageStr.c_str());
+    }
+}
+
 int main(int argc, char **argv)
 {
     UNITY_BEGIN();
@@ -176,6 +197,7 @@ int main(int argc, char **argv)
     RUN_TEST(test_isKeyword_valid);
     RUN_TEST(test_isKeyword_invalid);
     RUN_TEST(test_valid_meta);
+    RUN_TEST(test_full);
     UNITY_END();
     return 0;
 }

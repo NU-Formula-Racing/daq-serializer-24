@@ -16,10 +16,6 @@ def CarData
 {
 	DateTime timestamp;
 	float ambientTemp;
-	bool isOverheating;
-	float coolantTemp;
-	float coolantFlowRate;
-	bool coolantLeak;
 }
 
 # frame definition (a special required definition)

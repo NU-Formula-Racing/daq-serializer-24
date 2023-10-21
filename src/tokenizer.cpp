@@ -47,7 +47,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
                 ; // ignore the rest of the line
             continue;
         }
-        
+
         if (std::isspace(c))
         { // If a whitespace character is encountered, then we consider the token as complete
             if (!word.empty())
@@ -55,7 +55,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
             continue;  // ignore leading whitespace
         }
 
-        if (c == '{' || c == '}' || c == ';')
+        if (c == '{' || c == '}' || c == ';' || c == '(' || c == ')' || c == ':') // code smelly
         { // Handle symbols
             if (!word.empty())
             {
@@ -121,6 +121,8 @@ bool Tokenizer::isSymbol(const std::string &word, TokenType &type)
         {"}", R_BRACE},
         {":", COLON},
         {";", SEMICOLON},
+        {"(", L_PARENTHESES},
+        {")", R_PARENTHESES},
     };
 
     auto it = symbols.find(word);
