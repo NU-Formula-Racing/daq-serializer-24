@@ -53,5 +53,6 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "D:/Documents/Code/School/NFR_23-24/daq-serializer-24/.pio/libdeps/esp32dev/Unity"
 }

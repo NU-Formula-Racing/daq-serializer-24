@@ -76,7 +76,15 @@ Token Tokenizer::getNextToken(std::ifstream &file)
         token.value = word;
         return token;
     }
-
+       
+    // if it is not a literal, then we are going to assume that it is an identifier, given that it's a valid name
+    if (isValidIdentifier(word))
+    {
+        token.type = IDENTIFIER;
+        token.value = word;
+        return token;
+    }
+    
     token.type = INVALID;
     token.value = word;
     return token;
@@ -101,14 +109,15 @@ bool Tokenizer::isKeyword(const std::string &word, TokenType &type)
 
 bool Tokenizer::isSymbol(const std::string &word, TokenType &type)
 {
-    static std::map<std::string, TokenType> keywords{
+    static std::map<std::string, TokenType> symbols{
         {"{", L_BRACE},
         {"}", R_BRACE},
+        {":", COLON},
         {";", SEMICOLON},
     };
 
-    auto it = keywords.find(word);
-    if (it != keywords.end())
+    auto it = symbols.find(word);
+    if (it != symbols.end())
     {
         type = it->second;
         return true;
@@ -154,4 +163,28 @@ bool Tokenizer::isLiteral(const std::string &word, TokenType &type)
     }
 
     return false;
+}
+
+bool Tokenizer::isValidIdentifier(const std::string &word)
+{
+    // check that all characters in the word are alphanumeric or underscore
+    // the first number cannot be a digit, but it can be a period
+    // the only character allowed to be a period is the first character
+    // the last character cannot be a period
+    
+    if (word.empty()) {
+        return false;
+    }
+    
+    if (!isalpha(word[0]) && word[0] != '_' && word[0] != '.') {
+        return false;
+    }
+    
+    for (size_t i = 1; i < word.size(); i++) {
+        if (!isalnum(word[i]) && word[i] != '_') {
+            return false;
+        }      
+    }
+    
+    return true;
 }

@@ -65,6 +65,7 @@ public:
     bool isSymbol(const std::string &word, TokenType &type);
     bool isKeyword(const std::string &word, TokenType &type);
     bool isLiteral(const std::string &word, TokenType &type);
+    bool isValidIdentifier(const std::string &word);
 
 private:
     std::string _fileName;
