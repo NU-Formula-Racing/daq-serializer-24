@@ -1,0 +1,26 @@
+# meta information about the serialization method
+meta
+{
+	# required meta-information (denoted with the '.')
+	.schema : "test-full";
+	.version : 1.0.0;
+}
+
+# definitions
+def DateTime
+{
+	long long timeSince1990;
+}
+
+def CarData
+{
+	DateTime timestamp;
+	float ambientTemp;
+	bool isOverheating;
+	float coolantTemp;
+	float coolantFlowRate;
+	bool coolantLeak;
+}
+
+# frame definition (a special required definition)
+frame(CarData)

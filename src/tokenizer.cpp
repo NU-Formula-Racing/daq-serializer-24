@@ -41,6 +41,13 @@ Token Tokenizer::getNextToken(std::ifstream &file)
 
     while (file.get(c))
     {
+        if (c == '#')
+        { // Handle comments
+            while (file.get(c) && c != '\n')
+                ; // ignore the rest of the line
+            continue;
+        }
+        
         if (std::isspace(c))
         { // If a whitespace character is encountered, then we consider the token as complete
             if (!word.empty())
