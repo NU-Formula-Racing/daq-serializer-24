@@ -33,6 +33,8 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected scope after definition/frame identifier");
         }
 
+        // continue parsing 
+        
         return Parser::ParsingResult::ok();
     }
 }
