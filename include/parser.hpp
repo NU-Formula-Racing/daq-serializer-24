@@ -69,6 +69,15 @@ struct Schema
 class Parser
 {
 public:
+    enum ParserScope
+    {
+        GLOBAL,
+        DATA_TYPE,
+        META,
+        FRAME,
+        POST_FRAME
+    };
+
     class ParsingResult
     {
     public:
