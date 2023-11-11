@@ -9,7 +9,7 @@ meta
 # definitions
 def DateTime
 {
-	long long timeSince1990;
+	long timeSince1990;
 }
 
 def CarData

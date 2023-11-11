@@ -33,12 +33,12 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         // CHECK FOR DECLARATIONS
         // def, and frames must be followed by an identifier, then followed by a scope
         // the scope should be left brace for def, and left parentheses for frames
-        if (tokens[i].type == DEF || tokens[i].type == FRAME)
+        if (tokens[i].type == DEF)
         {
             if (tokens[i + 1].type != IDENTIFIER)
-                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier after def or frame");
-            if (tokens[i + 2].type != L_BRACE && tokens[i + 2].type != L_PARENTHESES)
-                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected scope after definition/frame identifier");
+                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier after def");
+            if (tokens[i + 2].type != L_BRACE)
+                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected scope after definition identifier");
         }
 
         // now check that the next scope is opened with the proper type

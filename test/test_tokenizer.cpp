@@ -162,7 +162,7 @@ void test_full(void)
     Tokenizer Tokenizer(filename);
     TokenType expected[] = {
         META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE, // meta
-        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def DateTime
+        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def DateTime
         DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def CarData
         FRAME, L_PARENTHESES, IDENTIFIER, R_PARENTHESES, // frame (CarData)
     };
@@ -171,9 +171,12 @@ void test_full(void)
     for (int i = 0; i < tokens.size(); i++)
     {
         std::stringstream message;
-        message << "Expected " << expected[i] << " but got " << tokens[i].type << " at token " << i;
+        TokenType expectedType = expected[i];
+        std::string expected = Tokenizer::tokenTypeToString(expectedType);
+        std::string actual = Tokenizer::tokenTypeToString(tokens[i].type);
+        message << "Expected " << expected << " but got " << actual << " at token " << i;
         std::string messageStr = message.str();
-        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expected[i], messageStr.c_str());
+        TEST_ASSERT_TRUE_MESSAGE(tokens[i].type == expectedType, messageStr.c_str());
     }
 }
 

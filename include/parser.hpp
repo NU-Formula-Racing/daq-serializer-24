@@ -127,7 +127,7 @@ public:
         ParsingResult(TokenType token, int index)
         {
             std::string tokenString = Tokenizer::tokenTypeToString(token);
-            message << "** Parsing Result at index " << index << "(TOKEN TYPE: " << token << ") **" << std::endl;
+            message << "** Parsing Result at index " << index << "(TOKEN TYPE: " << tokenString << ") **" << std::endl;
         }
     };
 
