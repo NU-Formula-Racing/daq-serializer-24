@@ -4,16 +4,9 @@
 #include <sstream>
 #include <iostream>
 
+#include "testing_suite.hpp"
 #include "tokenizer.hpp"
 #include "parser.hpp"
-
-void setUp(void)
-{
-}
-
-void tearDown(void)
-{
-}
 
 void test_simple_sequence_validation(void)
 {
@@ -25,10 +18,7 @@ void test_simple_sequence_validation(void)
     TEST_ASSERT_TRUE_MESSAGE(result.isValid, "Expected true for valid sequence");
 }
 
-int main(int argc, char **argv)
+void TestingSuite::runParserTests()
 {
-    UNITY_BEGIN();
     RUN_TEST(test_simple_sequence_validation);
-    UNITY_END();
-    return 0;
 }

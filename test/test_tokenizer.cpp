@@ -5,14 +5,7 @@
 #include <iostream>
 
 #include "tokenizer.hpp"
-
-void setUp(void)
-{
-}
-
-void tearDown(void)
-{
-}
+#include "testing_suite.hpp"
 
 void test_integer_literal(void)
 {
@@ -184,9 +177,9 @@ void test_full(void)
     }
 }
 
-int main(int argc, char **argv)
+void TestingSuite::runTokenizerTests()
 {
-    UNITY_BEGIN();
+
     RUN_TEST(test_integer_literal);
     RUN_TEST(test_float_literal);
     RUN_TEST(test_string_literal);
@@ -198,6 +191,4 @@ int main(int argc, char **argv)
     RUN_TEST(test_isKeyword_invalid);
     RUN_TEST(test_valid_meta);
     RUN_TEST(test_full);
-    UNITY_END();
-    return 0;
 }
