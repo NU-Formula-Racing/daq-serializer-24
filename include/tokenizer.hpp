@@ -62,7 +62,7 @@ public:
         // nothing
     }
 
-    static std::string tokenToString(const Token &token)
+    static std::string tokenTypeToString(const TokenType &tokenType)
     {
         static std::map<int, std::string> tokenMap{
             {INVALID, "INVALID"},
@@ -85,7 +85,7 @@ public:
             {VERSION_LITERAL, "VERSION_LITERAL"}
         };
 
-        auto it = tokenMap.find(token.type);
+        auto it = tokenMap.find(tokenType);
 
         if (it != tokenMap.end())
             return it->second;
@@ -98,7 +98,7 @@ public:
         std::stringstream ss;
         for (auto token : tokens)
         {
-            ss << tokenToString(token) << separator;
+            ss << tokenTypeToString(token.type) << separator;
         }
         return ss.str();
     }

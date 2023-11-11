@@ -14,7 +14,7 @@
 
 Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
 {
-    Parser::ParserScope scope = Parser::ParserScope::GLOBAL;
+    Parser::ParserScope scope = Parser::ParserScope::GLOBAL_SCOPE;
 
     for (int i = 0; i < tokens.size();)
     {
@@ -52,36 +52,41 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         // now progress the index based on the scope type
         if (tokens[i].type == DEF)
         {
-            scope = Parser::ParserScope::DATA_TYPE;
+            std::cout << "Found valid def token, changing scope" << std::endl;
+            scope = Parser::ParserScope::DATA_TYPE_SCOPE;
             i += 2;
             continue;
         }
         if (tokens[i].type == FRAME)
         {
-            scope = Parser::ParserScope::FRAME;
+            std::cout << "Found valid frame token, changing scope" << std::endl;
+            scope = Parser::ParserScope::FRAME_SCOPE;
             i += 1;
             continue;
         }
         if (tokens[i].type == META)
         {
-            scope = Parser::ParserScope::META;
+            std::cout << "Found valid meta token, changing scope" << std::endl;
+            scope = Parser::ParserScope::META_SCOPE;
             i += 1;
             continue;
         }
 
+        std::cout << "Evaluating within scope: " << scope << std::endl;
+        
         // CHECK FOR SCOPES
         switch (scope)
         {
-        case Parser::ParserScope::GLOBAL:
+        case Parser::ParserScope::GLOBAL_SCOPE:
             // we should not be in the global scope at this point of the code
             // only def, frame, and meta are allowed in the global scope
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected def, frame, or meta");
-        case Parser::ParserScope::DATA_TYPE:
+        case Parser::ParserScope::DATA_TYPE_SCOPE:
             // we should only be in the data type scope if we are in a def
             // the only valid tokens in this scope are identifiers, and data types
             if (tokens[i].type == R_BRACE)
             {
-                scope = Parser::ParserScope::GLOBAL;
+                scope = Parser::ParserScope::GLOBAL_SCOPE;
                 i++;
                 continue;
             }
@@ -93,12 +98,12 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
                 return Parser::ParsingResult::invalidSequence(tokens[i+2].type, i+2, "Expected semicolon");
             i += 3;
             continue;
-        case Parser::ParserScope::META:
+        case Parser::ParserScope::META_SCOPE:
             // we should only be in the meta scope if we are in a meta
             // the only valid tokens in this scope are identifiers, and data types
             if (tokens[i].type == R_BRACE)
             {
-                scope = Parser::ParserScope::GLOBAL;
+                scope = Parser::ParserScope::GLOBAL_SCOPE;
                 i++;
                 continue;
             }
@@ -112,23 +117,24 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
                 return Parser::ParsingResult::invalidSequence(tokens[i+3].type, i+3, "Expected semicolon");
             i += 4;
             continue;
-        case Parser::ParserScope::FRAME:
+        case Parser::ParserScope::FRAME_SCOPE:
             if (tokens[i].type != IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
             if (tokens[i+1].type != R_PARENTHESES)
                 return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected right parentheses");
             i += 2;
-            scope = Parser::ParserScope::POST_FRAME;
+            scope = Parser::ParserScope::POST_FRAME_SCOPE;
             continue;
-        case Parser::ParserScope::POST_FRAME:
+        case Parser::ParserScope::POST_FRAME_SCOPE:
             if (tokens[i].type != END_OF_FILE)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected end of file");
         default:
-            break;
+            return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Unknown scope");
         }
-
-        return Parser::ParsingResult::ok();
     }
+
+    
+    return Parser::ParsingResult::ok();
 }
 
 bool Parser::isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex)

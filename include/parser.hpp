@@ -71,11 +71,11 @@ class Parser
 public:
     enum ParserScope
     {
-        GLOBAL,
-        DATA_TYPE,
-        META,
-        FRAME,
-        POST_FRAME
+        GLOBAL_SCOPE,
+        DATA_TYPE_SCOPE,
+        META_SCOPE,
+        FRAME_SCOPE,
+        POST_FRAME_SCOPE
     };
 
     class ParsingResult
@@ -126,6 +126,7 @@ public:
 
         ParsingResult(TokenType token, int index)
         {
+            std::string tokenString = Tokenizer::tokenTypeToString(token);
             message << "** Parsing Result at index " << index << "(TOKEN TYPE: " << token << ") **" << std::endl;
         }
     };
