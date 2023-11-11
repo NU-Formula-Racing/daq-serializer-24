@@ -13,6 +13,7 @@ public:
     {
         UNITY_BEGIN();
         runTokenizerTests();
+        runDataTypeFactoryTests();
         runParserTests();
         UNITY_END();
     }
@@ -20,6 +21,7 @@ public:
 private:
     void runTokenizerTests();
     void runParserTests();
+    void runDataTypeFactoryTests();
 };
 
 #endif // __TESTING_SUITE_H__
