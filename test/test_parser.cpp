@@ -15,7 +15,10 @@ void test_simple_sequence_validation(void)
     Parser parser;
     std::vector<Token> tokens = tokenizer.tokenize();
     Parser::ParsingResult result = parser.isValidSequence(tokens);
-    TEST_ASSERT_TRUE_MESSAGE(result.isValid, "Expected true for valid sequence");
+    std::stringstream ss;
+    ss << "TOKENS:\n " << Tokenizer::dumpTokens(tokens, " ") << std::endl;
+    ss << result.message.str();
+    TEST_ASSERT_TRUE_MESSAGE(result.isValid, ss.str().c_str());
 }
 
 void TestingSuite::runParserTests()

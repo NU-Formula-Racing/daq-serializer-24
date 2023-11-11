@@ -1,7 +1,6 @@
 #ifndef __TOKENIZER_H__
 #define __TOKENIZER_H__
 
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -61,6 +60,47 @@ public:
     Tokenizer(const Tokenizer &other) : _fileName(other._fileName)
     {
         // nothing
+    }
+
+    static std::string tokenToString(const Token &token)
+    {
+        static std::map<int, std::string> tokenMap{
+            {INVALID, "INVALID"},
+            {META, "META"},
+            {DEF, "DEF"},
+            {FRAME, "FRAME"},
+            {L_BRACE, "L_BRACE"},
+            {R_BRACE, "R_BRACE"},
+            {L_PARENTHESES, "L_PARENTHESES"},
+            {R_PARENTHESES, "R_PARENTHESES"},
+            {COLON, "COLON"},
+            {SEMICOLON, "SEMICOLON"},
+            {END_OF_FILE, "END_OF_FILE"},
+            {DATA_TYPE, "DATA_TYPE"},
+            {IDENTIFIER, "IDENTIFIER"},
+            {INT_LITERAL, "INT_LITERAL"},
+            {FLOAT_LITERAL, "FLOAT_LITERAL"},
+            {BOOL_LITERAL, "BOOL_LITERAL"},
+            {STRING_LITERAL, "STRING_LITERAL"},
+            {VERSION_LITERAL, "VERSION_LITERAL"}
+        };
+
+        auto it = tokenMap.find(token.type);
+
+        if (it != tokenMap.end())
+            return it->second;
+
+        return "UNKNOWN";
+    }
+
+    static std::string dumpTokens(const std::vector<Token> &tokens, const std::string &separator = " ")
+    {
+        std::stringstream ss;
+        for (auto token : tokens)
+        {
+            ss << tokenToString(token) << separator;
+        }
+        return ss.str();
     }
 
     std::vector<Token> tokenize();
