@@ -61,12 +61,21 @@ class DataTypeFactory
 {
 public:
     template <typename T>
-    DataType buildDataType(std::string name, T value);
+    DataType buildDataType(std::string name, T value)
+    {
+
+    };
 
     template <typename T>
     Value buildValue(T value);
+    {
+
+    };
 
     template <typename T>
-    FieldType getFieldType();
+    FieldType getFieldType()
+    {
+
+    };
 };
 #endif // __DATATYPE_FACTORY_H__
