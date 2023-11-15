@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <stdexcept>
+#include <iostream>
 
 enum FieldType
 {
@@ -24,30 +26,167 @@ enum FieldType
 // </summary>
 
 #pragma region Node types
+
+struct Field;
+
 struct DataType
 {
     std::string name;
     std::size_t size;
-    std::map<std::string, DataType> fields;
+    std::map<std::string, Field> fields; // map of field name to field
 };
 
-union Value
+struct Value
 {
-    int intVal;
-    float floatValue;
-    bool boolValue;
-    std::string strVal;
-    int versionValue[3];
-    std::shared_ptr<DataType> customValue;
+    char buffer[8]; // 8 bytes is the max size of a value
+
+    Value() = default;
+
+    template <typename T>
+    Value &operator=(const T &other)
+    {
+        if (sizeof(T) > sizeof(Value))
+        {
+            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+        }
+
+        char *valueBuffer = std::reinterpret_cast<char *>(&other);
+        for (int i = 0; i < sizeof(T); i++)
+        {
+            buffer[i] = valueBuffer[i];
+        }
+
+        return *this;
+    };
+
+    template <typename T>
+    operator T() const
+    {
+        if (sizeof(T) > sizeof(Value))
+        {
+            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+        }
+
+        char *valueBuffer = std::reinterpret_cast<char *>(this);
+        T value;
+        for (int i = 0; i < sizeof(T); i++)
+        {
+            valueBuffer[i] = buffer[i];
+        }
+        return value;
+    };
+
+    template <typename T>
+    bool operator==(const T &other) const
+    {
+        if (sizeof(T) > sizeof(Value))
+        {
+            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+        }
+
+        char *valueBuffer = std::reinterpret_cast<char *>(this);
+        for (int i = 0; i < sizeof(T); i++)
+        {
+            if (valueBuffer[i] != other[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    };
 };
 
 struct Field
 {
     std::string name;
-    FieldType type;
-    Value value;
     bool predefined;
+    Value value; // only if this is a predefined field
+    FieldType type;
+    std::size_t size;
+
+    // constructor for creating a predefined field
+    template <typename T>
+    Field(std::string name, T value)
+    {
+        this->name = name;
+        this->predefined = true;
+        if (sizeof(T) > sizeof(Value))
+        {
+            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+        }
+        this->size = sizeof(T);
+        this->value = value;
+
+        // get the type of the field
+        if (std::is_same<T, int>::value)
+        {
+            this->type = FieldType::INT;
+        }
+        else if (std::is_same<T, float>::value)
+        {
+            this->type = FieldType::FLOAT;
+        }
+        else if (std::is_same<T, bool>::value)
+        {
+            this->type = FieldType::BOOL;
+        }
+        else if (std::is_same<T, char *>::value)
+        {
+            this->type = FieldType::STRING;
+        }
+        else if (std::is_same<T, int[3]>::value)
+        {
+            this->type = FieldType::VERSION;
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+        }
+    };
+
+    // constructor for creating a custom field, not predefined
+    Field(std::string name, FieldType type)
+    {
+        this->name = name;
+        this->predefined = false;
+        this->type = type;
+
+        // get the size of the field
+        switch (type)
+        {
+        case FieldType::INT:
+            this->size = sizeof(int);
+            break;
+        case FieldType::FLOAT:
+            this->size = sizeof(float);
+            break;
+        case FieldType::BOOL:
+            this->size = sizeof(bool);
+            break;
+        case FieldType::STRING:
+            this->size = sizeof(char *);
+            break;
+        case FieldType::VERSION:
+            this->size = sizeof(int[3]);
+            break;
+        case FieldType::CUSTOM:
+            this->size = sizeof(DataType *);
+        default:
+            throw std::invalid_argument("Invalid type fora field -- must be int, float, bool, string, version or custom");
+        }
+    };
+
+    // copy constructor
+    Field(const Field &other)
+    {
+        this->name = other.name;
+        this->predefined = other.predefined;
+        this->type = other.type;
+        this->size = other.size;
+        this->value = other.value;
+    };
 };
+
 #pragma endregion Node Types
 
 struct SchemaMeta
@@ -60,22 +199,23 @@ struct SchemaMeta
 class DataTypeFactory
 {
 public:
-    template <typename T>
-    DataType buildDataType(std::string name, T value)
-    {
+    DataTypeFactory() = default;
 
-    };
+    // DataType buildDataType(std::string name, std::map<std::string, Field> fields)
+    // {
 
-    template <typename T>
-    Value buildValue(T value);
-    {
+    // };
 
-    };
+    // template <typename T>
+    // Value buildValue(T value)
+    // {
 
-    template <typename T>
-    FieldType getFieldType()
-    {
+    // };
 
-    };
+    // template <typename T>
+    // FieldType getFieldType()
+    // {
+
+    // };
 };
 #endif // __DATATYPE_FACTORY_H__
