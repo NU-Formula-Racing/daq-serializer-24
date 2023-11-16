@@ -48,7 +48,7 @@ struct Value
     {
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Invalid type for value comparision field -- must be int, float, bool, string or version");
         }
 
         char *valueBuffer = (char*)(&other);
@@ -93,6 +93,7 @@ struct Value
 
         // now we can set the value
         strncpy(buffer, stringPtr, 8);
+        return *this;
     };
 
     template <typename T>
@@ -100,13 +101,14 @@ struct Value
     {
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Invalid type for value comparision -- must be int, float, bool, string or version");
         }
 
-        char *valueBuffer = this->buffer;
+        const char *valueBuffer = this->buffer;
+        const char *otherBytes = (char*)(&other);
         for (int i = 0; i < sizeof(T); i++)
         {
-            if (valueBuffer[i] != other[i])
+            if (valueBuffer[i] != otherBytes[i])
             {
                 return false;
             }
@@ -125,75 +127,85 @@ struct Field
 
     // constructor for creating a predefined field
     template <typename T>
-    Field(std::string name, T value)
+    static Field predfinedField(std::string name, T value)
     {
-        this->name = name;
-        this->predefined = true;
+        Field field;
+        field.name = name;
+        field.predefined = true;
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Invalid type for predefined field (value is larger than 16 bytes) -- must be int, float, bool, string or version");
         }
-        this->size = sizeof(T);
-        this->value = value;
+    
+        field.size = sizeof(T);
+        field.value = value;
 
         // get the type of the field
         if (std::is_same<T, int>::value)
         {
-            this->type = FieldType::INT;
+            field.type = FieldType::INT;
         }
         else if (std::is_same<T, float>::value)
         {
-            this->type = FieldType::FLOAT;
+            field.type = FieldType::FLOAT;
         }
         else if (std::is_same<T, bool>::value)
         {
-            this->type = FieldType::BOOL;
+            field.type = FieldType::BOOL;
         }
         else if (std::is_same<T, char *>::value)
         {
-            this->type = FieldType::STRING;
+            field.type = FieldType::STRING;
         }
         else if (std::is_same<T, int[3]>::value)
         {
-            this->type = FieldType::VERSION;
+            field.type = FieldType::VERSION;
         }
         else
         {
             throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
         }
+
+        return field;
     };
 
     // constructor for creating a custom field, not predefined
-    Field(std::string name, FieldType type)
+    static Field emptyField(std::string name, FieldType type)
     {
-        this->name = name;
-        this->predefined = false;
-        this->type = type;
+        Field field;
+        field.name = name;
+        field.predefined = false;
+        field.type = type;
 
         // get the size of the field
         switch (type)
         {
         case FieldType::INT:
-            this->size = sizeof(int);
+            field.size = sizeof(int);
             break;
         case FieldType::FLOAT:
-            this->size = sizeof(float);
+            field.size = sizeof(float);
             break;
         case FieldType::BOOL:
-            this->size = sizeof(bool);
+            field.size = sizeof(bool);
             break;
         case FieldType::STRING:
-            this->size = sizeof(char *);
+            field.size = sizeof(char *);
             break;
         case FieldType::VERSION:
-            this->size = sizeof(int[3]);
+            field.size = sizeof(int[3]);
             break;
         case FieldType::CUSTOM:
-            this->size = sizeof(DataType *);
+            field.size = sizeof(DataType *);
         default:
-            throw std::invalid_argument("Invalid type fora field -- must be int, float, bool, string, version or custom");
+            throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
         }
+
+        return field;
     };
+
+    // empty constructor
+    Field() = default;
 
     // copy constructor
     Field(const Field &other)
