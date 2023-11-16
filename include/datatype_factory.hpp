@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <iostream>
+#include <string.h>
 
 enum FieldType
 {
@@ -38,7 +39,7 @@ struct DataType
 
 struct Value
 {
-    char buffer[8]; // 8 bytes is the max size of a value
+    char buffer[16]; // 16 bytes is the max size of a value
 
     Value() = default;
 
@@ -50,7 +51,7 @@ struct Value
             throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
         }
 
-        char *valueBuffer = std::reinterpret_cast<char *>(&other);
+        char *valueBuffer = (char*)(&other);
         for (int i = 0; i < sizeof(T); i++)
         {
             buffer[i] = valueBuffer[i];
@@ -58,22 +59,40 @@ struct Value
 
         return *this;
     };
-
-    template <typename T>
-    operator T() const
+    
+    Value &operator=(const char* other)
     {
-        if (sizeof(T) > sizeof(Value))
+        // we need to malloc the string
+        // but we need to know the size of the string
+        // so we need to iterate through the string to find the size
+        short maxSize = 256;
+        short size = 0;
+        char *valueBuffer = (char*)(&other);
+        for (int i = 0; i < maxSize; i++)
         {
-            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+            if (valueBuffer[i] == '\0')
+            {
+                size = i;
+                break;
+            }
         }
 
-        char *valueBuffer = std::reinterpret_cast<char *>(this);
-        T value;
-        for (int i = 0; i < sizeof(T); i++)
+        if (size == 0)
         {
-            valueBuffer[i] = buffer[i];
+            throw std::invalid_argument("Invalid string -- must be null terminated");
         }
-        return value;
+
+        // now we know the size of the string
+        // we can malloc the string
+        char *stringPtr = (char*)malloc(size);
+        // copy the string into the malloc'd string
+        for (int i = 0; i < size; i++)
+        {
+            stringPtr[i] = valueBuffer[i];
+        }
+
+        // now we can set the value
+        strncpy(buffer, stringPtr, 8);
     };
 
     template <typename T>
@@ -84,7 +103,7 @@ struct Value
             throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
         }
 
-        char *valueBuffer = std::reinterpret_cast<char *>(this);
+        char *valueBuffer = this->buffer;
         for (int i = 0; i < sizeof(T); i++)
         {
             if (valueBuffer[i] != other[i])

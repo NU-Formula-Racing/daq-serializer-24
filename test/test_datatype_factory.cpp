@@ -6,28 +6,28 @@
 void test_field_predefined_int(void)
 {
     Field field("test", 123);
-    TEST_ASSERT_EQUAL_INT(123, field.value.intVal);
+    TEST_ASSERT_EQUAL_INT(123, field.value);
     TEST_ASSERT_EQUAL_INT(sizeof(int), field.size);
 }
 
 void test_field_predefined_float(void)
 {
     Field field("test", 123.456);
-    TEST_ASSERT_EQUAL_FLOAT(123.456, field.value.floatValue);
+    TEST_ASSERT_EQUAL_FLOAT(123.456, field.value);
     TEST_ASSERT_EQUAL_INT(sizeof(float), field.size);
 }
 
 void test_field_predefined_bool(void)
 {
     Field field("test", true);
-    TEST_ASSERT_EQUAL_INT(true, field.value.boolValue);
+    TEST_ASSERT_EQUAL_INT(true, field.value);
     TEST_ASSERT_EQUAL_INT(sizeof(bool), field.size);
 }
 
 void test_field_predefined_string(void)
 {
     Field field("test", "hello world");
-    TEST_ASSERT_EQUAL_STRING("hello world", field.value.strVal.c_str());
+    TEST_ASSERT_EQUAL_STRING("hello world", field.value);
     TEST_ASSERT_EQUAL_INT(sizeof(std::string), field.size);
 }
 
@@ -35,9 +35,7 @@ void test_field_predefined_version(void)
 {
     int version[3] = {1, 2, 3};
     Field field("test", version);
-    TEST_ASSERT_EQUAL_INT(1, field.value.versionValue[0]);
-    TEST_ASSERT_EQUAL_INT(2, field.value.versionValue[1]);
-    TEST_ASSERT_EQUAL_INT(3, field.value.versionValue[2]);
+    TEST_ASSERT_TRUE(version == field.value)
     TEST_ASSERT_EQUAL_INT(sizeof(int[3]), field.size);
 }
 
