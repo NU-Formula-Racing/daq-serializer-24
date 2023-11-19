@@ -72,6 +72,8 @@ struct Value
         return *this;
     };
 
+    // Value var = "hello";
+    // Value var = 10;
     Value &operator=(const char *primative)
     {
         // we need to malloc the string
@@ -79,15 +81,18 @@ struct Value
         // so we need to iterate through the string to find the size
         short maxSize = 256;
         short size = 0;
-        char *valueBuffer = (char *)(&primative);
+        const char *valueBuffer = primative;
         for (int i = 0; i < maxSize; i++)
         {
+            std::cout << (char)valueBuffer[i] << std::endl;
             if (valueBuffer[i] == '\0')
             {
-                size = i - 1;
+                size = i;
                 break;
             }
         }
+
+        std::cout << "\nSize of string: " << size << std::endl;
 
         if (size <= 0)
         {
@@ -96,7 +101,9 @@ struct Value
 
         // now we know the size of the string
         // we can malloc the string
-        char *stringPtr = (char *)malloc((size + sizeof(short)));
+        // LENGTH (2 bytes) | REST_SRC (LENGTH bytes)
+        char *stringPtr = (char *)malloc((size + sizeof(short) * sizeof(char)));
+
         std::cout << "Mallocing string of size " << size << " original : " << primative << std::endl;
         // prepend the size of the string to the string
         strncpy(stringPtr, (char *)(&size), sizeof(short));
@@ -115,12 +122,14 @@ struct Value
         std::cout << std::endl;
 
         this->heapAllocated = true;
-
-        // now we can set the value
-        strncpy(buffer, stringPtr, sizeof(char*));
+        // copy the address of the string into our buffer
+        strncpy(buffer, stringPtr, sizeof(char *));
         return *this;
     };
 
+
+    // Value var = 10;
+    // bool equal = var == 10;
     template <typename T>
     bool operator==(const T &other) const
     {
@@ -135,13 +144,16 @@ struct Value
             char *valueBuffer = (char *)(&this->buffer);
             // we should check the size of the value
             short valueSize = (short)(*valueBuffer);
+            std::cout << "Value: " << valueBuffer << std::endl;
             // now we can compare the value to the other
-            const char *otherBytes = (char *)(&other);
+            const char *otherBytes = (const char *)(std::addressof(other));
+            std::cout << "Value size: " << valueSize << std::endl;
             bool result = false;
+            int valueOffset = sizeof(short);
             for (int i = 0; i < valueSize; i++)
             {
-                char value = valueBuffer[i];
-                char other = otherBytes[i];
+                const char value = valueBuffer[i + valueOffset];
+                const char other = otherBytes[i];
                 std::cout << "comparing " << value << " to " << other << std::endl;
                 result = result || (value == other);
             }

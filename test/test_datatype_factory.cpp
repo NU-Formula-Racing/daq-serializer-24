@@ -26,8 +26,9 @@ void test_field_predefined_bool(void)
 
 void test_field_predefined_string(void)
 {
-    Field field = Field::predfinedField("test", "hello world");
-    TEST_ASSERT_TRUE(field.value == "hello world");
+    const char* str = "hello";
+    Field field = Field::predfinedField("test", str);
+    TEST_ASSERT_TRUE(field.value == str);
     TEST_ASSERT_EQUAL_INT(sizeof(std::string), field.size);
 }
 
