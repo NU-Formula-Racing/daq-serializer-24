@@ -162,7 +162,7 @@ struct Field
         else if (std::is_same<T, float>::value)
         {
             field.type = FieldType::FLOAT;
-            field.size = 4;
+            field.size = sizeof(float);
         }
         else if (std::is_same<T, bool>::value)
         {
@@ -181,10 +181,10 @@ struct Field
         }
         else
         {
-            // throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
         }
 
-        std::cout << "Created a field with size " << field.size << std::endl;   
+        std::cout << "Created a predefined field with type " << fieldTypeToString(field.type) << " and size " << field.size << std::endl;
         return field;
     };
 
@@ -221,6 +221,28 @@ struct Field
         }
 
         return field;
+    };
+
+    // mapping from FieldType to string
+    static std::string fieldTypeToString(FieldType type)
+    {
+        switch (type)
+        {
+        case FieldType::INT:
+            return "int";
+        case FieldType::FLOAT:
+            return "float";
+        case FieldType::BOOL:
+            return "bool";
+        case FieldType::STRING:
+            return "string";
+        case FieldType::VERSION:
+            return "version";
+        case FieldType::CUSTOM:
+            return "custom";
+        default:
+            throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        }
     };
 
     // empty constructor

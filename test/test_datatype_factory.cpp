@@ -12,8 +12,8 @@ void test_field_predefined_int(void)
 
 void test_field_predefined_float(void)
 {
-    Field field = Field::predfinedField("test", 123.456);
-    TEST_ASSERT_TRUE(field.value == 123.456);
+    Field field = Field::predfinedField("test", 123.456f);
+    TEST_ASSERT_TRUE(field.value == 123.456f);
     TEST_ASSERT_EQUAL_INT(sizeof(float), field.size);
 }
 
@@ -50,7 +50,7 @@ void test_field_not_predefined_int(void)
 void test_field_not_predefined_float(void)
 {
     Field field = Field::emptyField("test", FieldType::FLOAT);
-    TEST_ASSERT_TRUE(field.value == 0.0);
+    TEST_ASSERT_TRUE(field.value == 0.0f);
     TEST_ASSERT_FALSE(field.predefined);
     TEST_ASSERT_EQUAL_INT(sizeof(float), field.size);
 }
