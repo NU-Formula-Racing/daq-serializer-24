@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <string.h>
+#include <type_traits>
 
 enum FieldType
 {
@@ -40,34 +41,36 @@ struct DataType
 struct Value
 {
     char buffer[16]; // 16 bytes is the max size of a value
+    bool heapAllocated = false;
 
     Value() = default;
 
     template <typename T>
-    Value &operator=(const T &other)
+    Value &operator=(const T &primative)
     {
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for value comparision field -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Invalid type for value comparision field (value is too big) -- must be int, float, bool, string or version");
         }
 
-        char *valueBuffer = (char*)(&other);
+        char *valueBuffer = (char *)(&primative);
         for (int i = 0; i < sizeof(T); i++)
         {
             buffer[i] = valueBuffer[i];
         }
 
+        this->heapAllocated = false;
         return *this;
     };
-    
-    Value &operator=(const char* other)
+
+    Value &operator=(const char *primative)
     {
         // we need to malloc the string
         // but we need to know the size of the string
         // so we need to iterate through the string to find the size
         short maxSize = 256;
         short size = 0;
-        char *valueBuffer = (char*)(&other);
+        char *valueBuffer = (char *)(&primative);
         for (int i = 0; i < maxSize; i++)
         {
             if (valueBuffer[i] == '\0')
@@ -84,13 +87,13 @@ struct Value
 
         // now we know the size of the string
         // we can malloc the string
-        char *stringPtr = (char*)malloc(size);
+        char *stringPtr = (char *)malloc(size);
         // copy the string into the malloc'd string
         for (int i = 0; i < size; i++)
         {
             stringPtr[i] = valueBuffer[i];
         }
-
+        this->heapAllocated = true;
         // now we can set the value
         strncpy(buffer, stringPtr, 8);
         return *this;
@@ -101,13 +104,14 @@ struct Value
     {
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for value comparision -- must be int, float, bool, string or version");
+            throw std::invalid_argument("Invalid type for value comparision (other is too big) -- must be int, float, bool, string or version");
         }
 
         const char *valueBuffer = this->buffer;
-        const char *otherBytes = (char*)(&other);
+        const char *otherBytes = (char *)(&other);
         for (int i = 0; i < sizeof(T); i++)
         {
+            std::cout << "comparing " << valueBuffer[i] << " to " << otherBytes[i] << std::endl;
             if (valueBuffer[i] != otherBytes[i])
             {
                 return false;
@@ -115,6 +119,14 @@ struct Value
         }
         return true;
     };
+
+    ~Value()
+    {
+        if (this->heapAllocated)
+        {
+            free((void *)buffer);
+        }
+    }
 };
 
 struct Field
@@ -136,36 +148,43 @@ struct Field
         {
             throw std::invalid_argument("Invalid type for predefined field (value is larger than 16 bytes) -- must be int, float, bool, string or version");
         }
-    
-        field.size = sizeof(T);
+
         field.value = value;
+        // cannot set the size of the field here, because we don't know the type yet
+        // doing sizeof(T) will not work because it will return the size of the pointer
 
         // get the type of the field
         if (std::is_same<T, int>::value)
         {
             field.type = FieldType::INT;
+            field.size = sizeof(int);
         }
         else if (std::is_same<T, float>::value)
         {
             field.type = FieldType::FLOAT;
+            field.size = 4;
         }
         else if (std::is_same<T, bool>::value)
         {
             field.type = FieldType::BOOL;
+            field.size = sizeof(bool);
         }
         else if (std::is_same<T, char *>::value)
         {
             field.type = FieldType::STRING;
+            field.size = sizeof(char *);
         }
-        else if (std::is_same<T, int[3]>::value)
+        else if (std::is_same<T, int*>::value)
         {
             field.type = FieldType::VERSION;
+            field.size = sizeof(int[3]);
         }
         else
         {
-            throw std::invalid_argument("Invalid type for predefined field -- must be int, float, bool, string or version");
+            // throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
         }
 
+        std::cout << "Created a field with size " << field.size << std::endl;   
         return field;
     };
 
