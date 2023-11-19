@@ -40,7 +40,13 @@ struct DataType
 
 struct Value
 {
-    char buffer[16]; // 16 bytes is the max size of a value
+    // stores the value of the field
+    // if this a heap allocated value, then the buffer holds a pointer to the heap
+    // there, the value is laid out as follows:
+    // SIZE (2 bytes -- as short), VALUE (SIZE bytes -- char array)
+    // The maximum size of a value is 256 bytes (not including the size of the short)
+    // otherwise, the buffer holds the valus
+    char buffer[16];
     bool heapAllocated = false;
 
     Value() = default;
@@ -50,7 +56,10 @@ struct Value
     {
         if (sizeof(T) > sizeof(Value))
         {
-            throw std::invalid_argument("Invalid type for value comparision field (value is too big) -- must be int, float, bool, string or version");
+            // we should refer to the special case of strings -- call that version of the operator=
+            const char *valueBuffer = (char *)(&primative);
+            this->operator=(valueBuffer);
+            return *this;
         }
 
         char *valueBuffer = (char *)(&primative);
@@ -75,27 +84,40 @@ struct Value
         {
             if (valueBuffer[i] == '\0')
             {
-                size = i;
+                size = i - 1;
                 break;
             }
         }
 
-        if (size == 0)
+        if (size <= 0)
         {
             throw std::invalid_argument("Invalid string -- must be null terminated");
         }
 
         // now we know the size of the string
         // we can malloc the string
-        char *stringPtr = (char *)malloc(size);
-        // copy the string into the malloc'd string
-        for (int i = 0; i < size; i++)
+        char *stringPtr = (char *)malloc((size + sizeof(short)));
+        std::cout << "Mallocing string of size " << size << " original : " << primative << std::endl;
+        // prepend the size of the string to the string
+        strncpy(stringPtr, (char *)(&size), sizeof(short));
+        // copy the string into the malloc'd string, offset by the size of the short
+        stringPtr += sizeof(short);
+        strncpy(stringPtr, primative, size);
+        // reset the pointer
+        stringPtr -= sizeof(short);
+        // as a sanity check, we can print the string
+        std::cout << "Saved value:\n";
+        for (int i = 0; i < size + sizeof(short); i++)
         {
-            stringPtr[i] = valueBuffer[i];
+            std::cout << "byte (" << i << "): " << stringPtr[i];
+            std::cout << "\n";
         }
+        std::cout << std::endl;
+
         this->heapAllocated = true;
+
         // now we can set the value
-        strncpy(buffer, stringPtr, 8);
+        strncpy(buffer, stringPtr, sizeof(char*));
         return *this;
     };
 
@@ -107,17 +129,36 @@ struct Value
             throw std::invalid_argument("Invalid type for value comparision (other is too big) -- must be int, float, bool, string or version");
         }
 
-        const char *valueBuffer = this->buffer;
-        const char *otherBytes = (char *)(&other);
-        for (int i = 0; i < sizeof(T); i++)
+        if (this->heapAllocated)
         {
-            std::cout << "comparing " << valueBuffer[i] << " to " << otherBytes[i] << std::endl;
-            if (valueBuffer[i] != otherBytes[i])
+            std::cout << "Grabbing value from heap" << std::endl;
+            char *valueBuffer = (char *)(&this->buffer);
+            // we should check the size of the value
+            short valueSize = (short)(*valueBuffer);
+            // now we can compare the value to the other
+            const char *otherBytes = (char *)(&other);
+            bool result = false;
+            for (int i = 0; i < valueSize; i++)
             {
-                return false;
+                char value = valueBuffer[i];
+                char other = otherBytes[i];
+                std::cout << "comparing " << value << " to " << other << std::endl;
+                result = result || (value == other);
             }
+            return result;
         }
-        return true;
+        else
+        {
+            const char *valueBuffer = this->buffer;
+            const char *otherBytes = (char *)(&other);
+            bool result = false;
+            for (int i = 0; i < sizeof(T); i++)
+            {
+                std::cout << "comparing " << valueBuffer[i] << " to " << otherBytes[i] << std::endl;
+                result = result || (valueBuffer[i] == otherBytes[i]);
+            }
+            return result;
+        }
     };
 
     ~Value()
@@ -169,12 +210,12 @@ struct Field
             field.type = FieldType::BOOL;
             field.size = sizeof(bool);
         }
-        else if (std::is_same<T, char *>::value)
+        else if (std::is_same<T, const char *>::value)
         {
             field.type = FieldType::STRING;
             field.size = sizeof(char *);
         }
-        else if (std::is_same<T, int*>::value)
+        else if (std::is_same<T, int *>::value)
         {
             field.type = FieldType::VERSION;
             field.size = sizeof(int[3]);
