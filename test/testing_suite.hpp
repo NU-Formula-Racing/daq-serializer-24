@@ -19,16 +19,19 @@ public:
         {
             std::cout << "*** RUNNING TOKENIZER TESTS ***" << std::endl;
             runTokenizerTests();
+            std::cout << "*** FINISHED RUNNING TOKENIZER TESTS ***" << std::endl;
         }
         if (RUN_DATATYPE_FACTORY_TESTS)
         {
             std::cout << "*** RUNNING DATATYPE FACTORY TESTS ***" << std::endl;
             runDataTypeFactoryTests();
+            std::cout << "*** FINISHED RUNNING DATATYPE FACTORY TESTS ***" << std::endl;
         }
         if (RUN_PARSER_TESTS)
         {
             std::cout << "*** RUNNING PARSER TESTS ***" << std::endl;
             runParserTests();
+            std::cout << "*** FINISHED RUNNING PARSER TESTS ***" << std::endl;
         }
         std::cout << "*** FINISHED RUNNING TESTS ***" << std::endl;
         UNITY_END();
