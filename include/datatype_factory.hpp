@@ -19,23 +19,36 @@ enum FieldType
     CUSTOM
 };
 
-/// <summary>
+/// @brief
 // DataTypes have a name, size and a map of fields from fieldName to field values
 // Each field has a name, a variable type and a possible predfefined value
 // The field may be a custom DataType, in this case, we must recursively search for primative
 // Thinking about DataTypes as a forest of trees is the best way to think of it,
 // with the rule that the bottom leaf of all trees will be a primative (NOT custom) datatype, with a possible predefined definition
-// </summary>
+//     
 
 #pragma region Node types
 
 struct Field;
+struct Value;
 
 struct DataType
 {
     std::string name;
     std::size_t size;
     std::map<std::string, Field> fields; // map of field name to field
+
+    /// @brief Flattens the DataType into a map of field name to value
+    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened
+    /// @details This flattening process will result in a map that is accessible with map["fieldName"]["fieldName"]...
+    /// @return std::map<std::string, Value>
+    std::map<std::string, Value> flatten();
+
+    /// @brief Flattens the DataType into a map of field name to value
+    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened, but will not create a map of maps
+    /// @details This flattening process will result in a map that is accessible with map["fieldName"]
+    /// @details However, if the field is within an internal datatype, it will be accessible with map["dataTypeFieldName_fieldName"]
+    std::map<std::string, Value> flattenFull();
 };
 
 struct Value
@@ -133,44 +146,46 @@ struct Value
     template <typename T>
     bool operator==(const T &other) const
     {
-        if (sizeof(T) > sizeof(Value))
-        {
-            throw std::invalid_argument("Invalid type for value comparision (other is too big) -- must be int, float, bool, string or version");
-        }
+        const char *valueBuffer;
+        const char *otherBuffer = (char *)(&other);
+        short size = 0;
 
         if (this->heapAllocated)
         {
-            std::cout << "Grabbing value from heap" << std::endl;
-            char *valueBuffer = (char *)(&this->buffer);
-            // we should check the size of the value
-            short valueSize = (short)(*valueBuffer);
-            std::cout << "Value: " << valueBuffer << std::endl;
-            // now we can compare the value to the other
-            const char *otherBytes = (const char *)(std::addressof(other));
-            std::cout << "Value size: " << valueSize << std::endl;
-            bool result = false;
-            int valueOffset = sizeof(short);
-            for (int i = 0; i < valueSize; i++)
-            {
-                const char value = valueBuffer[i + valueOffset];
-                const char other = otherBytes[i];
-                std::cout << "comparing " << value << " to " << other << std::endl;
-                result = result || (value == other);
-            }
-            return result;
+            std::cout << "Comparing heap allocated value" << std::endl;
+            // grab the value buffer from the run-length encoded string
+            size = *(short *)buffer;
+            std::cout << "Size of string: " << size << std::endl;
+            valueBuffer = buffer + sizeof(short);
         }
         else
         {
-            const char *valueBuffer = this->buffer;
-            const char *otherBytes = (char *)(&other);
-            bool result = false;
-            for (int i = 0; i < sizeof(T); i++)
+            std::cout << "Comparing non-heap allocated value" << std::endl;
+            if (sizeof(T) > sizeof(Value))
             {
-                std::cout << "comparing " << valueBuffer[i] << " to " << otherBytes[i] << std::endl;
-                result = result || (valueBuffer[i] == otherBytes[i]);
+                // we are trying to compare a value that is larger than our buffer size
+                // ordinarily, this would have been heap allocated in our assignment operator
+                std::cout << "Comparing a value that is larger than our buffer size" << std::endl;
+                return false;
             }
-            return result;
+            valueBuffer = buffer;
+            size = sizeof(T);
         }
+
+        bool result = true;
+        // now we can compare the two buffers
+        for (int i = 0; i < size; i++)
+        {
+            const char value = valueBuffer[i];
+            const char otherValue = otherBuffer[i];
+            std::cout << "Comparing byte " << i << " : " << value << " == " << otherValue << std::endl;
+            if (value != otherValue)
+            {
+                result = false;
+            }
+        }
+
+        return result;
     };
 
     ~Value()
