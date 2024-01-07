@@ -56,26 +56,30 @@ struct Value
     // stores the value of the field
     // if this a heap allocated value, then the buffer holds a pointer to the heap
     // there, the value is laid out as follows:
-    // SIZE (2 bytes -- as short), VALUE (SIZE bytes -- char array)
+    // SIZE (2 bytes -- as short), VALUE (SIZE bytes -- unsigned char array)
     // The maximum size of a value is 256 bytes (not including the size of the short)
     // otherwise, the buffer holds the valus
-    char buffer[16];
+    unsigned char buffer[16];
     bool heapAllocated = false;
 
-    Value() = default;
+    Value()
+    {
+        memset(buffer, 0, sizeof(buffer));
+        this->heapAllocated = false;
+    }
 
     template <typename T>
     Value &operator=(const T &primative)
     {
-        if (sizeof(T) > sizeof(Value))
+        if (sizeof(T) > 16)
         {
             // we should refer to the special case of strings -- call that version of the operator=
-            const char *valueBuffer = (char *)(&primative);
+            const unsigned char *valueBuffer = (unsigned char *)(&primative);
             this->operator=(valueBuffer);
             return *this;
         }
 
-        char *valueBuffer = (char *)(&primative);
+        unsigned char *valueBuffer = (unsigned char *)(&primative);
         for (int i = 0; i < sizeof(T); i++)
         {
             buffer[i] = valueBuffer[i];
@@ -87,17 +91,17 @@ struct Value
 
     // Value var = "hello";
     // Value var = 10;
-    Value &operator=(const char *primative)
+    Value &operator=(const unsigned char *primative)
     {
         // we need to malloc the string
         // but we need to know the size of the string
         // so we need to iterate through the string to find the size
         short maxSize = 256;
         short size = 0;
-        const char *valueBuffer = primative;
+        const unsigned char *valueBuffer = primative;
         for (int i = 0; i < maxSize; i++)
         {
-            std::cout << (char)valueBuffer[i] << std::endl;
+            std::cout << (unsigned char)valueBuffer[i] << std::endl;
             if (valueBuffer[i] == '\0')
             {
                 size = i;
@@ -112,32 +116,25 @@ struct Value
             throw std::invalid_argument("Invalid string -- must be null terminated");
         }
 
-        // now we know the size of the string
-        // we can malloc the string
-        // LENGTH (2 bytes) | REST_SRC (LENGTH bytes)
-        char *stringPtr = (char *)malloc((size + sizeof(short) * sizeof(char)));
-
-        std::cout << "Mallocing string of size " << size << " original : " << primative << std::endl;
-        // prepend the size of the string to the string
-        strncpy(stringPtr, (char *)(&size), sizeof(short));
-        // copy the string into the malloc'd string, offset by the size of the short
-        stringPtr += sizeof(short);
-        strncpy(stringPtr, primative, size);
-        // reset the pointer
-        stringPtr -= sizeof(short);
-        // as a sanity check, we can print the string
-        std::cout << "Saved value:\n";
-        for (int i = 0; i < size + sizeof(short); i++)
+        // we need to malloc the string
+        // we will be using run-length encoding to store the string
+        int bufferSize = sizeof(short) + size;
+        unsigned char *buffer = (unsigned char *)malloc(bufferSize);
+        std::cout << "Allocated buffer of size " << bufferSize << std::endl;
+        // copy the size into the buffer
+        memcpy(buffer, &size, sizeof(short));
+        int startIndex = sizeof(short);
+        // copy the string into the buffer
+        for (int i = 0; i < size; i++)
         {
-            std::cout << "byte (" << i << "): " << stringPtr[i];
-            std::cout << "\n";
+            std::cout << "Copying byte " << i << " : " << valueBuffer[i] << std::endl;
+            buffer[startIndex + i] = valueBuffer[i];
         }
-        std::cout << std::endl;
 
+        // set the buffer
         this->heapAllocated = true;
-        // copy the address of the string into our buffer
-        strncpy(buffer, stringPtr, sizeof(char *));
-        return *this;
+        // copy the pointer to the buffer into the value buffer
+        memcpy(this->buffer, &buffer, sizeof(unsigned char *));
     };
 
 
@@ -146,8 +143,8 @@ struct Value
     template <typename T>
     bool operator==(const T &other) const
     {
-        const char *valueBuffer;
-        const char *otherBuffer = (char *)(&other);
+        const unsigned char *valueBuffer;
+        const unsigned char *otherBuffer = (unsigned char *)(&other);
         short size = 0;
 
         if (this->heapAllocated)
@@ -166,6 +163,7 @@ struct Value
                 // we are trying to compare a value that is larger than our buffer size
                 // ordinarily, this would have been heap allocated in our assignment operator
                 std::cout << "Comparing a value that is larger than our buffer size" << std::endl;
+                std::cout << "Other size: " << sizeof(T) << std::endl;
                 return false;
             }
             valueBuffer = buffer;
@@ -176,8 +174,8 @@ struct Value
         // now we can compare the two buffers
         for (int i = 0; i < size; i++)
         {
-            const char value = valueBuffer[i];
-            const char otherValue = otherBuffer[i];
+            const unsigned char value = valueBuffer[i];
+            const unsigned char otherValue = otherBuffer[i];
             std::cout << "Comparing byte " << i << " : " << value << " == " << otherValue << std::endl;
             if (value != otherValue)
             {
@@ -242,6 +240,11 @@ struct Field
             field.type = FieldType::STRING;
             field.size = sizeof(char *);
         }
+        else if (std::is_same<T, std::string>::value)
+        {
+            field.type = FieldType::STRING;
+            field.size = sizeof(char *);
+        }
         else if (std::is_same<T, int *>::value)
         {
             field.type = FieldType::VERSION;
@@ -277,7 +280,7 @@ struct Field
             field.size = sizeof(bool);
             break;
         case FieldType::STRING:
-            field.size = sizeof(char *);
+            field.size = sizeof(unsigned char *);
             break;
         case FieldType::VERSION:
             field.size = sizeof(int[3]);

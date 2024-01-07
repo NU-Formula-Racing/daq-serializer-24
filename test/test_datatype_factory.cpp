@@ -28,8 +28,8 @@ void test_field_predefined_string(void)
 {
     const char* str = "hello";
     Field field = Field::predfinedField("test", str);
-    TEST_ASSERT_TRUE(field.value == str);
-    TEST_ASSERT_EQUAL_INT(sizeof(std::string), field.size);
+    TEST_ASSERT_TRUE(field.value == "hello");
+    TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
 }
 
 void test_field_predefined_version(void)
