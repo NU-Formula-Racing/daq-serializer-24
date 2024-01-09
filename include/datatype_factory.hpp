@@ -25,7 +25,7 @@ enum FieldType
 // The field may be a custom DataType, in this case, we must recursively search for primative
 // Thinking about DataTypes as a forest of trees is the best way to think of it,
 // with the rule that the bottom leaf of all trees will be a primative (NOT custom) datatype, with a possible predefined definition
-//     
+//
 
 #pragma region Node types
 
@@ -51,181 +51,138 @@ struct DataType
     std::map<std::string, Value> flattenFull();
 };
 
+/// @brief A Value is a container for any type of value
+/// @details The value is stored as a void pointer, and the type is stored as a FieldType
+/// @details The size of the value is stored as well, so that we can do type checking
 struct Value
 {
-    // stores the value of the field
-    // if this a heap allocated value, then the buffer holds a pointer to the heap
-    // there, the value is laid out as follows:
-    // SIZE (2 bytes -- as short), VALUE (SIZE bytes -- unsigned char array)
-    // The maximum size of a value is 256 bytes (not including the size of the short)
-    // otherwise, the buffer holds the valus
-    unsigned char buffer[16];
-    bool heapAllocated = false;
+    void *valuePtr = nullptr;
+    int valueSize = 0;
 
-    Value()
-    {
-        memset(buffer, 0, sizeof(buffer));
-        this->heapAllocated = false;
-    }
+    /// @brief Empty constructor for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    Value() = default;
 
+    /// @brief Constructor for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    /// @param value The value to store
     template <typename T>
-    Value &operator=(const T &primative)
+    Value(T value)
     {
-        if (sizeof(T) > 16)
+        // malloc the value and copy it over
+        this->valuePtr = malloc(sizeof(T));
+        memcpy(valuePtr, &value, sizeof(T));
+        this->valueSize = sizeof(T);
+    };
+
+    /// @brief Copy constructor for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    Value(const Value &other)
+    {
+        void *valueBuffer = malloc(other.valueSize);
+        memcpy(valueBuffer, other.valuePtr, other.valueSize);
+        this->valuePtr = valueBuffer;
+        this->valueSize = other.valueSize;
+    };
+
+    /// @brief Assignment operator for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    template <typename T>
+    Value &operator=(T value)
+    {
+        // malloc the value and copy it over
+        if (valuePtr != nullptr)
         {
-            // we should refer to the special case of strings -- call that version of the operator=
-            const unsigned char *valueBuffer = (unsigned char *)(&primative);
-            this->operator=(valueBuffer);
-            return *this;
+            free(valuePtr);
         }
 
-        unsigned char *valueBuffer = (unsigned char *)(&primative);
-        for (int i = 0; i < sizeof(T); i++)
-        {
-            std::cout << "Copying byte " << i << " : " << valueBuffer[i] << std::endl;
-            buffer[i] = valueBuffer[i];
-        }
-
-        this->heapAllocated = false;
+        this->valuePtr = malloc(sizeof(T));
+        memcpy(valuePtr, &value, sizeof(T));
+        this->valueSize = sizeof(T);
         return *this;
     };
 
-    // Value var = "hello";
-    // Value var = 10;
-    Value &operator=(const unsigned char *primative)
+    /// @brief Assignment operator for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    Value &operator=(const Value &other)
     {
-        // we need to malloc the string
-        // but we need to know the size of the string
-        // so we need to iterate through the string to find the size
-        short maxSize = 256;
-        short size = 0;
-        const unsigned char *valueBuffer = primative;
-        unsigned char comp;
-        for (int i = 0; i < maxSize; i++)
-        {
-            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
-            memccpy(&comp, valueBuffer + i, '\0', sizeof(unsigned char));
-            std::cout << comp << std::endl;
-            if (comp == '\0')
-            {
-                size = i;
-                break;
-            }
-        }
-
-        std::cout << "\nSize of string: " << size << std::endl;
-
-        if (size <= 0)
-        {
-            throw std::invalid_argument("Invalid string -- must be null terminated");
-        }
-
-        // we need to malloc the string
-        // we will be using run-length encoding to store the string
-        int bufferSize = sizeof(short) + size;
-        unsigned char *buffer = (unsigned char *)malloc(bufferSize);
-        std::cout << "Allocated buffer of size " << bufferSize << std::endl;
-        // copy the size into the buffer
-        memcpy(buffer, &size, sizeof(short));
-        int startIndex = sizeof(short);
-        // copy the string into the buffer
-        for (int i = 0; i < size; i++)
-        {
-            std::cout << "Copying byte " << i << " : " << valueBuffer[i] << std::endl;
-            buffer[startIndex + i] = valueBuffer[i];
-        }
-
-        // set the buffer
-        this->heapAllocated = true;
-        // copy the pointer to the buffer into the value buffer
-        memcpy(this->buffer, &buffer, sizeof(unsigned char *));
+        this->valuePtr = other.valuePtr;
+        this->valueSize = other.valueSize;
+        return *this;
     };
 
-
-    // Value var = 10;
-    // bool equal = var == 10;
+    /// @brief Equality operator for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
     template <typename T>
-    bool operator==(const T &other) const
+    bool operator==(T value)
     {
-        const unsigned char *valueBuffer;
-        const unsigned char *otherBuffer = (unsigned char *)(&other);
-        short size = 0;
-
-        if (this->heapAllocated)
+        // if the valuePtr is nullptr, then consider it to be equal to a bit pattern of all zeros
+        if (valuePtr == nullptr || valuePtr == NULL || valueSize == 0)
         {
-            std::cout << "Comparing heap allocated value" << std::endl;
-            // grab the value buffer from the run-length encoded string
-            size = *(short *)buffer;
-            std::cout << "Size of string: " << size << std::endl;
-            valueBuffer = buffer + sizeof(short);
-        }
-        else
-        {
-            std::cout << "Comparing non-heap allocated value" << std::endl;
-            if (sizeof(T) > sizeof(Value))
+            if (std::is_same<T, int>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value)
             {
-                // we are trying to compare a value that is larger than our buffer size
-                // ordinarily, this would have been heap allocated in our assignment operator
-                std::cout << "Comparing a value that is larger than our buffer size" << std::endl;
-                std::cout << "Other size: " << sizeof(T) << std::endl;
-                return false;
+                return value == 0;
             }
-            valueBuffer = buffer;
-            size = sizeof(T);
-        }
-
-        bool result = true;
-        // now we can compare the two buffers
-        unsigned char value = 0;
-        unsigned char otherValue = 0;
-
-        // for debugging, print out each buffer
-        std::cout << "Value buffer: " << std::endl;
-        char c;
-        for (int i = 0; i < size; i++)
-        {
-            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
-            memcpy(&value, valueBuffer + i, sizeof(unsigned char));
-            // print the hex value of the byte
-            std::cout << "Hex " << i << " : " << std::hex << (int)value << std::endl;
-        }
-
-        std::cout << "Other buffer: " << std::endl;
-        for (int i = 0; i < size; i++)
-        {
-            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
-            memcpy(&otherValue, otherBuffer + i, sizeof(unsigned char));
-            // std::cout << c << std::endl;
-            // print the hex value of the byte
-            std::cout << "Hex " << i << " : " << std::hex << (int)otherValue << std::endl;
-        }
-
-
-        for (int i = 0; i < size; i++)
-        {
-            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
-            memcpy(&value, valueBuffer + i, sizeof(unsigned char));
-            memcpy(&otherValue, otherBuffer + i, sizeof(unsigned char));
-
-            std::cout << "Comparing byte " << i << " : " << value << " == " << otherValue << std::endl;
-            // print the hex value of the byte
-            // std::cout << "Hex " << i << " : " << std::hex << (int)value << " == " << (int)otherValue << std::endl;
-            if (value != otherValue)
+            else if (std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, char *>::value)
             {
-                result = false;
+                char *valueComp = (char *)(&value);
+                return strcmp(valueComp, "") == 0;
+            }
+            else if (std::is_same<T, int *>::value)
+            {
+                int *valueComp = (int *)(&value);
+                return valueComp[0] == 0 && valueComp[1] == 0 && valueComp[2] == 0;
+            }
+            else
+            {
+                try
+                {
+                    T empty;
+                    return value == empty;
+                }
+                catch (std::exception e)
+                {
+                    return false;
+                }
             }
         }
 
-        return result;
+        if (sizeof(T) != valueSize)
+        {
+            return false;
+        }
+
+        return *(T *)valuePtr == value;
     };
 
+    /// @brief Inequality operator for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    template <typename T>
+    bool operator!=(T value)
+    {
+        return !(*this == value);
+    };
+
+    /// @brief Checks if this value is not null or empty
+    bool isValid()
+    {
+        return valuePtr != nullptr && valueSize > 0;
+    };
+
+    /// @brief Destructor for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
     ~Value()
     {
-        if (this->heapAllocated)
-        {
-            free((void *)buffer);
-        }
-    }
+        free(valuePtr);
+    };
 };
 
 struct Field
@@ -313,7 +270,7 @@ struct Field
             field.size = sizeof(bool);
             break;
         case FieldType::STRING:
-            field.size = sizeof(unsigned char *);
+            field.size = sizeof(uint8_t *);
             break;
         case FieldType::VERSION:
             field.size = sizeof(int[3]);
