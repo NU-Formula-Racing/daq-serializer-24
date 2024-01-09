@@ -100,10 +100,13 @@ struct Value
         short maxSize = 256;
         short size = 0;
         const unsigned char *valueBuffer = primative;
+        unsigned char comp;
         for (int i = 0; i < maxSize; i++)
         {
-            std::cout << (unsigned char)valueBuffer[i] << std::endl;
-            if (valueBuffer[i] == '\0')
+            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
+            memccpy(&comp, valueBuffer + i, '\0', sizeof(unsigned char));
+            std::cout << comp << std::endl;
+            if (comp == '\0')
             {
                 size = i;
                 break;
@@ -176,6 +179,27 @@ struct Value
         unsigned char value = 0;
         unsigned char otherValue = 0;
 
+        // for debugging, print out each buffer
+        std::cout << "Value buffer: " << std::endl;
+        char c;
+        for (int i = 0; i < size; i++)
+        {
+            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
+            memcpy(&value, valueBuffer + i, sizeof(unsigned char));
+            // print the hex value of the byte
+            std::cout << "Hex " << i << " : " << std::hex << (int)value << std::endl;
+        }
+
+        std::cout << "Other buffer: " << std::endl;
+        for (int i = 0; i < size; i++)
+        {
+            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
+            memcpy(&otherValue, otherBuffer + i, sizeof(unsigned char));
+            // std::cout << c << std::endl;
+            // print the hex value of the byte
+            std::cout << "Hex " << i << " : " << std::hex << (int)otherValue << std::endl;
+        }
+
 
         for (int i = 0; i < size; i++)
         {
@@ -185,7 +209,7 @@ struct Value
 
             std::cout << "Comparing byte " << i << " : " << value << " == " << otherValue << std::endl;
             // print the hex value of the byte
-            std::cout << "Hex " << i << " : " << std::hex << (int)value << " == " << (int)otherValue << std::endl;
+            // std::cout << "Hex " << i << " : " << std::hex << (int)value << " == " << (int)otherValue << std::endl;
             if (value != otherValue)
             {
                 result = false;
