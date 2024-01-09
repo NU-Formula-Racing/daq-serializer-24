@@ -26,9 +26,9 @@ void test_field_predefined_bool(void)
 
 void test_field_predefined_string(void)
 {
-    const char* str = "hello";
+    const char* str = "hello world!";
     Field field = Field::predfinedField("test", str);
-    TEST_ASSERT_TRUE(field.value == "hello");
+    TEST_ASSERT_TRUE(field.value == "hello world!");
     TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
 }
 
@@ -69,7 +69,7 @@ void test_field_not_predefined_string(void)
     Field field = Field::emptyField("test", FieldType::STRING);
     TEST_ASSERT_TRUE(field.value == "");
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_EQUAL_INT(sizeof(std::string), field.size);
+    TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
 }
 
 void TestingSuite::runDataTypeFactoryTests()

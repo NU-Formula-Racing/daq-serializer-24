@@ -82,6 +82,7 @@ struct Value
         unsigned char *valueBuffer = (unsigned char *)(&primative);
         for (int i = 0; i < sizeof(T); i++)
         {
+            std::cout << "Copying byte " << i << " : " << valueBuffer[i] << std::endl;
             buffer[i] = valueBuffer[i];
         }
 
@@ -172,11 +173,19 @@ struct Value
 
         bool result = true;
         // now we can compare the two buffers
+        unsigned char value = 0;
+        unsigned char otherValue = 0;
+
+
         for (int i = 0; i < size; i++)
         {
-            const unsigned char value = valueBuffer[i];
-            const unsigned char otherValue = otherBuffer[i];
+            // memcpy the value into the buffer -- gets around the issue of casting char to unsigned char (keeps binary the same)
+            memcpy(&value, valueBuffer + i, sizeof(unsigned char));
+            memcpy(&otherValue, otherBuffer + i, sizeof(unsigned char));
+
             std::cout << "Comparing byte " << i << " : " << value << " == " << otherValue << std::endl;
+            // print the hex value of the byte
+            std::cout << "Hex " << i << " : " << std::hex << (int)value << " == " << (int)otherValue << std::endl;
             if (value != otherValue)
             {
                 result = false;
