@@ -16,7 +16,6 @@ enum FieldType
     BOOL,
     STRING,
     VERSION,
-    CUSTOM
 };
 
 /// @brief
@@ -31,25 +30,7 @@ enum FieldType
 
 struct Field;
 struct Value;
-
-struct DataType
-{
-    std::string name;
-    std::size_t size;
-    std::map<std::string, Field> fields; // map of field name to field
-
-    /// @brief Flattens the DataType into a map of field name to value
-    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened
-    /// @details This flattening process will result in a map that is accessible with map["fieldName"]["fieldName"]...
-    /// @return std::map<std::string, Value>
-    std::map<std::string, Value> flatten();
-
-    /// @brief Flattens the DataType into a map of field name to value
-    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened, but will not create a map of maps
-    /// @details This flattening process will result in a map that is accessible with map["fieldName"]
-    /// @details However, if the field is within an internal datatype, it will be accessible with map["dataTypeFieldName_fieldName"]
-    std::map<std::string, Value> flattenFull();
-};
+struct DataType;
 
 /// @brief A Value is a container for any type of value
 /// @details The value is stored as a void pointer, and the type is stored as a FieldType
@@ -275,8 +256,6 @@ struct Field
         case FieldType::VERSION:
             field.size = sizeof(int[3]);
             break;
-        case FieldType::CUSTOM:
-            field.size = sizeof(DataType *);
         default:
             throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
         }
@@ -299,8 +278,6 @@ struct Field
             return "string";
         case FieldType::VERSION:
             return "version";
-        case FieldType::CUSTOM:
-            return "custom";
         default:
             throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
         }
@@ -316,7 +293,9 @@ struct Field
         this->predefined = other.predefined;
         this->type = other.type;
         this->size = other.size;
-        this->value = other.value;
+        // copy the value over
+        Value valueCopy(other.value);
+        this->value = valueCopy;
     };
 };
 
@@ -329,26 +308,255 @@ struct SchemaMeta
     std::map<std::string, DataType> additionalFields;
 };
 
-class DataTypeFactory
+/// @brief Contiains either a field or a custom DataType
+struct DataMember
 {
-public:
-    DataTypeFactory() = default;
+    void *memberPtr = nullptr;
+    bool isDataType = false; // if this is true, then the memberPtr is a pointer to a DataType, otherwise it is a pointer to a Field
 
-    // DataType buildDataType(std::string name, std::map<std::string, Field> fields)
-    // {
+    /// @brief Empty constructor for DataMember
+    DataMember() = default;
 
-    // };
+    /// @brief Constructor for DataMember
+    /// @param field The field to store
+    DataMember(const Field &field)
+    {
+        // malloc the field and copy it over
+        this->memberPtr = malloc(sizeof(Field));
+        memcpy(memberPtr, &field, sizeof(Field));
+        this->isDataType = false;
+    };
 
-    // template <typename T>
-    // Value buildValue(T value)
-    // {
+    /// @brief Constructor for DataMember
+    /// @param dataType The custom DataType to store
+    DataMember(const DataType &dataType)
+    {
+        // malloc the field and copy it over
+        this->memberPtr = malloc(sizeof(DataType));
+        memcpy(memberPtr, &dataType, sizeof(DataType));
+        this->isDataType = true;
+    };
 
-    // };
+    /// @brief Copy constructor for DataMember
+    /// @param other The DataMember to copy
+    DataMember(const DataMember &other)
+    {
+        this->memberPtr = other.memberPtr;
+        this->isDataType = other.isDataType;
+    };
 
-    // template <typename T>
-    // FieldType getFieldType()
-    // {
+    /// @brief Assignment operator for DataMember
+    /// @param other The DataMember to copy
+    DataMember &operator=(const DataMember &other)
+    {
+        this->memberPtr = other.memberPtr;
+        this->isDataType = other.isDataType;
+        return *this;
+    };
 
-    // };
+    /// @brief String indexing operator for DataMember
+    /// @details If the DataMember is not a DataType, then this will throw an exception
+    /// @param fieldName The name of the field to get
+    /// @return DataMember
+    DataMember operator[](const std::string &fieldName)
+    {
+        if (!isDataType)
+        {
+            throw std::invalid_argument("DataMember is a Field, not a DataType");
+        }
+
+        DataType DataType = this->getDataType();
+        return DataType.getMember(fieldName);
+    };
+
+    /// @brief Indexing operator for DataMember
+    Field getField()
+    {
+        if (this->isDataType)
+        {
+            throw std::invalid_argument("DataMember is a DataType, not a Field");
+        }
+
+        Field field = *(Field *)this->memberPtr;
+        return field;
+    };
+
+    DataType getDataType()
+    {
+        if (!this->isDataType)
+        {
+            throw std::invalid_argument("DataMember is a Field, not a DataType");
+        }
+
+        DataType dataType = *(DataType *)this->memberPtr;
+        return dataType;
+    };
 };
+
+/// @brief A datatype is a contianer for a set of fields, and may be nested
+/// @details A datatype may be nested, and may contain other datatypes
+/// @details A datatype may also contain predefined fields, which are fields that have a predefined value
+struct DataType
+{
+    std::string name;
+    std::size_t size;
+    std::map<std::string, Field> fields;             // map of field name to field
+    std::map<std::string, DataType> customDataTypes; // map of custom data type name to custom data type
+
+    /// @brief Empty constructor for DataType
+    DataType() = default;
+
+    /// @brief Copy constructor for DataType
+    DataType(const DataType &other)
+    {
+        this->name = other.name;
+        this->size = other.size;
+        // copy fields and values over
+        for (auto &field : other.fields)
+        {
+            Field fieldCopy(field.second);
+            this->fields[field.first] = fieldCopy;
+        }
+    };
+
+    /// @brief Assignment operator for DataType
+    DataType &operator=(const DataType &other)
+    {
+        this->name = other.name;
+        this->size = other.size;
+        // copy fields and values over
+        for (auto &field : other.fields)
+        {
+            Field fieldCopy(field.second);
+            this->fields[field.first] = fieldCopy;
+        }
+        return *this;
+    };
+
+    /// @brief Adds a field to the DataType
+    /// @details The field must be a primative type, and not a custom DataType
+    /// @param field The field to add
+    void addField(const Field &field)
+    {
+        fields[field.name] = field;
+        size += field.size;
+    };
+
+    /// @brief Removes a field from the DataType
+    /// @param fieldName The name of the field to remove
+    void removeField(const std::string &fieldName)
+    {
+        if (fields.find(fieldName) == fields.end())
+        {
+            throw std::invalid_argument("Field does not exist");
+        }
+
+        size -= fields[fieldName].size;
+        fields.erase(fieldName);
+    };
+
+    /// @brief Adds a custom DataType field to the DataType
+    /// @param dataType The custom DataType to add
+    void addCustomField(DataType dataType, const std::string &fieldName)
+    {
+        customDataTypes[fieldName] = dataType;
+        size += dataType.size;
+    };
+
+    /// @brief Removes a custom DataType field from the DataType
+    /// @param fieldName The name of the custom DataType field to remove
+    void removeCustomField(const std::string &fieldName)
+    {
+        if (customDataTypes.find(fieldName) == customDataTypes.end())
+        {
+            throw std::invalid_argument("Custom field does not exist");
+        }
+
+        size -= customDataTypes[fieldName].size;
+        customDataTypes.erase(fieldName);
+    };
+
+    /// @brief Gets the size of the DataType
+    /// @return std::size_t
+    std::size_t getSize() const
+    {
+        return size;
+    };
+
+    /// @brief Gets a data member from the DataType
+    /// @param fieldName The name of the field to get
+    /// @return Field
+    DataMember getMember(const std::string &fieldName) const
+    {
+        if (fields.find(fieldName) != fields.end())
+        {
+            return DataMember(fields.at(fieldName));
+        }
+        else if (customDataTypes.find(fieldName) != customDataTypes.end())
+        {
+            return DataMember(customDataTypes.at(fieldName));
+        }
+        else
+        {
+            throw std::invalid_argument("Field does not exist");
+        }
+    };
+
+    /// @brief Flattens the DataType into a map of field name to value
+    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened
+    /// @details This flattening process will result in a map that is accessible with map["fieldName"]["fieldName"]...
+    /// @return std::map<std::string, Value>
+    std::map<std::string, DataMember> flatten() const
+    {
+        // flattens the DataType into a map of field name to value
+        std::map<std::string, DataMember> flattened;
+        for (auto &field : fields)
+        {
+            // create a data member for the field
+            DataMember member(field.second);
+            flattened[field.first] = member;
+        }
+
+        // now add the custom data types
+        for (auto &customDataType : customDataTypes)
+        {
+            std::map<std::string, DataMember> flattenedCustomDataType = customDataType.second.flatten();
+            for (auto &field : flattenedCustomDataType)
+            {
+                // create a data member for the field
+                DataMember member(field.second);
+                flattened[customDataType.first] = member;
+            }
+        }
+
+        return flattened;
+    }
+
+    /// @brief Flattens the DataType into a map of field name to fields
+    /// @details If there are any custom DataTypes held in the fields, they will be recursively flattened, but will not create a map of maps
+    /// @details This flattening process will result in a map that is accessible with map["fieldName"]
+    /// @details However, if the field is within an internal datatype, it will be accessible with map["dataTypeFieldName_fieldName"]
+    std::map<std::string, Field> flattenFull() const
+    {
+        // flattens the DataType into a map of field name to value
+        std::map<std::string, Field> flattened;
+        for (auto &field : fields)
+        {
+            flattened[field.first] = field.second;
+        }
+
+        // now add the custom data types
+        for (auto &customDataType : customDataTypes)
+        {
+            std::map<std::string, Field> flattenedCustomDataType = customDataType.second.flattenFull();
+            for (auto &field : flattenedCustomDataType)
+            {
+                flattened[customDataType.first + "_" + field.first] = field.second;
+            }
+        }
+
+        return flattened;
+    }
+};
+
 #endif // __DATATYPE_FACTORY_H__
