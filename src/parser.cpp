@@ -48,7 +48,7 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left parentheses after frame");
         if (tokens[i].type == META && tokens[i + 1].type != L_BRACE)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left brace after meta");
-
+        
         // now progress the index based on the scope type
         if (tokens[i].type == DEF)
         {
