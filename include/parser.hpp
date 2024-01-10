@@ -13,7 +13,7 @@ struct Token;
 struct Schema
 {
     SchemaMeta meta;
-    std::map<std::string, DataTypeTemplate> dataTypes;
+    std::map<std::string, DataType> dataTypes;
 };
 
 class Parser
@@ -85,7 +85,7 @@ public:
     ParsingResult isValidSequence(const std::vector<Token> &tokens);
 
 private:
-    std::map<std::string, DataTypeTemplate> _dataTypes;
+    std::map<std::string, DataType> _dataTypes;
 
     bool isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex);
 };

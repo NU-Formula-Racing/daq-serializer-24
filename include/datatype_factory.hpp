@@ -564,6 +564,24 @@ struct DataType
 
         return flattened;
     }
+
+    /// @brief Returns a treestyle string representation of the DataType
+    /// @details This is useful for debugging
+    /// @return std::string
+    std::string toTreeString()
+    {
+        std::stringstream ss;
+        ss << "DataType: " << name << std::endl;
+        ss << "Size: " << size << std::endl;
+        ss << "Fields: " << std::endl;
+        std::map<std::string, Field> flattened = flattenFull();
+        for (auto &field : flattened)
+        {
+            ss << "\t" << field.first << " : " << Field::fieldTypeToString(field.second.type) << std::endl;
+        }
+
+        return ss.str();
+    }
 };
 
 #endif // __DATATYPE_FACTORY_H__
