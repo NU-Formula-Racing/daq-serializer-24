@@ -297,6 +297,13 @@ struct Field
         Value valueCopy(other.value);
         this->value = valueCopy;
     };
+
+    /// @brief Equality operator for Field
+    bool operator==(const Field &other)
+    {
+        return this->name == other.name && this->predefined == other.predefined && this->type == other.type && this->size == other.size && this->value == other.value;
+    };
+
 };
 
 #pragma endregion Node Types

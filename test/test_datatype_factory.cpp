@@ -82,6 +82,33 @@ void test_field_not_predefined_string(void)
     TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
 }
 
+void test_flat_data_type(void)
+{
+    Field floatField = Field::emptyField("float", FieldType::FLOAT);
+    Field intField = Field::emptyField("int", FieldType::INT);
+    std::size_t size = floatField.size + intField.size;
+    DataType testType;
+
+    testType.addField(floatField);
+    testType.addField(intField);
+
+    TEST_ASSERT_TRUE(testType.size == size);
+
+    // test flattening
+    std::map<std::string, DataMember> flatMembers = testType.flatten();
+    TEST_ASSERT_TRUE(flatMembers.size() == 2);
+    DataMember floatMember = flatMembers["float"];
+    DataMember intMember = flatMembers["int"];
+
+    // test that we get no errors converting the datamember to a field
+    Field floatFieldFromMember = floatMember.getField();
+    Field intFieldFromMember = intMember.getField();
+
+    // now test that the fields are the is_same
+    TEST_ASSERT_TRUE(floatFieldFromMember == floatField);
+    TEST_ASSERT_TRUE(intFieldFromMember == intField);
+}
+
 void TestingSuite::runDataTypeFactoryTests()
 {
     // field tests
