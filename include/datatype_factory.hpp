@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include <type_traits>
+#include <sstream>
 
 enum FieldType
 {
@@ -30,7 +31,6 @@ enum FieldType
 
 struct Field;
 struct Value;
-struct DataType;
 
 /// @brief A Value is a container for any type of value
 /// @details The value is stored as a void pointer, and the type is stored as a FieldType
@@ -308,6 +308,8 @@ struct Field
 
 #pragma endregion Node Types
 
+struct DataType;
+
 struct SchemaMeta
 {
     std::string schemaName;
@@ -326,78 +328,29 @@ struct DataMember
 
     /// @brief Constructor for DataMember
     /// @param field The field to store
-    DataMember(const Field &field)
-    {
-        // malloc the field and copy it over
-        this->memberPtr = malloc(sizeof(Field));
-        memcpy(memberPtr, &field, sizeof(Field));
-        this->isDataType = false;
-    };
+    DataMember(const Field &field);
 
     /// @brief Constructor for DataMember
     /// @param dataType The custom DataType to store
-    DataMember(const DataType &dataType)
-    {
-        // malloc the field and copy it over
-        this->memberPtr = malloc(sizeof(DataType));
-        memcpy(memberPtr, &dataType, sizeof(DataType));
-        this->isDataType = true;
-    };
+    DataMember(const DataType &dataType);
 
     /// @brief Copy constructor for DataMember
     /// @param other The DataMember to copy
-    DataMember(const DataMember &other)
-    {
-        this->memberPtr = other.memberPtr;
-        this->isDataType = other.isDataType;
-    };
+    DataMember(const DataMember &other);
 
     /// @brief Assignment operator for DataMember
     /// @param other The DataMember to copy
-    DataMember &operator=(const DataMember &other)
-    {
-        this->memberPtr = other.memberPtr;
-        this->isDataType = other.isDataType;
-        return *this;
-    };
+    DataMember &operator=(const DataMember &other);
 
     /// @brief String indexing operator for DataMember
     /// @details If the DataMember is not a DataType, then this will throw an exception
     /// @param fieldName The name of the field to get
     /// @return DataMember
-    DataMember operator[](const std::string &fieldName)
-    {
-        if (!isDataType)
-        {
-            throw std::invalid_argument("DataMember is a Field, not a DataType");
-        }
+    DataMember operator[](const std::string &fieldName);
 
-        DataType DataType = this->getDataType();
-        return DataType.getMember(fieldName);
-    };
+    Field getField();
 
-    /// @brief Indexing operator for DataMember
-    Field getField()
-    {
-        if (this->isDataType)
-        {
-            throw std::invalid_argument("DataMember is a DataType, not a Field");
-        }
-
-        Field field = *(Field *)this->memberPtr;
-        return field;
-    };
-
-    DataType getDataType()
-    {
-        if (!this->isDataType)
-        {
-            throw std::invalid_argument("DataMember is a Field, not a DataType");
-        }
-
-        DataType dataType = *(DataType *)this->memberPtr;
-        return dataType;
-    };
+    DataType getDataType();
 };
 
 /// @brief A datatype is a contianer for a set of fields, and may be nested
