@@ -35,6 +35,8 @@ struct Value;
 /// @brief A Value is a container for any type of value
 /// @details The value is stored as a void pointer, and the type is stored as a FieldType
 /// @details The size of the value is stored as well, so that we can do type checking
+/// @details The actual "value" struct lives on the stack, whilst the valuePtr points to a malloc'd value on the heap
+/// @details This is so that we can copy the valuePtr without worrying about the lifetime of the value
 struct Value
 {
     void *valuePtr = nullptr;
@@ -70,7 +72,7 @@ struct Value
     {
         if (this == &other)
         {
-            std::cout << "Copied self" << std::endl;
+            // std::cout << "Copied self" << std::endl;
             return;
         }
 
@@ -82,11 +84,10 @@ struct Value
             return;
         }
 
-        void *valueBuffer = malloc(other.valueSize);
-        memcpy(valueBuffer, other.valuePtr, other.valueSize);
-        this->valuePtr = valueBuffer;
+        // malloc the value and copy it over
+        this->valuePtr = malloc(other.valueSize);
+        memcpy(valuePtr, other.valuePtr, other.valueSize);
         this->valueSize = other.valueSize;
-        // std::cout << "Copied value with size " << this->valueSize << std::endl;
     };
 
     /// @brief Assignment operator for Value
@@ -95,7 +96,6 @@ struct Value
     template <typename T>
     Value &operator=(T value)
     {
-        std::cout << "Value::operator=(T value)" << std::endl;
         // malloc the value and copy it over
         if (valuePtr != nullptr)
         {
@@ -113,10 +113,23 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value &operator=(const Value &other)
     {
-        std::cout << "Value::operator=(const Value &other)" << std::endl;
-        Value valueCopy(other);
-        this->valuePtr = valueCopy.valuePtr;
-        this->valueSize = valueCopy.valueSize;
+        if (this == &other)
+        {
+            std::cout << "Copied self" << std::endl;
+            return *this;
+        }
+
+        if (other.valueSize == 0)
+        {
+            // std::cout << "Copied empty value" << std::endl;
+            this->valuePtr = nullptr;
+            this->valueSize = 0;
+            return *this;
+        }
+
+        this->valuePtr = malloc(other.valueSize);
+        memcpy(valuePtr, other.valuePtr, other.valueSize);
+        this->valueSize = other.valueSize;
         return *this;
     };
 
@@ -164,6 +177,26 @@ struct Value
 
         return *(T *)valuePtr == value;
     };
+
+    /// @brief Equality operator for Value
+    /// @details The value is stored as a void pointer, as well as the size of the value
+    /// @details The size of the value is stored as well, so that we can do type checking
+    bool operator==(const Value &other)
+    {
+        if (this->valueSize != other.valueSize)
+        {
+            return false;
+        }
+
+        // if both values are null, then they are equal
+        if (this->valuePtr == nullptr)
+        {
+            return other.valuePtr == nullptr;
+        }
+
+        // compare the values as bytes
+        return memcmp(this->valuePtr, other.valuePtr, this->valueSize) == 0;
+    }
 
     /// @brief Inequality operator for Value
     /// @details The value is stored as a void pointer, as well as the size of the value
@@ -249,7 +282,6 @@ struct Field
             throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
         }
 
-        std::cout << "Created a predefined field with type " << fieldTypeToString(field.type) << " and size " << field.size << std::endl;
         return field;
     };
 
@@ -317,8 +349,7 @@ struct Field
         this->type = other.type;
         this->size = other.size;
         // copy the value over
-        Value valueCopy(other.value);
-        this->value = valueCopy;
+        this->value = Value(other.value);
         std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
     };
 
@@ -328,6 +359,18 @@ struct Field
         return this->name == other.name && this->predefined == other.predefined && this->type == other.type && this->size == other.size && this->value == other.value;
     };
 
+    std::string toString() const
+    {
+        std::stringstream ss;
+        ss << "Field: " << name << std::endl;
+        ss << "  Predefined: " << predefined << std::endl;
+        ss << "  Type: " << fieldTypeToString(type) << std::endl;
+        ss << "  Size: " << size << std::endl;
+        // print value as hex for the given size
+        ss << "  Value: " << std::hex << *(int *)value.valuePtr << std::endl;
+
+        return ss.str();
+    }
 };
 
 #pragma endregion Node Types
@@ -385,6 +428,7 @@ struct DataMember
     /// @brief Gets a string representation of the DataMember
     /// @return std::string
     std::string toString() const;
+
 };
 
 /// @brief A datatype is a contianer for a set of fields, and may be nested
@@ -513,7 +557,7 @@ struct DataType
         for (auto &field : fields)
         {
             // create a data member for the field
-            std::cout << "Flattening field " << field.first << std::endl;
+            // std::cout << "Flattening field " << field.first << std::endl;
             DataMember member(field.second);
             flattened[field.first] = member;
         }
@@ -525,7 +569,7 @@ struct DataType
             for (auto &field : flattenedCustomDataType)
             {
                 // create a data member for the field
-                std::cout << "Flattening field " << customDataType.first << "_" << field.first << std::endl;
+                // std::cout << "Flattening field " << customDataType.first << "_" << field.first << std::endl;
                 DataMember member(field.second);
                 flattened[customDataType.first] = member;
             }

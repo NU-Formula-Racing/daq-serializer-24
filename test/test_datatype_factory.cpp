@@ -98,8 +98,14 @@ void test_field_copy_constructor(void)
 {
     Field field = Field::predfinedField("test", 123);
     Field fieldCopy = Field(field);
-    TEST_ASSERT_TRUE(fieldCopy.value == 123);
-    TEST_ASSERT_TRUE(fieldCopy.value.isValid());
+    // std::cout << "field: " << field.toString() << std::endl;
+    // std::cout << "fieldCopy: " << fieldCopy.toString() << std::endl;
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.name == "test", "Field copy name is not test");
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.type == FieldType::INT, "Field copy type is not INT");
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.predefined == true, "Field copy is not predefined");
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.value == field.value, "Field copy value does not equal field value");
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.value == 123, "Field copy value is not 123");
+    TEST_ASSERT_TRUE_MESSAGE(fieldCopy.value.isValid(), "Field copy value is not valid");
     TEST_ASSERT_EQUAL_INT(sizeof(int), fieldCopy.size);
 }
 

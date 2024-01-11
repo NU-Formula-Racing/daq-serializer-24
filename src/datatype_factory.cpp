@@ -50,7 +50,6 @@ DataMember DataMember::operator[](const std::string &fieldName)
 
 Field DataMember::getField()
 {
-    std::cout << "DataMember::getField()" << std::endl;
     if (isDataType)
     {
         throw std::invalid_argument("DataMember is a DataType, not a Field");
