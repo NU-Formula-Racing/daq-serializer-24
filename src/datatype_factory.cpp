@@ -50,13 +50,18 @@ DataMember DataMember::operator[](const std::string &fieldName)
 
 Field DataMember::getField()
 {
+    std::cout << "DataMember::getField()" << std::endl;
     if (isDataType)
     {
         throw std::invalid_argument("DataMember is a DataType, not a Field");
     }
 
-    Field field;
-    memcpy(&field, memberPtr, sizeof(Field));
+    if (memberPtr == nullptr)
+    {
+        throw std::invalid_argument("DataMember is null");
+    }
+
+    Field field = *(Field *)memberPtr;
     return field;
 }
 
@@ -67,7 +72,26 @@ DataType DataMember::getDataType()
         throw std::invalid_argument("DataMember is a Field, not a DataType");
     }
 
-    DataType dataType;
-    memcpy(&dataType, memberPtr, sizeof(DataType));
-    return dataType;
+    if (memberPtr == nullptr)
+    {
+        throw std::invalid_argument("DataMember is null");
+    }
+
+    return *(DataType *)memberPtr;
+}
+
+std::string DataMember::toString() const
+{
+    std::stringstream ss;
+    if (isDataType)
+    {
+        ss << "DataType";
+    }
+    else
+    {
+        ss << "Field";
+    }
+    ss << " at " << memberPtr;
+
+    return ss.str();
 }

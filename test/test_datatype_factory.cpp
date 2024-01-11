@@ -29,11 +29,11 @@ void test_field_predefined_bool(void)
 
 void test_field_predefined_string(void)
 {
-    const char* str = "hello world! i am evan";
+    const char *str = "hello world! i am evan";
     Field field = Field::predfinedField("test", str);
     TEST_ASSERT_TRUE(field.value == "hello world! i am evan");
     TEST_ASSERT_TRUE(field.value.isValid());
-    TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
+    TEST_ASSERT_EQUAL_INT(sizeof(char *), field.size);
 }
 
 void test_field_predefined_version(void)
@@ -79,7 +79,28 @@ void test_field_not_predefined_string(void)
     // TEST_ASSERT_TRUE(field.value == "");
     TEST_ASSERT_FALSE(field.predefined);
     TEST_ASSERT_FALSE(field.value.isValid());
-    TEST_ASSERT_EQUAL_INT(sizeof(char*), field.size);
+    TEST_ASSERT_EQUAL_INT(sizeof(char *), field.size);
+}
+
+void test_value_copy_constructor(void)
+{
+    Value value = 123;
+    Value valueCopy = Value(value);
+    TEST_ASSERT_TRUE(valueCopy == 123);
+
+    // now try copying via pointer
+    void *valuePtr = &value;
+    Value value2 = *(Value *)valuePtr;
+    TEST_ASSERT_TRUE(value2 == 123);
+}
+
+void test_field_copy_constructor(void)
+{
+    Field field = Field::predfinedField("test", 123);
+    Field fieldCopy = Field(field);
+    TEST_ASSERT_TRUE(fieldCopy.value == 123);
+    TEST_ASSERT_TRUE(fieldCopy.value.isValid());
+    TEST_ASSERT_EQUAL_INT(sizeof(int), fieldCopy.size);
 }
 
 void test_flat_data_type(void)
@@ -87,26 +108,35 @@ void test_flat_data_type(void)
     Field floatField = Field::emptyField("float", FieldType::FLOAT);
     Field intField = Field::emptyField("int", FieldType::INT);
     std::size_t size = floatField.size + intField.size;
+    std::cout << "Expected size: " << size << std::endl;
     DataType testType;
-
     testType.addField(floatField);
     testType.addField(intField);
-
+    std::cout << testType.toTreeString() << std::endl;
     TEST_ASSERT_TRUE(testType.size == size);
-
     // test flattening
     std::map<std::string, DataMember> flatMembers = testType.flatten();
-    TEST_ASSERT_TRUE(flatMembers.size() == 2);
-    DataMember floatMember = flatMembers["float"];
-    DataMember intMember = flatMembers["int"];
-
+    TEST_ASSERT_TRUE_MESSAGE(flatMembers.size() == 2, "Flat members size is not 2");
     // test that we get no errors converting the datamember to a field
-    Field floatFieldFromMember = floatMember.getField();
-    Field intFieldFromMember = intMember.getField();
-
-    // now test that the fields are the is_same
-    TEST_ASSERT_TRUE(floatFieldFromMember == floatField);
-    TEST_ASSERT_TRUE(intFieldFromMember == intField);
+    try
+    {
+        DataMember floatMember = flatMembers["float"];
+        DataMember intMember = flatMembers["int"];
+        std::cout << "got members from flat map" << std::endl;
+        std::cout << "float member: " << floatMember.toString() << std::endl;
+        std::cout << "int member: " << intMember.toString() << std::endl;
+        Field floatFieldFromMember = floatMember.getField();
+        Field intFieldFromMember = intMember.getField();
+        std::cout << "got fields from members" << std::endl;
+        // now test that the fields are the is_same
+        TEST_ASSERT_TRUE_MESSAGE(floatFieldFromMember == floatField, "Float fields are not the same");
+        TEST_ASSERT_TRUE_MESSAGE(intFieldFromMember == intField, "Int fields are not the same");
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "Encountered an error while running test_flat_data_type: " << e.what() << std::endl;
+        TEST_FAIL_MESSAGE(e.what());
+    }
 }
 
 void TestingSuite::runDataTypeFactoryTests()
@@ -121,4 +151,7 @@ void TestingSuite::runDataTypeFactoryTests()
     RUN_TEST(test_field_not_predefined_float);
     RUN_TEST(test_field_not_predefined_bool);
     RUN_TEST(test_field_not_predefined_string);
+    RUN_TEST(test_field_copy_constructor);
+    RUN_TEST(test_value_copy_constructor);
+    RUN_TEST(test_flat_data_type);
 }

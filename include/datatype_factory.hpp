@@ -52,6 +52,11 @@ struct Value
     template <typename T>
     Value(T value)
     {
+        if (std::is_same<T, Value>::value)
+        {
+            throw std::invalid_argument("Cannot create a Value from a Value");
+        }
+
         // malloc the value and copy it over
         this->valuePtr = malloc(sizeof(T));
         memcpy(valuePtr, &value, sizeof(T));
@@ -63,10 +68,25 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value(const Value &other)
     {
+        if (this == &other)
+        {
+            std::cout << "Copied self" << std::endl;
+            return;
+        }
+
+        if (other.valueSize == 0)
+        {
+            // std::cout << "Copied empty value" << std::endl;
+            this->valuePtr = nullptr;
+            this->valueSize = 0;
+            return;
+        }
+
         void *valueBuffer = malloc(other.valueSize);
         memcpy(valueBuffer, other.valuePtr, other.valueSize);
         this->valuePtr = valueBuffer;
         this->valueSize = other.valueSize;
+        // std::cout << "Copied value with size " << this->valueSize << std::endl;
     };
 
     /// @brief Assignment operator for Value
@@ -75,6 +95,7 @@ struct Value
     template <typename T>
     Value &operator=(T value)
     {
+        std::cout << "Value::operator=(T value)" << std::endl;
         // malloc the value and copy it over
         if (valuePtr != nullptr)
         {
@@ -92,8 +113,10 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value &operator=(const Value &other)
     {
-        this->valuePtr = other.valuePtr;
-        this->valueSize = other.valueSize;
+        std::cout << "Value::operator=(const Value &other)" << std::endl;
+        Value valueCopy(other);
+        this->valuePtr = valueCopy.valuePtr;
+        this->valueSize = valueCopy.valueSize;
         return *this;
     };
 
@@ -296,6 +319,7 @@ struct Field
         // copy the value over
         Value valueCopy(other.value);
         this->value = valueCopy;
+        std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
     };
 
     /// @brief Equality operator for Field
@@ -348,9 +372,19 @@ struct DataMember
     /// @return DataMember
     DataMember operator[](const std::string &fieldName);
 
+    /// @brief Gets the field from the DataMember
+    /// @return The field
+    /// @exception std::invalid_argument Thrown if the DataMember is a DataType, or if the DataMember is null
     Field getField();
 
+    /// @brief Gets the DataType from the DataMember
+    /// @return The DataType
+    /// @exception std::invalid_argument Thrown if the DataMember is a Field, or if the DataMember is null
     DataType getDataType();
+
+    /// @brief Gets a string representation of the DataMember
+    /// @return std::string
+    std::string toString() const;
 };
 
 /// @brief A datatype is a contianer for a set of fields, and may be nested
@@ -359,12 +393,18 @@ struct DataMember
 struct DataType
 {
     std::string name;
-    std::size_t size;
+    std::size_t size = 0;
     std::map<std::string, Field> fields;             // map of field name to field
     std::map<std::string, DataType> customDataTypes; // map of custom data type name to custom data type
 
     /// @brief Empty constructor for DataType
     DataType() = default;
+
+    DataType(std::string name)
+    {
+        this->name = name;
+        this->size = 0;
+    };
 
     /// @brief Copy constructor for DataType
     DataType(const DataType &other)
@@ -398,8 +438,8 @@ struct DataType
     /// @param field The field to add
     void addField(const Field &field)
     {
-        fields[field.name] = field;
-        size += field.size;
+        this->fields[field.name] = field;
+        this->size += field.size;
     };
 
     /// @brief Removes a field from the DataType
@@ -473,6 +513,7 @@ struct DataType
         for (auto &field : fields)
         {
             // create a data member for the field
+            std::cout << "Flattening field " << field.first << std::endl;
             DataMember member(field.second);
             flattened[field.first] = member;
         }
@@ -484,6 +525,7 @@ struct DataType
             for (auto &field : flattenedCustomDataType)
             {
                 // create a data member for the field
+                std::cout << "Flattening field " << customDataType.first << "_" << field.first << std::endl;
                 DataMember member(field.second);
                 flattened[customDataType.first] = member;
             }
