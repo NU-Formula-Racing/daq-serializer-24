@@ -52,27 +52,27 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         // now progress the index based on the scope type
         if (tokens[i].type == DEF)
         {
-            std::cout << "Found valid def token, changing scope" << std::endl;
+            // std::cout << "Found valid def token, changing scope" << std::endl;
             scope = Parser::ParserScope::DATA_TYPE_SCOPE;
             i += 2;
             continue;
         }
         if (tokens[i].type == FRAME)
         {
-            std::cout << "Found valid frame token, changing scope" << std::endl;
+            // std::cout << "Found valid frame token, changing scope" << std::endl;
             scope = Parser::ParserScope::FRAME_SCOPE;
             i += 1;
             continue;
         }
         if (tokens[i].type == META)
         {
-            std::cout << "Found valid meta token, changing scope" << std::endl;
+            // std::cout << "Found valid meta token, changing scope" << std::endl;
             scope = Parser::ParserScope::META_SCOPE;
             i += 1;
             continue;
         }
 
-        std::cout << "Evaluating within scope: " << scope << std::endl;
+        // std::cout << "Evaluating within scope: " << scope << std::endl;
         
         // CHECK FOR SCOPES
         switch (scope)

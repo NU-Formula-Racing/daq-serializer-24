@@ -145,6 +145,45 @@ void test_flat_data_type(void)
     }
 }
 
+void test_nested_data_type(void)
+{
+    Field floatField = Field::emptyField("float", FieldType::FLOAT);
+    Field intField = Field::emptyField("int", FieldType::INT);
+    DataType innerType;
+    innerType.addField(floatField);
+    innerType.addField(intField);
+    Field boolField = Field::emptyField("bool", FieldType::BOOL);
+    DataType outerType;
+    outerType.addField(boolField);
+    outerType.addCustomField("inner", innerType);
+
+    // test that the size is correct
+    std::size_t size = boolField.size + innerType.size;
+    TEST_ASSERT_TRUE_MESSAGE(outerType.size == size, "Outer type size is not correct");
+
+    // now try flattening
+    std::map<std::string, DataMember> flatMembers = outerType.flatten();
+    TEST_ASSERT_TRUE_MESSAGE(flatMembers.size() == 2, "Flat members size is not 3");
+    try
+    {
+        DataMember boolMember = flatMembers["bool"];
+        DataMember innerMember = flatMembers["inner"];
+        std::cout << "got members from flat map" << std::endl;
+        std::cout << "bool member: " << boolMember.toString() << std::endl;
+        std::cout << "inner member: " << innerMember.toString() << std::endl;
+        Field boolFieldFromMember = boolMember.getField();
+        DataType innerTypeFromMember = innerMember.getDataType();
+        std::cout << "got fields from members" << std::endl;
+        // now test that the fields are the is_same
+        TEST_ASSERT_TRUE_MESSAGE(boolFieldFromMember == boolField, "Bool fields are not the same");
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "Encountered an error while running test_nested_data_type: " << e.what() << std::endl;
+        TEST_FAIL_MESSAGE(e.what());
+    }
+}
+
 void TestingSuite::runDataTypeFactoryTests()
 {
     // field tests
@@ -159,5 +198,8 @@ void TestingSuite::runDataTypeFactoryTests()
     RUN_TEST(test_field_not_predefined_string);
     RUN_TEST(test_field_copy_constructor);
     RUN_TEST(test_value_copy_constructor);
+
+    // data type tests
     RUN_TEST(test_flat_data_type);
+    RUN_TEST(test_nested_data_type);
 }

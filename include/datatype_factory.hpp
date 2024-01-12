@@ -501,7 +501,7 @@ struct DataType
 
     /// @brief Adds a custom DataType field to the DataType
     /// @param dataType The custom DataType to add
-    void addCustomField(DataType dataType, const std::string &fieldName)
+    void addCustomField(const std::string &fieldName, const DataType &dataType)
     {
         customDataTypes[fieldName] = dataType;
         size += dataType.size;
