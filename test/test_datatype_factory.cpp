@@ -86,12 +86,12 @@ void test_value_copy_constructor(void)
 {
     Value value = 123;
     Value valueCopy = Value(value);
-    TEST_ASSERT_TRUE(valueCopy == 123);
+    TEST_ASSERT_TRUE_MESSAGE(valueCopy == 123, "Value copy obtained via copy constructor is not 123");
 
     // now try copying via pointer
     void *valuePtr = &value;
     Value value2 = *(Value *)valuePtr;
-    TEST_ASSERT_TRUE(value2 == 123);
+    TEST_ASSERT_TRUE_MESSAGE(value2 == 123, "Value copy obtained via pointer is not 123");
 }
 
 void test_field_copy_constructor(void)

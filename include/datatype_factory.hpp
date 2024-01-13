@@ -61,6 +61,7 @@ struct Value
 
         // set the value
         this->valuePtr = std::make_shared<T>(value);
+        this->valueSize = sizeof(T);
     };
 
     /// @brief Copy constructor for Value
@@ -68,7 +69,6 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value(const Value &other)
     {
-        // std::cout << "Value::Value(const Value &other)" << std::endl;
         this->valuePtr = other.valuePtr;
         this->valueSize = other.valueSize;        
     };
@@ -103,7 +103,7 @@ struct Value
     bool operator==(const T value)
     {
         // if the valuePtr is nullptr, then consider it to be equal to a bit pattern of all zeros
-        if (valuePtr == nullptr || valuePtr == NULL || valueSize == 0)
+        if (valuePtr == nullptr || valueSize == 0)
         {
             if (std::is_same<T, int>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value)
             {
@@ -140,6 +140,7 @@ struct Value
 
         // compare the values
         // cast the valuePtr to a pointer of type T
+        std::cout << "Comparing valuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << " to value: " << value << std::endl;
         T *valueComp = (T *)(this->valuePtr.get());
         return *valueComp == value;
     };
