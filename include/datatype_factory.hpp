@@ -97,7 +97,7 @@ struct Value
     /// @details The value is stored as a void pointer, as well as the size of the value
     /// @details The size of the value is stored as well, so that we can do type checking
     template <typename T>
-    bool operator==(T value)
+    bool operator==(const T value)
     {
         // if the valuePtr is nullptr, then consider it to be equal to a bit pattern of all zeros
         if (valuePtr == nullptr || valuePtr == NULL || valueSize == 0)
@@ -135,7 +135,10 @@ struct Value
             return false;
         }
 
-        return *(T *)valuePtr == value;
+        // compare the values
+        // cast the valuePtr to a pointer of type T
+        T *valueComp = (T *)(this->valuePtr.get());
+        return *valueComp == value;
     };
 
     /// @brief Equality operator for Value
@@ -172,6 +175,22 @@ struct Value
     {
         return valuePtr != nullptr && valueSize > 0;
     };
+
+    /// @brief Returns a string representation of the value
+    /// @return std::string
+    std::string toString() const
+    {
+        std::stringstream ss;
+        ss << "Value: " << std::endl;
+        if (this->valuePtr.get() == nullptr) {
+            ss << "  ValuePtr: null" << std::endl;
+        } else {
+            ss << "  ValuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << std::endl;
+        }
+
+        ss << "  ValueSize: " << std::dec << this->valueSize << std::endl;
+        return ss.str();
+    }
 };
 
 struct Field
@@ -340,10 +359,7 @@ struct Field
         ss << "  Type: " << fieldTypeToString(type) << std::endl;
         ss << "  Size: " << size << std::endl;
         // print value as hex for the given size
-        if (this->value.isValid())
-            ss << "  Value: " << std::hex << *(int *)this->value.valuePtr << std::endl;
-        else
-            ss << "  Value: " << "null" << std::endl;
+        ss << value.toString() << std::endl;
 
         return ss.str();
     }
