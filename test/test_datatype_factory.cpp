@@ -191,7 +191,9 @@ void test_nested_data_type(void)
     }
     catch (std::exception &e)
     {
-        std::cout << "Encountered an error while running test_nested_data_type: " << e.what() << std::endl;
+        std::cout << "Encountered an error while running test_nested_data_type: " << std::endl;
+        // print out stack trace
+        std::cout << e.what() << std::endl;
         TEST_FAIL_MESSAGE(e.what());
     }
 }

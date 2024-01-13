@@ -68,6 +68,7 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value(const Value &other)
     {
+        // std::cout << "Value::Value(const Value &other)" << std::endl;
         this->valuePtr = other.valuePtr;
         this->valueSize = other.valueSize;        
     };
@@ -78,6 +79,7 @@ struct Value
     template <typename T>
     Value &operator=(T value)
     {
+        // std::cout << "Value::operator=(T value)" << std::endl;
         this->valuePtr = std::make_shared<T>(value);
         this->valueSize = sizeof(T);
         return *this;
@@ -88,6 +90,7 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value &operator=(const Value &other)
     {
+        // std::cout << "Value::operator=(const Value &other)" << std::endl;
         this->valuePtr = other.valuePtr;
         this->valueSize = other.valueSize;
         return *this;
@@ -445,28 +448,20 @@ struct DataType
     /// @brief Copy constructor for DataType
     DataType(const DataType &other)
     {
+        // std::cout << "DataType::DataType(const DataType &other)" << std::endl;
         this->name = other.name;
         this->size = other.size;
-        // copy fields and values over
-        for (auto &field : other.fields)
-        {
-            std::cout << "Copying field " << std::endl;
-            // std::cout << field.second.toString() << std::endl;
-            this->fields[field.first] = field.second;
-        }
+        // ideally this would be a deep copy...
+        this->fields = other.fields;
     };
 
     /// @brief Assignment operator for DataType
     DataType &operator=(const DataType &other)
     {
+        // std::cout << "DataType::operator=(const DataType &other)" << std::endl;
         this->name = other.name;
         this->size = other.size;
-        // copy fields and values over
-        for (auto &field : other.fields)
-        {
-            Field fieldCopy(field.second);
-            this->fields[field.first] = fieldCopy;
-        }
+        this->fields = other.fields;
         return *this;
     };
 
