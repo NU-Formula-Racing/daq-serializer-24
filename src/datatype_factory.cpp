@@ -8,6 +8,110 @@
 
 #include "datatype_factory.hpp"
 
+#pragma region Field
+
+// STATIC METHODS
+Field Field::emptyField(const std::string &name, FieldType type)
+{
+    Field field;
+    field.name = name;
+    field.predefined = false;
+    field.type = type;
+
+    // get the size of the field
+    switch (type)
+    {
+    case FieldType::INT:
+        field.size = sizeof(int);
+        break;
+    case FieldType::FLOAT:
+        field.size = sizeof(float);
+        break;
+    case FieldType::BOOL:
+        field.size = sizeof(bool);
+        break;
+    case FieldType::STRING:
+        field.size = sizeof(uint8_t *);
+        break;
+    case FieldType::VERSION:
+        field.size = sizeof(int[3]);
+        break;
+    default:
+        throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+    }
+
+    return field;
+}
+
+std::string Field::fieldTypeToString(FieldType type)
+{
+    switch (type)
+    {
+    case FieldType::INT:
+        return "int";
+    case FieldType::FLOAT:
+        return "float";
+    case FieldType::BOOL:
+        return "bool";
+    case FieldType::STRING:
+        return "string";
+    case FieldType::VERSION:
+        return "version";
+    default:
+        throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+    }
+}
+
+// CONSTRUCTORS
+Field::Field(const Field &other)
+{
+    this->name = other.name;
+    this->predefined = other.predefined;
+    this->type = other.type;
+    this->size = other.size;
+    // copy the value over
+    this->value = Value(other.value);
+    // std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
+}
+
+Field &Field::operator=(const Field &other)
+{
+    this->name = other.name;
+    this->predefined = other.predefined;
+    this->type = other.type;
+    this->size = other.size;
+    // copy the value over
+    this->value = Value(other.value);
+    // std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
+    return *this;
+}
+
+bool Field::operator==(const Field &other) const
+{
+    return this->name == other.name &&
+           this->predefined == other.predefined &&
+           this->type == other.type &&
+           this->size == other.size &&
+           this->value == other.value;
+}
+
+std::string Field::toString() const
+{
+    std::stringstream ss;
+    ss << "Field: " << name << std::endl;
+    ss << "  Predefined: " << predefined << std::endl;
+    ss << "  Type: " << fieldTypeToString(type) << std::endl;
+    ss << "  Size: " << size << std::endl;
+    // print value as hex for the given size
+    ss << value.toString() << std::endl;
+
+    return ss.str();
+}
+
+#pragma endregion
+
+#pragma region DataMember
+
 DataMember::DataMember(const Field &field)
 {
     // malloc the field and copy it over
@@ -100,3 +204,141 @@ std::string DataMember::toString() const
 
     return ss.str();
 }
+
+#pragma endregion
+
+#pragma region DataType
+
+DataType::DataType(const DataType &other)
+{
+    // std::cout << "DataType::DataType(const DataType &other)" << std::endl;
+    this->name = other.name;
+    this->size = other.size;
+    // ideally this would be a deep copy...
+    this->fields = other.fields;
+}
+
+DataType &DataType::operator=(const DataType &other)
+{
+    // std::cout << "DataType::operator=(const DataType &other)" << std::endl;
+    this->name = other.name;
+    this->size = other.size;
+    this->fields = other.fields;
+    return *this;
+}
+
+bool DataType::operator==(const DataType &other) const
+{
+    return this->name == other.name &&
+           this->size == other.size &&
+           this->fields == other.fields;
+}
+
+DataMember DataType::operator[](const std::string &fieldName) const
+{
+    return this->getMember(fieldName);
+}
+
+void DataType::addField(const Field &field)
+{
+    this->fields[field.name] = field;
+    this->size += field.size;
+};
+
+void DataType::removeField(const std::string &fieldName)
+{
+    if (fields.find(fieldName) == fields.end())
+    {
+        throw std::invalid_argument("Field does not exist");
+    }
+
+    this->size -= fields[fieldName].size;
+    this->fields.erase(fieldName);
+};
+
+void DataType::addCustomField(const std::string &fieldName, const DataType &dataType)
+{
+    this->customDataTypes[fieldName] = dataType;
+    this->size += dataType.size;
+};
+
+void DataType::removeCustomField(const std::string &fieldName)
+{
+    if (this->customDataTypes.find(fieldName) == this->customDataTypes.end())
+    {
+        throw std::invalid_argument("Custom field does not exist");
+    }
+
+    this->size -= customDataTypes[fieldName].size;
+    this->customDataTypes.erase(fieldName);
+};
+
+DataMember DataType::getMember(const std::string &fieldName) const
+{
+    if (this->fields.find(fieldName) != this->fields.end())
+    {
+        return DataMember(this->fields.at(fieldName));
+    }
+    else if (this->customDataTypes.find(fieldName) != this->customDataTypes.end())
+    {
+        return DataMember(this->customDataTypes.at(fieldName));
+    }
+    else
+    {
+        throw std::invalid_argument("Field does not exist");
+    }
+};
+
+std::map<std::string, DataMember> DataType::flatten() const
+{
+    std::map<std::string, DataMember> flatMembers;
+    for (auto const &field : this->fields)
+    {
+        flatMembers[field.first] = DataMember(field.second);
+    }
+    for (auto const &customField : this->customDataTypes)
+    {
+        flatMembers[customField.first] = DataMember(customField.second);
+    }
+
+    return flatMembers;
+};
+
+std::map<std::string, Field> DataType::flattenFull() const
+{
+    // flattens the DataType into a map of field name to value
+    std::map<std::string, Field> flattened;
+    for (auto &field : this->fields)
+    {
+        flattened[field.first] = field.second;
+    }
+
+    // now add the custom data types
+    for (auto &customDataType : this->customDataTypes)
+    {
+        std::map<std::string, Field> flattenedCustomDataType = customDataType.second.flattenFull();
+        for (auto &field : flattenedCustomDataType)
+        {
+            flattened[customDataType.first + "_" + field.first] = field.second;
+        }
+    }
+
+    return flattened;
+}
+
+std::string DataType::toString()
+{
+    std::stringstream ss;
+    ss << "DataType: " << this->name << std::endl;
+    ss << "Size: " << this->size << std::endl;
+    ss << "Fields: " << std::endl;
+    std::map<std::string, Field> flattened = this->flattenFull();
+    for (auto &field : flattened)
+    {
+        ss << "\t" << field.first << " : " << Field::fieldTypeToString(field.second.type) << std::endl;
+    }
+
+    return ss.str();
+}
+
+#pragma endregion
