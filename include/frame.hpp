@@ -15,6 +15,7 @@
 #include <string.h>
 #include <type_traits>
 #include <sstream>
+#include <algorithm>
 
 #include "datatype_factory.hpp"
 
@@ -56,6 +57,26 @@ public:
         this->_values[index] = value;
     }
 
+    /// @brief Gets a value from the frame template
+    /// @tparam T The type of the value to get
+    /// @param fieldName The name of the field to get -- to access nested fields, use dot notation, for example: "innerField.field"
+    /// @return The value of the field
+    template <typename T>
+    T get(std::string fieldName)
+    {
+        // Check if the field exists
+        if (std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) == this->_fieldNames.end())
+        {
+            throw std::invalid_argument("Field does not exist in frame template");
+        }
+
+        // Get the index of the field
+        auto index = std::distance(this->_fieldNames.begin(), std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName));
+
+        // Get the value
+        return this->_values[index].get<T>();
+    }
+
     std::vector<std::uint8_t> buildFrame() const
     {
         std::vector<std::uint8_t> frame;
@@ -68,6 +89,17 @@ public:
         }
 
         return frame;   
+    }
+
+    std::vector<std::string> getFieldNames() const
+    {
+        return this->_fieldNames;
+    }
+
+    bool isField(std::string fieldName) const
+    {
+        // find the field name in the vector of field names
+        return std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) != this->_fieldNames.end();
     }
 
 private:

@@ -181,6 +181,15 @@ struct Value
         return valuePtr != nullptr && valueSize > 0;
     };
 
+    /// @brief Returns the value as a casted type
+    /// @tparam T The type to cast the value to
+    /// @return T
+    template <typename T>
+    T get() const
+    {
+        return *(T *)(this->valuePtr.get());
+    }
+
     /// @brief Returns a string representation of the value
     /// @return std::string
     std::string toString() const

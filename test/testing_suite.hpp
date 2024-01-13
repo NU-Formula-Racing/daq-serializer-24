@@ -33,6 +33,12 @@ public:
             runParserTests();
             std::cout << "*** FINISHED RUNNING PARSER TESTS ***" << std::endl;
         }
+        if (RU_FRAME_TESTS)
+        {
+            std::cout << "*** RUNNING FRAME TESTS ***" << std::endl;
+            runFrameTests();
+            std::cout << "*** FINISHED RUNNING FRAME TESTS ***" << std::endl;
+        }
         std::cout << "*** FINISHED RUNNING TESTS ***" << std::endl;
         UNITY_END();
     }
@@ -40,10 +46,12 @@ public:
 private:
     const bool RUN_TOKENIZER_TESTS = false;
     const bool RUN_PARSER_TESTS = false;
-    const bool RUN_DATATYPE_FACTORY_TESTS = true;
+    const bool RUN_DATATYPE_FACTORY_TESTS = false;
+    const bool RU_FRAME_TESTS = true;
     void runTokenizerTests();
     void runParserTests();
     void runDataTypeFactoryTests();
+    void runFrameTests();
 };
 
 #endif // __TESTING_SUITE_H__
