@@ -114,11 +114,9 @@ void test_flat_data_type(void)
     Field floatField = Field::emptyField("float", FieldType::FLOAT);
     Field intField = Field::emptyField("int", FieldType::INT);
     std::size_t size = floatField.size + intField.size;
-    std::cout << "Expected size: " << size << std::endl;
     DataType testType;
     testType.addField(floatField);
     testType.addField(intField);
-    std::cout << testType.toTreeString() << std::endl;
     TEST_ASSERT_TRUE(testType.size == size);
     // test flattening
     std::map<std::string, DataMember> flatMembers = testType.flatten();
@@ -128,12 +126,8 @@ void test_flat_data_type(void)
     {
         DataMember floatMember = flatMembers["float"];
         DataMember intMember = flatMembers["int"];
-        std::cout << "got members from flat map" << std::endl;
-        std::cout << "float member: " << floatMember.toString() << std::endl;
-        std::cout << "int member: " << intMember.toString() << std::endl;
         Field floatFieldFromMember = floatMember.getField();
         Field intFieldFromMember = intMember.getField();
-        std::cout << "got fields from members" << std::endl;
         // now test that the fields are the is_same
         TEST_ASSERT_TRUE_MESSAGE(floatFieldFromMember == floatField, "Float fields are not the same");
         TEST_ASSERT_TRUE_MESSAGE(intFieldFromMember == intField, "Int fields are not the same");
@@ -147,32 +141,50 @@ void test_flat_data_type(void)
 
 void test_nested_data_type(void)
 {
+    // nested data type hierarchy
+    // def innerType:
+    //     float : float
+    //     int : int
+    //
+    // def outerType:
+    //     bool : bool
+    //     inner : innerType
+    //
+
+    // Create the inner type
+    DataType innerType;
     Field floatField = Field::emptyField("float", FieldType::FLOAT);
     Field intField = Field::emptyField("int", FieldType::INT);
-    DataType innerType;
     innerType.addField(floatField);
     innerType.addField(intField);
-    Field boolField = Field::emptyField("bool", FieldType::BOOL);
+
+    // Create the outer type
     DataType outerType;
+    Field boolField = Field::emptyField("bool", FieldType::BOOL);
     outerType.addField(boolField);
     outerType.addCustomField("inner", innerType);
 
+    // validation
     // test that the size is correct
     std::size_t size = boolField.size + innerType.size;
     TEST_ASSERT_TRUE_MESSAGE(outerType.size == size, "Outer type size is not correct");
-
     // now try flattening
     std::map<std::string, DataMember> flatMembers = outerType.flatten();
-    TEST_ASSERT_TRUE_MESSAGE(flatMembers.size() == 2, "Flat members size is not 3");
+    TEST_ASSERT_TRUE_MESSAGE(flatMembers.size() == 2, "Flat members size is not 2");
     try
     {
+        // test that we get no errors converting the datamember to a field
         DataMember boolMember = flatMembers["bool"];
         DataMember innerMember = flatMembers["inner"];
-        std::cout << "got members from flat map" << std::endl;
-        std::cout << "bool member: " << boolMember.toString() << std::endl;
-        std::cout << "inner member: " << innerMember.toString() << std::endl;
+        std::cout << "got members from flat" << std::endl;
+        std::cout << boolMember.toString() << std::endl;
+        std::cout << innerMember.toString() << std::endl;
+
+        std::cout << "getting fields from members" << std::endl;
         Field boolFieldFromMember = boolMember.getField();
+        std::cout << "getting inner type from member" << std::endl;
         DataType innerTypeFromMember = innerMember.getDataType();
+
         std::cout << "got fields from members" << std::endl;
         // now test that the fields are the is_same
         TEST_ASSERT_TRUE_MESSAGE(boolFieldFromMember == boolField, "Bool fields are not the same");

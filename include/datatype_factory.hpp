@@ -208,7 +208,7 @@ struct Value
     };
 
     /// @brief Checks if this value is not null or empty
-    bool isValid()
+    bool isValid() const
     {
         return valuePtr != nullptr && valueSize > 0;
     };
@@ -226,11 +226,15 @@ struct Field
 {
     std::string name;
     bool predefined;
-    Value value; // only if this is a predefined field
+    Value value;
     FieldType type;
     std::size_t size;
 
-    // constructor for creating a predefined field
+    /// @brief Creates a field with a predefined value
+    /// @tparam T The type of the value
+    /// @param name The name of the field
+    /// @param value The value of the field
+    /// @return A field that is predefined with the given value
     template <typename T>
     static Field predfinedField(std::string name, T value)
     {
@@ -285,7 +289,10 @@ struct Field
         return field;
     };
 
-    // constructor for creating a custom field, not predefined
+    /// @brief Creates an empty field
+    /// @param name The name of the field
+    /// @param type The type of the field
+    /// @return A field that is not predefined
     static Field emptyField(std::string name, FieldType type)
     {
         Field field;
@@ -318,7 +325,9 @@ struct Field
         return field;
     };
 
-    // mapping from FieldType to string
+    /// @brief Returns a string representation of the FieldType
+    /// @param type the type to convert to a string
+    /// @return the string representation of the FieldType
     static std::string fieldTypeToString(FieldType type)
     {
         switch (type)
@@ -338,10 +347,10 @@ struct Field
         }
     };
 
-    // empty constructor
+    ///@brief empty constructor
     Field() = default;
 
-    // copy constructor
+    /// @brief copy constructor
     Field(const Field &other)
     {
         this->name = other.name;
@@ -350,7 +359,19 @@ struct Field
         this->size = other.size;
         // copy the value over
         this->value = Value(other.value);
-        std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
+        // std::cout << "Copied field with type " << fieldTypeToString(this->type) << " and size " << this->size << std::endl;
+    };
+
+    /// @brief assignment operator
+    Field &operator=(const Field &other)
+    {
+        this->name = other.name;
+        this->predefined = other.predefined;
+        this->type = other.type;
+        this->size = other.size;
+        // copy the value over
+        this->value = Value(other.value);
+        return *this;
     };
 
     /// @brief Equality operator for Field
@@ -367,7 +388,10 @@ struct Field
         ss << "  Type: " << fieldTypeToString(type) << std::endl;
         ss << "  Size: " << size << std::endl;
         // print value as hex for the given size
-        ss << "  Value: " << std::hex << *(int *)value.valuePtr << std::endl;
+        if (this->value.isValid())
+            ss << "  Value: " << std::hex << *(int *)this->value.valuePtr << std::endl;
+        else
+            ss << "  Value: " << "null" << std::endl;
 
         return ss.str();
     }
@@ -458,8 +482,9 @@ struct DataType
         // copy fields and values over
         for (auto &field : other.fields)
         {
-            Field fieldCopy(field.second);
-            this->fields[field.first] = fieldCopy;
+            std::cout << "Copying field " << std::endl;
+            // std::cout << field.second.toString() << std::endl;
+            this->fields[field.first] = field.second;
         }
     };
 
@@ -475,6 +500,15 @@ struct DataType
             this->fields[field.first] = fieldCopy;
         }
         return *this;
+    };
+
+    /// @brief String indexing operator for DataType
+    /// @details If the DataType does not contain a field with the given name, then this will throw an exception
+    /// @param fieldName The name of the field to get
+    /// @return DataMember
+    DataMember operator[](const std::string &fieldName) const
+    {
+        return this->getMember(fieldName);
     };
 
     /// @brief Adds a field to the DataType
@@ -565,14 +599,8 @@ struct DataType
         // now add the custom data types
         for (auto &customDataType : customDataTypes)
         {
-            std::map<std::string, DataMember> flattenedCustomDataType = customDataType.second.flatten();
-            for (auto &field : flattenedCustomDataType)
-            {
-                // create a data member for the field
-                // std::cout << "Flattening field " << customDataType.first << "_" << field.first << std::endl;
-                DataMember member(field.second);
-                flattened[customDataType.first] = member;
-            }
+            DataMember member(customDataType.first);
+            flattened[customDataType.first] = member;
         }
 
         return flattened;
