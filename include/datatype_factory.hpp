@@ -39,7 +39,7 @@ struct Value;
 /// @details This is so that we can copy the valuePtr without worrying about the lifetime of the value
 struct Value
 {
-    void *valuePtr = nullptr;
+    std::shared_ptr<void> valuePtr = nullptr;
     int valueSize = 0;
 
     /// @brief Empty constructor for Value
@@ -59,10 +59,8 @@ struct Value
             throw std::invalid_argument("Cannot create a Value from a Value");
         }
 
-        // malloc the value and copy it over
-        this->valuePtr = malloc(sizeof(T));
-        memcpy(valuePtr, &value, sizeof(T));
-        this->valueSize = sizeof(T);
+        // set the value
+        this->valuePtr = std::make_shared<T>(value);
     };
 
     /// @brief Copy constructor for Value
@@ -70,24 +68,8 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value(const Value &other)
     {
-        if (this == &other)
-        {
-            // std::cout << "Copied self" << std::endl;
-            return;
-        }
-
-        if (other.valueSize == 0)
-        {
-            // std::cout << "Copied empty value" << std::endl;
-            this->valuePtr = nullptr;
-            this->valueSize = 0;
-            return;
-        }
-
-        // malloc the value and copy it over
-        this->valuePtr = malloc(other.valueSize);
-        memcpy(valuePtr, other.valuePtr, other.valueSize);
-        this->valueSize = other.valueSize;
+        this->valuePtr = other.valuePtr;
+        this->valueSize = other.valueSize;        
     };
 
     /// @brief Assignment operator for Value
@@ -96,14 +78,7 @@ struct Value
     template <typename T>
     Value &operator=(T value)
     {
-        // malloc the value and copy it over
-        if (valuePtr != nullptr)
-        {
-            free(valuePtr);
-        }
-
-        this->valuePtr = malloc(sizeof(T));
-        memcpy(valuePtr, &value, sizeof(T));
+        this->valuePtr = std::make_shared<T>(value);
         this->valueSize = sizeof(T);
         return *this;
     };
@@ -113,22 +88,7 @@ struct Value
     /// @details The size of the value is stored as well, so that we can do type checking
     Value &operator=(const Value &other)
     {
-        if (this == &other)
-        {
-            std::cout << "Copied self" << std::endl;
-            return *this;
-        }
-
-        if (other.valueSize == 0)
-        {
-            // std::cout << "Copied empty value" << std::endl;
-            this->valuePtr = nullptr;
-            this->valueSize = 0;
-            return *this;
-        }
-
-        this->valuePtr = malloc(other.valueSize);
-        memcpy(valuePtr, other.valuePtr, other.valueSize);
+        this->valuePtr = other.valuePtr;
         this->valueSize = other.valueSize;
         return *this;
     };
@@ -195,7 +155,7 @@ struct Value
         }
 
         // compare the values as bytes
-        return memcmp(this->valuePtr, other.valuePtr, this->valueSize) == 0;
+        return memcmp(this->valuePtr.get(), other.valuePtr.get(), this->valueSize) == 0;
     }
 
     /// @brief Inequality operator for Value
@@ -211,14 +171,6 @@ struct Value
     bool isValid() const
     {
         return valuePtr != nullptr && valueSize > 0;
-    };
-
-    /// @brief Destructor for Value
-    /// @details The value is stored as a void pointer, as well as the size of the value
-    /// @details The size of the value is stored as well, so that we can do type checking
-    ~Value()
-    {
-        free(valuePtr);
     };
 };
 
