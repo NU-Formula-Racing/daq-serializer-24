@@ -188,10 +188,45 @@ void test_nested_data_type(void)
         std::cout << "got fields from members" << std::endl;
         // now test that the fields are the is_same
         TEST_ASSERT_TRUE_MESSAGE(boolFieldFromMember == boolField, "Bool fields are not the same");
+        TEST_ASSERT_TRUE_MESSAGE(innerTypeFromMember == innerType, "Inner types are not the same");
+        
+        // now test that the inner type is correct
+        std::map<std::string, DataMember> innerFlatMembers = innerTypeFromMember.flatten();
+        TEST_ASSERT_TRUE_MESSAGE(innerFlatMembers.size() == 2, "Inner flat members size is not 2");
+        DataMember innerFloatMember = innerFlatMembers["float"];
+        DataMember innerIntMember = innerFlatMembers["int"];
+
+        Field innerFloatFieldFromMember = innerFloatMember.getField();
+        Field innerIntFieldFromMember = innerIntMember.getField();
+
+        TEST_ASSERT_TRUE_MESSAGE(innerFloatFieldFromMember == floatField, "Inner float fields are not the same");
+        TEST_ASSERT_TRUE_MESSAGE(innerIntFieldFromMember == intField, "Inner int fields are not the same");
     }
     catch (std::exception &e)
     {
-        std::cout << "Encountered an error while running test_nested_data_type: " << std::endl;
+        std::cout << "Encountered an error while running test_nested_data_type and flatten(): " << std::endl;
+        // print out stack trace
+        std::cout << e.what() << std::endl;
+        TEST_FAIL_MESSAGE(e.what());
+    }
+
+    // now test this using the flattenFull method
+    try 
+    {
+        std::map<std::string, Field> flattened = outerType.flattenFull();
+        TEST_ASSERT_TRUE_MESSAGE(flattened.size() == 3, "Flattened size is not 4");
+        // test that we get no errors converting the datamember to a field
+        Field boolFieldFromMember = flattened["bool"];
+        Field innerFloatFieldFromMember = flattened["inner.float"];
+        Field innerIntFieldFromMember = flattened["inner.int"];
+
+        TEST_ASSERT_TRUE_MESSAGE(boolFieldFromMember == boolField, "Bool fields are not the same");
+        TEST_ASSERT_TRUE_MESSAGE(innerFloatFieldFromMember == floatField, "Inner float fields are not the same");
+        TEST_ASSERT_TRUE_MESSAGE(innerIntFieldFromMember == intField, "Inner int fields are not the same");
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "Encountered an error while running test_nested_data_type and flattenFull(): " << std::endl;
         // print out stack trace
         std::cout << e.what() << std::endl;
         TEST_FAIL_MESSAGE(e.what());

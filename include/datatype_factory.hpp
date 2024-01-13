@@ -9,6 +9,15 @@
 #include <string.h>
 #include <type_traits>
 #include <sstream>
+#include <vector>
+
+/// @brief
+// DataTypes have a name, size and a map of fields from fieldName to field values
+// Each field has a name, a variable type and a possible predfefined value
+// The field may be a custom DataType, in this case, we must recursively search for primative
+// Thinking about DataTypes as a forest of trees is the best way to think of it,
+// with the rule that the bottom leaf of all trees will be a primative (NOT custom) datatype, with a possible predefined definition
+//
 
 enum FieldType
 {
@@ -18,14 +27,6 @@ enum FieldType
     STRING,
     VERSION,
 };
-
-/// @brief
-// DataTypes have a name, size and a map of fields from fieldName to field values
-// Each field has a name, a variable type and a possible predfefined value
-// The field may be a custom DataType, in this case, we must recursively search for primative
-// Thinking about DataTypes as a forest of trees is the best way to think of it,
-// with the rule that the bottom leaf of all trees will be a primative (NOT custom) datatype, with a possible predefined definition
-//
 
 #pragma region Node types
 
@@ -194,6 +195,22 @@ struct Value
 
         ss << "  ValueSize: " << std::dec << this->valueSize << std::endl;
         return ss.str();
+    }
+
+    /// @brief Returns the binary representation of the value
+    /// @return std::vector<std::uint8_t>
+    std::vector<std::uint8_t> toBinary() const
+    {
+        std::vector<std::uint8_t> binary;
+        if (this->valuePtr.get() == nullptr)
+        {
+            return binary;
+        }
+
+        // copy the valuePtr into the binary vector
+        binary.resize(this->valueSize);
+        memcpy(binary.data(), this->valuePtr.get(), this->valueSize);
+        return binary;
     }
 };
 
