@@ -24,9 +24,9 @@ std::vector<Token> Tokenizer::tokenize()
     while (file.good())
     {
         Token token = getNextToken(file);
+        tokens.push_back(token);
         if (token.type == END_OF_FILE)
             break;
-        tokens.push_back(token);
     }
 
     file.close();

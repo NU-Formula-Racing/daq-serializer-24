@@ -19,4 +19,4 @@ def CarData
 }
 
 # frame definition (a special required definition)
-frame(CarData)
+frame(CarData);

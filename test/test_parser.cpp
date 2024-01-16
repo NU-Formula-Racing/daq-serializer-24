@@ -19,6 +19,7 @@ void test_sequence(std::string filename)
     ss << result.message.str();
     TEST_ASSERT_TRUE_MESSAGE(result.isValid, ss.str().c_str());
 }
+
 void test_simple_sequence_validation(void)
 {
     test_sequence("./test/static/test_valid_meta.drive");

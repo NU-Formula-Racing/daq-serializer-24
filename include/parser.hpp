@@ -63,11 +63,15 @@ public:
             return result;
         }
 
-        static ParsingResult ok()
+        static ParsingResult ok(std::string message = "")
         {
             ParsingResult result;
             result.isValid = true;
-            result.message << "Parsing successful" << std::endl;
+            if (message != "")
+                result.message << message << std::endl;
+            else {
+                result.message << "Parsing Successful" << std::endl;
+            }
             return result;
         }
 

@@ -139,7 +139,7 @@ void test_flat_data_type(void)
     }
 }
 
-void test_nested_data_type(void)
+void test_nested_data_type_flatten(void)
 {
     // nested data type hierarchy
     // def innerType:
@@ -184,21 +184,17 @@ void test_nested_data_type(void)
         Field boolFieldFromMember = boolMember.getField();
         std::cout << "getting inner type from member" << std::endl;
         DataType innerTypeFromMember = innerMember.getDataType();
-
         std::cout << "got fields from members" << std::endl;
         // now test that the fields are the is_same
         TEST_ASSERT_TRUE_MESSAGE(boolFieldFromMember == boolField, "Bool fields are not the same");
         TEST_ASSERT_TRUE_MESSAGE(innerTypeFromMember == innerType, "Inner types are not the same");
-        
         // now test that the inner type is correct
         std::map<std::string, DataMember> innerFlatMembers = innerTypeFromMember.flatten();
         TEST_ASSERT_TRUE_MESSAGE(innerFlatMembers.size() == 2, "Inner flat members size is not 2");
         DataMember innerFloatMember = innerFlatMembers["float"];
         DataMember innerIntMember = innerFlatMembers["int"];
-
         Field innerFloatFieldFromMember = innerFloatMember.getField();
         Field innerIntFieldFromMember = innerIntMember.getField();
-
         TEST_ASSERT_TRUE_MESSAGE(innerFloatFieldFromMember == floatField, "Inner float fields are not the same");
         TEST_ASSERT_TRUE_MESSAGE(innerIntFieldFromMember == intField, "Inner int fields are not the same");
     }
@@ -250,5 +246,5 @@ void TestingSuite::runDataTypeFactoryTests()
 
     // data type tests
     RUN_TEST(test_flat_data_type);
-    RUN_TEST(test_nested_data_type);
+    RUN_TEST(test_nested_data_type_flatten);
 }

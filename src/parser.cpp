@@ -80,6 +80,9 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         case Parser::ParserScope::GLOBAL_SCOPE:
             // we should not be in the global scope at this point of the code
             // only def, frame, and meta are allowed in the global scope
+            if (tokens[i].type == END_OF_FILE)
+                // we have reached the end of the file, so we are done -- but we haven't found a frame
+                return Parser::ParsingResult::ok("No frame found in file, but file is valid");
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected def, frame, or meta");
         case Parser::ParserScope::DATA_TYPE_SCOPE:
             // we should only be in the data type scope if we are in a def
@@ -126,10 +129,16 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
             scope = Parser::ParserScope::POST_FRAME_SCOPE;
             continue;
         case Parser::ParserScope::POST_FRAME_SCOPE:
-            if (tokens[i].type != END_OF_FILE)
-                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected end of file");
+            if (tokens[i].type != SEMICOLON)
+                return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected semicolon");
+            if (tokens[i+1].type != END_OF_FILE)
+                return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected end of file");
+            i += 2;
+            continue;
         default:
-            return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Unknown scope");
+            std::stringstream ss;
+            ss << "Unknown scope: " << scope;
+            return Parser::ParsingResult::invalidSequence(tokens[i].type, i, ss.str());
         }
     }
 

@@ -319,6 +319,7 @@ std::map<std::string, Field> DataType::flattenFull() const
         std::map<std::string, Field> flattenedCustomDataType = customDataType.second.flattenFull();
         for (auto &field : flattenedCustomDataType)
         {
+            std::cout << "Adding field " << field.first << std::endl;
             flattened[customDataType.first + "." + field.first] = field.second;
         }
     }

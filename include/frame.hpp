@@ -47,7 +47,9 @@ public:
         // Check if the field exists
         if (std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) == this->_fieldNames.end())
         {
-            throw std::invalid_argument("Field does not exist in frame template");
+            std::stringstream err;
+            err << "Field does not exist in frame template: " << fieldName;
+            throw std::invalid_argument(err.str());
         }
 
         // Get the index of the field
@@ -67,7 +69,9 @@ public:
         // Check if the field exists
         if (std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) == this->_fieldNames.end())
         {
-            throw std::invalid_argument("Field does not exist in frame template");
+            std::stringstream err;
+            err << "Field does not exist in frame template: " << fieldName;
+            throw std::invalid_argument(err.str());
         }
 
         // Get the index of the field
