@@ -3,6 +3,50 @@
 #include "testing_suite.hpp"
 #include "datatype_factory.hpp"
 
+void test_value_int(void)
+{
+    Value value = 123;
+    TEST_ASSERT_TRUE(value == 123);
+    TEST_ASSERT_TRUE(value.get<int>() == 123);
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
+void test_value_float(void)
+{
+    Value value = 123.456f;
+    TEST_ASSERT_TRUE(value == 123.456f);
+    TEST_ASSERT_TRUE(value.get<float>() == 123.456f);
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
+void test_value_bool(void)
+{
+    Value value = true;
+    TEST_ASSERT_TRUE(value == true);
+    TEST_ASSERT_TRUE(value.get<bool>() == true);
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
+void test_value_string(void)
+{
+    Value value = "hello world! i am evan";
+    TEST_ASSERT_TRUE(value == "hello world! i am evan");
+    TEST_ASSERT_TRUE(value.get<std::string>() == "hello world! i am evan");
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
+void test_value_version(void)
+{
+    int version[3] = {1, 2, 3};
+    Value value = version;
+    TEST_ASSERT_TRUE(value == version);
+    int *versionPtr = value.get<int *>();
+    TEST_ASSERT_TRUE(versionPtr[0] == 1);
+    TEST_ASSERT_TRUE(versionPtr[1] == 2);
+    TEST_ASSERT_TRUE(versionPtr[2] == 3);
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
 void test_field_predefined_int(void)
 {
     Field field = Field::predfinedField("test", 123);
@@ -231,6 +275,13 @@ void test_nested_data_type_flatten(void)
 
 void TestingSuite::runDataTypeFactoryTests()
 {
+    // value tests
+    RUN_TEST(test_value_int);
+    RUN_TEST(test_value_float);
+    RUN_TEST(test_value_bool);
+    RUN_TEST(test_value_string);
+    RUN_TEST(test_value_version);
+
     // field tests
     RUN_TEST(test_field_predefined_int);
     RUN_TEST(test_field_predefined_float);
