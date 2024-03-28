@@ -110,7 +110,7 @@ struct Value
             {
                 return value == 0;
             }
-            else if (std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, char *>::value)
+            else if (std::is_same<T, const char *>::value || std::is_same<T, char *>::value)
             {
                 char *valueComp = (char *)(&value);
                 return strcmp(valueComp, "") == 0;
@@ -142,8 +142,8 @@ struct Value
         // compare the values
         // cast the valuePtr to a pointer of type T
         std::cout << "Comparing valuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << " to value: " << value << std::endl;
-        T *valueComp = (T *)(this->valuePtr.get());
-        return *valueComp == value;
+        T valueComp = this->get<T>();
+        return valueComp == value;
     };
 
     /// @brief Equality operator for Value
@@ -188,6 +188,18 @@ struct Value
     T get() const
     {
         return *(T *)(this->valuePtr.get());
+    }
+
+    std::string get() const
+    {
+        if (this->valueSize == sizeof(char *))
+        {
+            // this is probably a c-style string
+            return std::string((char *)(this->valuePtr.get()));
+        }
+
+        // this is probably a std::string
+        return *(std::string *)(this->valuePtr.get());
     }
 
     /// @brief Returns a string representation of the value
