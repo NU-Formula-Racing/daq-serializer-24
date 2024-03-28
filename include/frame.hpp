@@ -35,6 +35,8 @@ public:
     FrameTemplate() {}
     FrameTemplate(const DataType &type) : _baseType(std::make_shared<DataType>(type)) 
     {
+        // std::cout << "Building frame template" << std::endl;
+        // std::cout << "Type: " << _baseType->toString() << std::endl;
         this->_buildTemplate();
     }
 
@@ -64,8 +66,10 @@ public:
     /// @param fieldName The name of the field to get -- to access nested fields, use dot notation, for example: "innerField.field"
     /// @return The value of the field
     template <typename T>
-    T get(std::string fieldName)
+    T get(std::string fieldName) const
     {
+        // Get the value
+        std::cout << "Getting value " << fieldName << std::endl;
         // Check if the field exists
         if (std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) == this->_fieldNames.end())
         {
@@ -74,10 +78,10 @@ public:
             throw std::invalid_argument(err.str());
         }
 
+        std::cout << "Field exists" << std::endl;
         // Get the index of the field
         auto index = std::distance(this->_fieldNames.begin(), std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName));
-
-        // Get the value
+        std::cout << "Index: " << index << std::endl;
         return this->_values[index].get<T>();
     }
 
@@ -120,9 +124,11 @@ private:
     void _buildTemplate()
     {
         std::map<std::string, Field> flattenedFields = this->_baseType->flattenFull();
+        // std::cout << "Flattening from:" << std::endl;
+        std::cout << this->_baseType->toString() << std::endl;
         for (auto &field : flattenedFields)
         {
-            std::cout << "field: " << field.first << std::endl;
+            // std::cout << "field: " << field.first << std::endl;
             this->_fieldNames.push_back(field.first);
             this->_values.push_back(field.second.value);
         }

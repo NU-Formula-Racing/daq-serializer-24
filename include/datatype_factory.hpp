@@ -303,7 +303,7 @@ struct Field
 
     ///@brief Empty Constructor
     ///@details Creates an empty field with no name, type or value
-    Field() = default;
+    Field() = default;   
 
     /// @brief Copy Constructor for Field
     /// @details Creates a shallow copy of the field -- most notably, the Value that the field holds is a pointer to the same value

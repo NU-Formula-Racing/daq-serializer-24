@@ -154,6 +154,7 @@ DataMember DataMember::operator[](const std::string &fieldName)
 
 Field DataMember::getField()
 {
+   
     if (memberPtr == nullptr)
     {
         throw std::invalid_argument("DataMember is null");
@@ -216,6 +217,7 @@ DataType::DataType(const DataType &other)
     this->size = other.size;
     // ideally this would be a deep copy...
     this->fields = other.fields;
+    this->customDataTypes = other.customDataTypes;
 }
 
 DataType &DataType::operator=(const DataType &other)
@@ -224,6 +226,7 @@ DataType &DataType::operator=(const DataType &other)
     this->name = other.name;
     this->size = other.size;
     this->fields = other.fields;
+    this->customDataTypes = other.customDataTypes;
     return *this;
 }
 
@@ -231,7 +234,8 @@ bool DataType::operator==(const DataType &other) const
 {
     return this->name == other.name &&
            this->size == other.size &&
-           this->fields == other.fields;
+           this->fields == other.fields &&
+           this->customDataTypes == other.customDataTypes;
 }
 
 DataMember DataType::operator[](const std::string &fieldName) const
@@ -241,7 +245,9 @@ DataMember DataType::operator[](const std::string &fieldName) const
 
 void DataType::addField(const Field &field)
 {
-    this->fields[field.name] = field;
+    // copy the field over
+    Field newField(field);
+    this->fields[field.name] = newField;
     this->size += field.size;
 };
 
@@ -258,7 +264,9 @@ void DataType::removeField(const std::string &fieldName)
 
 void DataType::addCustomField(const std::string &fieldName, const DataType &dataType)
 {
-    this->customDataTypes[fieldName] = dataType;
+    // copy the dataType over
+    DataType newDataType(dataType);
+    this->customDataTypes[fieldName] = newDataType;
     this->size += dataType.size;
 };
 

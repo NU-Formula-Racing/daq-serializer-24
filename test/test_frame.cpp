@@ -22,7 +22,6 @@ DataType build_example_datatype()
     outerType.addField(field4);
     outerType.addField(field5);
     outerType.addCustomField("innerField", innerType);
-
     return outerType;
 }
 
@@ -40,7 +39,8 @@ void test_frame_template_constructor()
 
 void test_frame_template_set()
 {
-    FrameTemplate frameTemplate = FrameTemplate(build_example_datatype());
+    DataType type = build_example_datatype();
+    FrameTemplate frameTemplate = FrameTemplate(type);
     frameTemplate.set("field4", "test");
     frameTemplate.set("innerField.field1", 1);
     frameTemplate.set("innerField.field2", 2.0f);
