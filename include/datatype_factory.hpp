@@ -60,7 +60,7 @@ struct Value
             throw std::invalid_argument("Cannot create a Value from a Value");
         }
 
-        // set the value
+
         this->valuePtr = std::make_shared<T>(value);
         this->valueSize = sizeof(T);
     };
@@ -237,9 +237,12 @@ inline std::string Value::get<std::string>() const
     if (this->valueSize == sizeof(char *))
     {
         // this is probably a c-style string
-        return std::string((char *)(this->valuePtr.get()));
+        std::cout << "Value is a c-string" << std::endl;
+        char* cString = *(char **)(this->valuePtr.get());  
+        return std::string(cString);
     }
 
+    std::cout << "Value is a std::string" << std::endl;
     // this is probably a std::string
     return *(std::string *)(this->valuePtr.get());
 }

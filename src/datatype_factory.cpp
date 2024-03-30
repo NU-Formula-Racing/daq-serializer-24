@@ -8,12 +8,6 @@
 
 #include "datatype_factory.hpp"
 
-#pragma region Value
-
-
-
-#pragma endregion
-
 #pragma region Field
 
 // STATIC METHODS
