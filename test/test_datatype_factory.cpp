@@ -31,6 +31,7 @@ void test_value_string(void)
 {
     Value value = "hello world! i am evan";
     TEST_ASSERT_TRUE(value == "hello world! i am evan");
+    std::cout << "RAH" << std::endl;
     TEST_ASSERT_TRUE(value.get<std::string>() == "hello world! i am evan");
     TEST_ASSERT_TRUE(value.isValid());
 }

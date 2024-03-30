@@ -71,7 +71,7 @@ struct Value
     Value(const Value &other)
     {
         this->valuePtr = other.valuePtr;
-        this->valueSize = other.valueSize;        
+        this->valueSize = other.valueSize;
     };
 
     /// @brief Assignment operator for Value
@@ -187,19 +187,8 @@ struct Value
     template <typename T>
     T get() const
     {
+        std::cout << "Value::get<T>()" << std::endl;
         return *(T *)(this->valuePtr.get());
-    }
-
-    std::string get() const
-    {
-        if (this->valueSize == sizeof(char *))
-        {
-            // this is probably a c-style string
-            return std::string((char *)(this->valuePtr.get()));
-        }
-
-        // this is probably a std::string
-        return *(std::string *)(this->valuePtr.get());
     }
 
     /// @brief Returns a string representation of the value
@@ -208,9 +197,12 @@ struct Value
     {
         std::stringstream ss;
         ss << "Value: " << std::endl;
-        if (this->valuePtr.get() == nullptr) {
+        if (this->valuePtr.get() == nullptr)
+        {
             ss << "  ValuePtr: null" << std::endl;
-        } else {
+        }
+        else
+        {
             ss << "  ValuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << std::endl;
         }
 
@@ -234,6 +226,23 @@ struct Value
         return binary;
     }
 };
+
+/// @brief Explicit specialization of the get method for std::string to cope
+/// with the fact that std::string and char* can be implicitly converted to
+/// @return std::string
+template <>
+inline std::string Value::get<std::string>() const
+{
+    std::cout << "Value::get<std::string>()" << std::endl;
+    if (this->valueSize == sizeof(char *))
+    {
+        // this is probably a c-style string
+        return std::string((char *)(this->valuePtr.get()));
+    }
+
+    // this is probably a std::string
+    return *(std::string *)(this->valuePtr.get());
+}
 
 struct Field
 {
@@ -315,7 +324,7 @@ struct Field
 
     ///@brief Empty Constructor
     ///@details Creates an empty field with no name, type or value
-    Field() = default;   
+    Field() = default;
 
     /// @brief Copy Constructor for Field
     /// @details Creates a shallow copy of the field -- most notably, the Value that the field holds is a pointer to the same value
@@ -391,7 +400,6 @@ struct DataMember
     /// @brief Gets a string representation of the DataMember
     /// @return std::string
     std::string toString() const;
-
 };
 
 /// @brief A datatype is a contianer for a set of fields, and may be nested

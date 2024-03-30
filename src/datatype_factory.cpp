@@ -8,6 +8,12 @@
 
 #include "datatype_factory.hpp"
 
+#pragma region Value
+
+
+
+#pragma endregion
+
 #pragma region Field
 
 // STATIC METHODS
@@ -154,7 +160,7 @@ DataMember DataMember::operator[](const std::string &fieldName)
 
 Field DataMember::getField()
 {
-   
+
     if (memberPtr == nullptr)
     {
         throw std::invalid_argument("DataMember is null");
