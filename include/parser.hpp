@@ -14,7 +14,7 @@ struct Token;
 struct Schema
 {
     std::string schemaName;
-    int versionNumber[3];
+    int *versionNumber;
     std::shared_ptr<FrameTemplate> frameTemplate;
 };
 
@@ -49,6 +49,26 @@ public:
             ParsingResult result(token, index);
             result.message << "Invalid sequence : " << description << std::endl;
             result.isValid = false;
+            return result;
+        }
+
+        static ParsingResult invalidDataType(TokenType token, int index, std::string description)
+        {
+            ParsingResult result(token, index);
+            result.message << "Invalid data type: " << description << std::endl;
+            result.isValid = false;
+            return result;
+        }
+
+        static ParsingResult missingMetaInformation(std::vector<std::string> missingFields)
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Missing meta information: " << std::endl;
+            for (auto field : missingFields)
+            {
+                result.message << field << std::endl;
+            }
             return result;
         }
 
@@ -101,6 +121,9 @@ private:
     bool _isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex) const;
     int _levensteinDistance(const std::string &word1, const std::string &word2) const;
     ParsingResult _validateMetaFields(std::map<std::string, Token> &metaFields) const;
+
+    int* _parseVersion(const std::string &versionString) const;
+
 };
 
 #endif // __PARSER_H__

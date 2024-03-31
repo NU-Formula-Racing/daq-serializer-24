@@ -352,13 +352,6 @@ struct Field
 
 struct DataType;
 
-struct SchemaMeta
-{
-    std::string schemaName;
-    int versionNumber[3];
-    std::map<std::string, DataType> additionalFields;
-};
-
 /// @brief Contiains either a field or a custom DataType
 struct DataMember
 {

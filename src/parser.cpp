@@ -246,6 +246,12 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // now validate the pairs
             ParsingResult metaPairValidation = this->_validateMetaFields(pairs);
 
+            if (!metaPairValidation.isValid)
+                return metaPairValidation;
+
+            // now we can add the meta data to the schema
+            schema.schemaName = pairs.at(".schema").value;
+            schema.versionNumber = this->_parseVersion(pairs.at(".version").value);
             break;
         }
     }
@@ -294,6 +300,13 @@ int Parser::_levensteinDistance(const std::string &word1, const std::string &wor
 
 Parser::ParsingResult Parser::_validateMetaFields(std::map<std::string, Token> &metaFields) const
 {
+    std::vector<std::string> missingFields;
+    for (auto const &field : this->_EXPECTED_META_FIELDS)
+    {
+        if (metaFields.find(field.first) == metaFields.end())
+            missingFields.push_back(field.first);
+    }
+
     for (auto const &field : metaFields)
     {
         if (this->_EXPECTED_META_FIELDS.find(field.first) == this->_EXPECTED_META_FIELDS.end())
@@ -321,9 +334,32 @@ Parser::ParsingResult Parser::_validateMetaFields(std::map<std::string, Token> &
             std::stringstream ss;
             ss << "Invalid type for meta field: " << Tokenizer::tokenTypeToString(field.second.type) 
                 << ". Expected " << Tokenizer::tokenTypeToString(this->_EXPECTED_META_FIELDS.at(field.first));
-            return Parser::ParsingResult::invalidSequence(field.second.type, 0, ss.str());
+            return Parser::ParsingResult::invalidDataType(field.second.type, 0, ss.str());
         }
+
+        // now mark the field as found
+        missingFields.erase(std::remove(missingFields.begin(), missingFields.end(), field.first), missingFields.end());
+    }
+
+    if (!missingFields.empty())
+    {
+        return Parser::ParsingResult::missingMetaInformation(missingFields);
     }
 
     return Parser::ParsingResult::ok();
+}
+
+int* Parser::_parseVersion(const std::string &versionString) const
+{
+    std::regex versionRegex("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
+    std::smatch match;
+    if (!std::regex_match(versionString, match, versionRegex))
+        return nullptr;
+
+    int *version = new int[3];
+    version[0] = std::stoi(match[1]);
+    version[1] = std::stoi(match[2]);
+    version[2] = std::stoi(match[3]);
+
+    return version;
 }
