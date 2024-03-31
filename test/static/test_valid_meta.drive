@@ -2,5 +2,5 @@ meta # define metadata about the schema
 {
     # schema name
     .schema : "valid-test-schema";
-    .meta : 1.0.1;
+    .version : 1.0.1;
 }

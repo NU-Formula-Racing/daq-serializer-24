@@ -27,7 +27,6 @@ struct Frame
     std::vector<std::uint8_t> data;
 };
 
-
 /// @brief A frame template is uses a DataType to define the structure of the frame
 class FrameTemplate
 {
@@ -134,6 +133,8 @@ private:
         }
     }
 };
+
+
 
 #pragma endregion
 

@@ -8,6 +8,7 @@
 #include <exception>
 #include <regex>
 #include <sstream>
+#include <queue>
 
 #include "tokenizer.hpp"
 #include "parser.hpp"
@@ -21,7 +22,7 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         // scope checking
         if (tokens[i].type == L_BRACE || tokens[i].type == L_PARENTHESES)
         {
-            if (!isScopeClosed(tokens, i))
+            if (!_isScopeClosed(tokens, i))
                 return Parser::ParsingResult::unclosedScope(tokens[i].type, i);
 
             i++; // continue to inside of scope
@@ -48,7 +49,7 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left parentheses after frame");
         if (tokens[i].type == META && tokens[i + 1].type != L_BRACE)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left brace after meta");
-        
+
         // now progress the index based on the scope type
         if (tokens[i].type == DEF)
         {
@@ -73,7 +74,7 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         }
 
         // std::cout << "Evaluating within scope: " << scope << std::endl;
-        
+
         // CHECK FOR SCOPES
         switch (scope)
         {
@@ -95,10 +96,10 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
             }
             if (tokens[i].type != IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i+1].type != IDENTIFIER)
-                return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected identifier type");
-            if (tokens[i+2].type != SEMICOLON)
-                return Parser::ParsingResult::invalidSequence(tokens[i+2].type, i+2, "Expected semicolon");
+            if (tokens[i + 1].type != IDENTIFIER)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected identifier type");
+            if (tokens[i + 2].type != SEMICOLON)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 2].type, i + 2, "Expected semicolon");
             i += 3;
             continue;
         case Parser::ParserScope::META_SCOPE:
@@ -112,27 +113,27 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
             }
             if (tokens[i].type != IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i+1].type != COLON)
-                return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected colon");
-            if (tokens[i+2].type < INT_LITERAL || tokens[i+2].type > VERSION_LITERAL)
-                return Parser::ParsingResult::invalidSequence(tokens[i+2].type, i+2, "Expected a literal");
-            if (tokens[i+3].type != SEMICOLON)
-                return Parser::ParsingResult::invalidSequence(tokens[i+3].type, i+3, "Expected semicolon");
+            if (tokens[i + 1].type != COLON)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected colon");
+            if (tokens[i + 2].type < INT_LITERAL || tokens[i + 2].type > VERSION_LITERAL)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 2].type, i + 2, "Expected a literal");
+            if (tokens[i + 3].type != SEMICOLON)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 3].type, i + 3, "Expected semicolon");
             i += 4;
             continue;
         case Parser::ParserScope::FRAME_SCOPE:
             if (tokens[i].type != IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i+1].type != R_PARENTHESES)
-                return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected right parentheses");
+            if (tokens[i + 1].type != R_PARENTHESES)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected right parentheses");
             i += 2;
             scope = Parser::ParserScope::POST_FRAME_SCOPE;
             continue;
         case Parser::ParserScope::POST_FRAME_SCOPE:
             if (tokens[i].type != SEMICOLON)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected semicolon");
-            if (tokens[i+1].type != END_OF_FILE)
-                return Parser::ParsingResult::invalidSequence(tokens[i+1].type, i+1, "Expected end of file");
+            if (tokens[i + 1].type != END_OF_FILE)
+                return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected end of file");
             i += 2;
             continue;
         default:
@@ -142,11 +143,10 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         }
     }
 
-    
     return Parser::ParsingResult::ok();
 }
 
-bool Parser::isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex)
+bool Parser::_isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex) const
 {
     TokenType openType = tokens[openingScopeIndex].type;
     if (openType != L_BRACE && openType != L_PARENTHESES)
@@ -170,4 +170,160 @@ bool Parser::isScopeClosed(const std::vector<Token> &tokens, int openingScopeInd
     }
 
     return false;
+}
+
+Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Schema &out)
+{
+    // first check if the sequence is valid
+    Parser::ParsingResult result = isValidSequence(tokens);
+    if (!result.isValid)
+        return result;
+
+    // now we can build the schema
+    Schema schema;
+    Parser::ParserScope scope = Parser::ParserScope::GLOBAL_SCOPE;
+
+    // copy the tokens to a queue
+    std::queue<Token> tokenQueue;
+    for (auto token : tokens)
+        tokenQueue.push(token);
+
+    while (!tokenQueue.empty())
+    {
+        // fetch the current scope
+        Token currentToken = tokenQueue.front();
+        tokenQueue.pop();
+
+        // scope checking
+        switch (currentToken.type)
+        {
+        case META:
+            scope = Parser::ParserScope::META_SCOPE;
+            continue;
+        case DEF:
+            scope = Parser::ParserScope::DATA_TYPE_SCOPE;
+            continue;
+        case FRAME:
+            scope = Parser::ParserScope::FRAME_SCOPE;
+            continue;
+        default:
+            // this should have been caught by the isValidSequence function
+            return Parser::ParsingResult::invalidToken(currentToken.type, 0);
+        }
+
+        // now we want to interpret the tokens based on the scope
+        switch (scope)
+        {
+        case Parser::ParserScope::META_SCOPE:
+            // we need to read the meta data
+            // we can assume that the next token is an identifier
+            // either ".schema" or ".version"
+
+            // eat the left brace
+            Token identifier = tokenQueue.front();
+            tokenQueue.pop();
+
+            // now build identifier-value pairs
+            std::map<std::string, Token> pairs;
+
+            while (identifier.type != R_BRACE)
+            {
+                // we expect an identifier : literal pair
+                // this should be validated by the isValidSequence function
+                std::string identifierStr = identifier.value;
+                tokenQueue.pop(); // eat the colon
+                Token value = tokenQueue.front();
+                tokenQueue.pop();
+
+                // now we can add the pair to the map
+                // first check if the identifier is not already in the map
+                if (pairs.find(identifierStr) != pairs.end())
+                    return Parser::ParsingResult::invalidSequence(identifier.type, 0, "Duplicate identifier in meta data");
+                
+                pairs[identifierStr] = value;
+            }
+
+            // now validate the pairs
+            ParsingResult metaPairValidation = this->_validateMetaFields(pairs);
+
+            break;
+        }
+    }
+}
+
+int Parser::_levensteinDistance(const std::string &word1, const std::string &word2) const
+{
+    int size1 = word1.size();
+    int size2 = word2.size();
+    int verif[size1 + 1][size2 + 1]; // Verification matrix i.e. 2D array which will store the calculated distance.
+
+    // If one of the words has zero length, the distance is equal to the size of the other word.
+    if (size1 == 0)
+        return size2;
+    if (size2 == 0)
+        return size1;
+
+    // Sets the first row and the first column of the verification matrix with the numerical order from 0 to the length of each word.
+    for (int i = 0; i <= size1; i++)
+        verif[i][0] = i;
+    for (int j = 0; j <= size2; j++)
+        verif[0][j] = j;
+
+    // Verification step / matrix filling.
+    for (int i = 1; i <= size1; i++)
+    {
+        for (int j = 1; j <= size2; j++)
+        {
+            // Sets the modification cost.
+            // 0 means no modification (i.e. equal letters) and 1 means that a modification is needed (i.e. unequal letters).
+            int cost = (word2[j - 1] == word1[i - 1]) ? 0 : 1;
+
+            // Sets the current position of the matrix as the minimum value between a (deletion), b (insertion) and c (substitution).
+            // a = the upper adjacent value plus 1: verif[i - 1][j] + 1
+            // b = the left adjacent value plus 1: verif[i][j - 1] + 1
+            // c = the upper left adjacent value plus the modification cost: verif[i - 1][j - 1] + cost
+            verif[i][j] = std::min(
+                std::min(verif[i - 1][j] + 1, verif[i][j - 1] + 1),
+                verif[i - 1][j - 1] + cost);
+        }
+    }
+
+    // The last position of the matrix will contain the Levenshtein distance.
+    return verif[size1][size2];
+}
+
+Parser::ParsingResult Parser::_validateMetaFields(std::map<std::string, Token> &metaFields) const
+{
+    for (auto const &field : metaFields)
+    {
+        if (this->_EXPECTED_META_FIELDS.find(field.first) == this->_EXPECTED_META_FIELDS.end())
+        {
+            // check for a close match
+            std::string closestMatch;
+            int closestDistance = INT_MAX;
+            for (auto const &expectedField : this->_EXPECTED_META_FIELDS)
+            {
+                int distance = _levensteinDistance(field.first, expectedField.first);
+                if (distance < closestDistance)
+                {
+                    closestMatch = expectedField.first;
+                    closestDistance = distance;
+                }
+            }
+
+            std::stringstream ss;
+            ss << "Invalid meta field: " << field.first << ". Did you mean " << closestMatch << "?";
+            return Parser::ParsingResult::invalidSequence(field.second.type, 0, ss.str());
+        }
+
+        if (metaFields[field.first].type != this->_EXPECTED_META_FIELDS.at(field.first))
+        {
+            std::stringstream ss;
+            ss << "Invalid type for meta field: " << Tokenizer::tokenTypeToString(field.second.type) 
+                << ". Expected " << Tokenizer::tokenTypeToString(this->_EXPECTED_META_FIELDS.at(field.first));
+            return Parser::ParsingResult::invalidSequence(field.second.type, 0, ss.str());
+        }
+    }
+
+    return Parser::ParsingResult::ok();
 }

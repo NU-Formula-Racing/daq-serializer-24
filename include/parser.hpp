@@ -7,13 +7,15 @@
 #include <map>
 
 #include "datatype_factory.hpp"
+#include "frame.hpp"
 
 struct Token;
 
 struct Schema
 {
-    SchemaMeta meta;
-    std::map<std::string, DataType> dataTypes;
+    std::string schemaName;
+    int versionNumber[3];
+    std::shared_ptr<FrameTemplate> frameTemplate;
 };
 
 class Parser
@@ -69,7 +71,8 @@ public:
             result.isValid = true;
             if (message != "")
                 result.message << message << std::endl;
-            else {
+            else
+            {
                 result.message << "Parsing Successful" << std::endl;
             }
             return result;
@@ -85,13 +88,19 @@ public:
         }
     };
 
-    Schema buildSchema(const std::vector<Token> &tokens);
+    ParsingResult buildSchema(const std::vector<Token> &tokens, Schema &out);
     ParsingResult isValidSequence(const std::vector<Token> &tokens);
 
 private:
+    const std::map<std::string, TokenType> _EXPECTED_META_FIELDS = {
+        {".schema", STRING_LITERAL},
+        {".version", VERSION_LITERAL}};
+
     std::map<std::string, DataType> _dataTypes;
 
-    bool isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex);
+    bool _isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex) const;
+    int _levensteinDistance(const std::string &word1, const std::string &word2) const;
+    ParsingResult _validateMetaFields(std::map<std::string, Token> &metaFields) const;
 };
 
 #endif // __PARSER_H__
