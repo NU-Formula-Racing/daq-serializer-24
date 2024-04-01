@@ -143,7 +143,10 @@ void test_valid_meta(void)
     std::string fileName = std::string("./test/static/test_valid_meta.drive");
     Tokenizer Tokenizer(fileName);
     TokenType expected[] = {
-        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE, END_OF_FILE
+        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE,  // meta
+        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def TestType
+        FRAME, L_PARENTHESES, IDENTIFIER, R_PARENTHESES, SEMICOLON,
+        END_OF_FILE
     };
 
     std::vector<Token> tokens  = Tokenizer.tokenize();

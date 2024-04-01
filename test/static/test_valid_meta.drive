@@ -4,3 +4,10 @@ meta # define metadata about the schema
     .schema : "valid-test-schema";
     .version : 1.0.1;
 }
+
+def TestType
+{
+    float value;
+}
+
+frame(TestType);
