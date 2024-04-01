@@ -72,6 +72,30 @@ public:
             return result;
         }
 
+        static ParsingResult missingMeta()
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Missing meta information" << std::endl;
+            return result;
+        }
+
+        static ParsingResult missingFrame()
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Missing frame information" << std::endl;
+            return result;
+        }
+
+        static ParsingResult duplicateDefinition(TokenType token, int index)
+        {
+            ParsingResult result(token, index);
+            result.message << "Duplicate definition: " << Tokenizer::tokenTypeToString(token) << std::endl;
+            result.isValid = false;
+            return result;
+        }
+
         static ParsingResult unclosedScope(TokenType token, int index)
         {
             ParsingResult result(token, index);

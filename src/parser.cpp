@@ -17,6 +17,36 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
 {
     Parser::ParserScope scope = Parser::ParserScope::GLOBAL_SCOPE;
 
+    // check for multiple meta tokens -- only one is allowed
+    int metaCount = 0;
+    for (int i = 0; i < tokens.size(); i++)
+    {
+        Token token = tokens[i];
+        if (token.type == META)
+            metaCount++;
+
+        if (metaCount > 1)
+            return Parser::ParsingResult::duplicateDefinition(META, i);
+    }
+
+    if (metaCount == 0)
+        return Parser::ParsingResult::missingMeta();
+
+    // check for multiple frame tokens -- only one is allowed
+    int frameCount = 0;
+    for (int i = 0; i < tokens.size(); i++)
+    {
+        Token token = tokens[i];
+        if (token.type == FRAME)
+            frameCount++;
+
+        if (frameCount > 1)
+            return Parser::ParsingResult::duplicateDefinition(FRAME, i);
+    }
+
+    if (frameCount == 0)
+        return Parser::ParsingResult::missingFrame();
+
     for (int i = 0; i < tokens.size();)
     {
         // scope checking
