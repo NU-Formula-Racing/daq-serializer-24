@@ -2,7 +2,7 @@
 meta
 {
 	# required meta-information (denoted with the '.')
-	.schema : "test-full";
+	.schema : "full-test-schema";
 	.version : 1.0.0;
 }
 

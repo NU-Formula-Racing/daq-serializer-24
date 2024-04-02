@@ -25,6 +25,7 @@ namespace daq::impl
     {
         INT,
         FLOAT,
+        LONG,
         BOOL,
         STRING,
         VERSION,
@@ -291,6 +292,11 @@ namespace daq::impl
             {
                 field.type = FieldType::BOOL;
                 field.size = sizeof(bool);
+            }
+            else if (std::is_same<T, long>::value)
+            {
+                field.type = FieldType::LONG;
+                field.size = sizeof(long);
             }
             else if (std::is_same<T, const char *>::value)
             {

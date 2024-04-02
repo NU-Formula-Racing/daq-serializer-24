@@ -185,6 +185,8 @@ namespace daq::impl
              { return Field::emptyField(name, FieldType::STRING); }},
             {"int", [](std::string name)
              { return Field::emptyField(name, FieldType::INT); }},
+            {"long", [](std::string name)
+             { return Field::emptyField(name, FieldType::INT); }},
             {"version", [](std::string name)
              { return Field::emptyField(name, FieldType::VERSION); }}};
 
