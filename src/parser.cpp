@@ -221,7 +221,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         tokenQueue.push(token);
 
     std::map<std::string, DataType> dataTypes; // holds the data types that have been defined
-    std::set<std::string> usedDataTypes;       // holds the names of the data types that have been used (minus primitives)
+    std::map<std::string, std::vector<std::tuple<std::string,std::string>>> dependencies; // holds the dependencies for each data type, maps from data type to a vector of dependencies 
 
     while (!tokenQueue.empty())
     {
@@ -348,19 +348,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 }
                 else
                 {
-                    // check if the type has been defined
-                    if (dataTypes.find(typeNameStr) == dataTypes.end())
-                    {
-                        // it has been defined, so we can add it to the prototype
-                        DataType innerType = dataTypes.at(typeNameStr);
-                        dataType.addCustomField(nameStr, innerType);
-                    }
+                    // this is a custom data type
+                    // we will skip it for now, and add it to the dependencies later
+                    std::cout << "Adding custom field to data type: " << typeNameStr << " : " << nameStr << std::endl;
+                    if (dependencies.find(definitionStr) == dependencies.end())
+                        dependencies[definitionStr] = std::vector<std::tuple<std::string,std::string>>{std::make_tuple(typeNameStr, nameStr)};
                     else
-                    {
-                        // it has not been defined, so we need to add it to the used data types
-                        usedDataTypes.insert(typeNameStr);
-                        dataType.addCustomField(nameStr, typeNameStr);
-                    }
+                        dependencies[definitionStr].push_back(std::make_tuple(typeNameStr, nameStr));
                 }
 
                 // eat the semicolon
@@ -389,6 +383,24 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // lets see if the type has been defined
             if (dataTypes.find(frameNameStr) == dataTypes.end())
                 return Parser::ParsingResult::undefinedType(frameNameStr);
+
+
+            // now, we need to resolve dependencies
+            if (dependencies.find(frameNameStr) != dependencies.end())
+            {
+                for (auto &dependency : dependencies.at(frameNameStr))
+                {
+                    std::string typeName = std::get<0>(dependency);
+                    std::string name = std::get<1>(dependency);
+
+                    // check if the type has been defined
+                    if (dataTypes.find(typeName) == dataTypes.end())
+                        return Parser::ParsingResult::undefinedType(typeName);
+
+                    // add the field to the data type
+                    dataTypes.at(frameNameStr).addCustomField(name, dataTypes.at(typeName));
+                }
+            }
 
             // now we can build the frame using the data type
             schema.frameTemplate = std::make_shared<FrameTemplate>(dataTypes.at(frameNameStr));

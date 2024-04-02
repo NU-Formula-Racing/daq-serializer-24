@@ -32,7 +32,7 @@ void test_full_sequence_validation(void)
     test_sequence("./test/static/test_full.drive");
 }
 
-void test_meta_extraction(void)
+void test_simple(void)
 {
     Tokenizer tokenizer("./test/static/test_valid_meta.drive");
     Parser parser;
@@ -46,11 +46,20 @@ void test_meta_extraction(void)
     for (int i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL(version[i], out.versionNumber[i]);
     }
+
+    // now test the frame template
+    // our frame should be of type TestType
+    // with a single float field called "value"
+
+    FrameTemplate frameTemplate = *out.frameTemplate;
+    TEST_ASSERT_EQUAL(1, frameTemplate.getFieldNames().size());
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("value"), "value not found in frame template");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("value").type == FieldType::FLOAT, "value is not of type FLOAT");
 }
 
 void TestingSuite::runParserTests()
 {
     RUN_TEST(test_simple_sequence_validation);
     RUN_TEST(test_full_sequence_validation);
-    RUN_TEST(test_meta_extraction);
+    RUN_TEST(test_simple);
 }

@@ -112,6 +112,19 @@ namespace daq::impl
             return std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) != this->_fieldNames.end();
         }
 
+        Field getField(std::string fieldName) const
+        {
+            // Check if the field exists
+            if (std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName) == this->_fieldNames.end())
+            {
+                std::stringstream err;
+                err << "Field does not exist in frame template: " << fieldName;
+                throw std::invalid_argument(err.str());
+            }
+            
+            return _baseType->getMember(fieldName).getField();
+        }
+
     private:
         std::shared_ptr<DataType> _baseType;
 
