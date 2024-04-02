@@ -218,6 +218,8 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
     for (auto token : tokens)
         tokenQueue.push(token);
 
+    std::map<std::string, DataType> dataTypes;
+
     while (!tokenQueue.empty())
     {
         // fetch the current scope
@@ -299,6 +301,11 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // now we can add the meta data to the schema
             schema.schemaName = pairs.at(".schema").value;
             schema.versionNumber = this->_parseVersion(pairs.at(".version").value);
+            break;
+        case Parser::ParserScope::DATA_TYPE_SCOPE:
+            // we need to read the data type
+            break;
+        default:
             break;
         }
     }
