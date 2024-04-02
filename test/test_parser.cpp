@@ -39,9 +39,11 @@ void test_meta_extraction(void)
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
     TEST_ASSERT_TRUE_MESSAGE(result.isValid, result.message.str().c_str());
-
-    TEST_ASSERT_EQUAL_STRING("valid-teast-schema", out.schemaName.c_str());
-    for (int i = 0; i < 3; i++) TEST_ASSERT_EQUAL(0, out.versionNumber[i]);
+    TEST_ASSERT_EQUAL_STRING("valid-test-schema", out.schemaName.c_str());
+    int version[3] = {1, 0, 1};
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL(version[i], out.versionNumber[i]);
+    }
 }
 
 void TestingSuite::runParserTests()

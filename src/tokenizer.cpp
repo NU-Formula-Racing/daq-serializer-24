@@ -80,6 +80,13 @@ Token Tokenizer::getNextToken(std::ifstream &file)
         isSymbol(word, token.type) ||
         isLiteral(word, token.type))
     {
+        if (token.type == STRING_LITERAL)
+        {
+            // remove the quotes from the string
+            token.value = word.substr(1, word.size() - 2);
+            return token;
+        }
+        
         token.value = word;
         return token;
     }

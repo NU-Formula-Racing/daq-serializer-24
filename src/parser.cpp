@@ -330,15 +330,44 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 tokenQueue.pop();
                 std::string typeNameStr = typeName.value;
 
-                Token dataType = tokenQueue.front();
+                Token name = tokenQueue.front();
                 tokenQueue.pop();
-                std::string dataTypeStr = dataType.value;
+                std::string nameStr = name.value;
 
-                std::cout << "Data type eval: " << typeNameStr << " : " << dataTypeStr << std::endl;
+                std::cout << "Data type eval: " << typeNameStr << " : " << nameStr << std::endl;
+
+                // check if this is a primitive type
+                if (this->_isPrimative(typeNameStr))
+                {
+                    // add the primitive type to the data type
+                    std::cout << "Adding primative field to data type: " << typeNameStr << " : " << nameStr << std::endl;
+                    Field field = this->_createPrimativeField(typeNameStr, nameStr);
+                    dataType.addField(field);
+                }
+                else
+                {
+                    // check if the type has been defined
+                    if (dataTypes.find(typeNameStr) == dataTypes.end())
+                    {
+                        // it has been defined, so we can add it to the prototype
+                        DataType innerType = dataTypes.at(typeNameStr);
+                        dataType.addCustomField(nameStr, innerType);
+                    }
+                    else
+                    {
+                        // it has not been defined, so we need to add it to the used data types
+                        usedDataTypes.insert(typeNameStr);
+                        dataType.addCustomField(nameStr, typeNameStr);
+                    }
+                }
 
                 // eat the semicolon
                 tokenQueue.pop();
             }
+
+            // add this to the data types
+            dataTypes[definitionStr] = dataType;
+
             // eat the right brace
             tokenQueue.pop();
             break;

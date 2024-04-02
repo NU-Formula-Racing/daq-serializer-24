@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.compute": "hlsl",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -61,7 +62,8 @@
         "iomanip": "cpp",
         "mutex": "cpp",
         "stop_token": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "set": "cpp"
     },
     "cmake.sourceDirectory": "D:/Documents/Code/School/NFR_23-24/daq-serializer-24/.pio/libdeps/esp32dev/Unity",
     "editor.fontLigatures": true,
