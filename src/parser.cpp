@@ -218,7 +218,8 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
     for (auto token : tokens)
         tokenQueue.push(token);
 
-    std::map<std::string, DataType> dataTypes;
+    std::map<std::string, DataType> dataTypes; // holds the data types that have been defined
+    std::set<std::string> usedDataTypes;       // holds the names of the data types that have been used (minus primitives)
 
     while (!tokenQueue.empty())
     {
@@ -251,6 +252,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         switch (scope)
         {
         case Parser::ParserScope::META_SCOPE:
+        {
             // we need to read the meta data
             // we can assume that the next token is an identifier
             // either ".schema" or ".version"
@@ -282,7 +284,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 // first check if the identifier is not already in the map
                 if (pairs.find(identifierStr) != pairs.end())
                     return Parser::ParsingResult::invalidSequence(identifier.type, 0, "Duplicate identifier in meta data");
-                
+
                 pairs[identifierStr] = value;
 
                 // eat the semicolon
@@ -302,11 +304,71 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             schema.schemaName = pairs.at(".schema").value;
             schema.versionNumber = this->_parseVersion(pairs.at(".version").value);
             break;
+        }
         case Parser::ParserScope::DATA_TYPE_SCOPE:
+        {
             // we need to read the data type
+            // eat the left brace
+            Token definition = tokenQueue.front();
+            tokenQueue.pop();
+            std::string definitionStr = definition.value;
+            std::cout << "Reading data type: " << definitionStr << std::endl;
+
+            // check if the data type has already been defined
+            if (dataTypes.find(definitionStr) != dataTypes.end())
+                return Parser::ParsingResult::duplicateTypeDefinition(definitionStr);
+
+            DataType dataType(definitionStr);
+
+            // eat the left brace
+            tokenQueue.pop();
+
+            while (tokenQueue.front().type != R_BRACE)
+            {
+                // our token sequence should be IDENTIFIER IDENTIFIER SEMICOLON
+                Token typeName = tokenQueue.front();
+                tokenQueue.pop();
+                std::string typeNameStr = typeName.value;
+
+                Token dataType = tokenQueue.front();
+                tokenQueue.pop();
+                std::string dataTypeStr = dataType.value;
+
+                std::cout << "Data type eval: " << typeNameStr << " : " << dataTypeStr << std::endl;
+
+                // eat the semicolon
+                tokenQueue.pop();
+            }
+            // eat the right brace
+            tokenQueue.pop();
             break;
-        default:
+        }
+        case Parser::ParserScope::FRAME_SCOPE:
+        {
+            // we need to read the frame
+            // eat the left parentheses
+            tokenQueue.pop();
+
+            // now we can assume that the next token is an identifier
+            Token frameName = tokenQueue.front();
+            tokenQueue.pop();
+            std::string frameNameStr = frameName.value;
+            std::cout << "Reading frame: " << frameNameStr << std::endl;
+
+            // lets see if the type has been defined
+            if (dataTypes.find(frameNameStr) == dataTypes.end())
+                return Parser::ParsingResult::undefinedType(frameNameStr);
+
+            // now we can build the frame using the data type
+            schema.frameTemplate = std::make_shared<FrameTemplate>(dataTypes.at(frameNameStr));
+
+            // eat the right parentheses
+            tokenQueue.pop();
+
+            // eat the semicolon
+            tokenQueue.pop();
             break;
+        }
         }
     }
 
@@ -389,8 +451,8 @@ Parser::ParsingResult Parser::_validateMetaFields(std::map<std::string, Token> &
         if (metaFields[field.first].type != this->_EXPECTED_META_FIELDS.at(field.first))
         {
             std::stringstream ss;
-            ss << "Invalid type for meta field: " << Tokenizer::tokenTypeToString(field.second.type) 
-                << ". Expected " << Tokenizer::tokenTypeToString(this->_EXPECTED_META_FIELDS.at(field.first));
+            ss << "Invalid type for meta field: " << Tokenizer::tokenTypeToString(field.second.type)
+               << ". Expected " << Tokenizer::tokenTypeToString(this->_EXPECTED_META_FIELDS.at(field.first));
             return Parser::ParsingResult::invalidDataType(field.second.type, 0, ss.str());
         }
 
@@ -406,7 +468,7 @@ Parser::ParsingResult Parser::_validateMetaFields(std::map<std::string, Token> &
     return Parser::ParsingResult::ok();
 }
 
-int* Parser::_parseVersion(const std::string &versionString) const
+int *Parser::_parseVersion(const std::string &versionString) const
 {
     std::regex versionRegex("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
     std::smatch match;

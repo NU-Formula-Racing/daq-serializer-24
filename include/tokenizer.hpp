@@ -27,7 +27,7 @@ enum TokenType
     END_OF_FILE,
 
     // Identifiers
-    DATA_TYPE,  // data type names
+    DATA_TYPE,  // data type names -- this is actually not used lol
     IDENTIFIER, // variable names
 
     // Literals

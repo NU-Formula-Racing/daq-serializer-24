@@ -185,7 +185,6 @@ void test_full(void)
 
 void TestingSuite::runTokenizerTests()
 {
-
     RUN_TEST(test_integer_literal);
     RUN_TEST(test_float_literal);
     RUN_TEST(test_string_literal);

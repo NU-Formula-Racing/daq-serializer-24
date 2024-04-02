@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <set>
+#include <functional>
 
 #include "datatype_factory.hpp"
 #include "frame.hpp"
@@ -96,6 +98,34 @@ public:
             return result;
         }
 
+        static ParsingResult duplicateTypeDefinition(std::string typeName)
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Duplicate type definition: " << typeName << std::endl;
+            return result;
+        }
+
+        static ParsingResult undefinedTypes(std::vector<std::string> undefinedTypes)
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Undefined types: " << std::endl;
+            for (auto type : undefinedTypes)
+            {
+                result.message << type << std::endl;
+            }
+            return result;
+        }
+
+        static ParsingResult undefinedType(std::string type)
+        {
+            ParsingResult result;
+            result.isValid = false;
+            result.message << "Undefined type: " << type << std::endl;
+            return result;
+        }
+
         static ParsingResult unclosedScope(TokenType token, int index)
         {
             ParsingResult result(token, index);
@@ -140,14 +170,30 @@ private:
         {".schema", STRING_LITERAL},
         {".version", VERSION_LITERAL}};
 
+    // const std::set<std::string> _SUPPORTED_PRIMATIVES_FIELD = {
+    //     "float", "bool", "long", "string", "int", "version"};
+
+    const std::map<std::string, std::function<Field(std::string)>> _SUPPORTED_PRIMATIVES_FIELD = {
+        {"float", [](std::string name)
+         { return Field::emptyField(name, FieldType::FLOAT); }},
+        {"bool", [](std::string name)
+         { return Field::emptyField(name, FieldType::BOOL); }},
+        {"string", [](std::string name)
+         { return Field::emptyField(name, FieldType::STRING); }},
+        {"int", [](std::string name)
+         { return Field::emptyField(name, FieldType::INT); }},
+        {"version", [](std::string name)
+         { return Field::emptyField(name, FieldType::VERSION); }}};
+
     std::map<std::string, DataType> _dataTypes;
 
     bool _isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex) const;
     int _levensteinDistance(const std::string &word1, const std::string &word2) const;
     ParsingResult _validateMetaFields(std::map<std::string, Token> &metaFields) const;
+    inline bool _isPrimative(const std::string &word) const { return _SUPPORTED_PRIMATIVES_FIELD.find(word) != _SUPPORTED_PRIMATIVES_FIELD.end(); }
+    inline Field _createPrimativeField(const std::string &type, const std::string &name) const { return _SUPPORTED_PRIMATIVES_FIELD.at(type)(name); }
 
-    int* _parseVersion(const std::string &versionString) const;
-
+    int *_parseVersion(const std::string &versionString) const;
 };
 
 #endif // __PARSER_H__
