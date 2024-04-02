@@ -224,17 +224,21 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         Token currentToken = tokenQueue.front();
         tokenQueue.pop();
 
+        std::cout << "Evaluting token in global scope: " << Tokenizer::tokenTypeToString(currentToken.type) << std::endl;
+
         // scope checking
         switch (currentToken.type)
         {
         case META:
             scope = Parser::ParserScope::META_SCOPE;
-            continue;
+            break;
         case DEF:
             scope = Parser::ParserScope::DATA_TYPE_SCOPE;
-            continue;
+            break;
         case FRAME:
             scope = Parser::ParserScope::FRAME_SCOPE;
+            break;
+        case END_OF_FILE:
             continue;
         default:
             // this should have been caught by the isValidSequence function
@@ -250,20 +254,27 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // either ".schema" or ".version"
 
             // eat the left brace
-            Token identifier = tokenQueue.front();
             tokenQueue.pop();
 
             // now build identifier-value pairs
             std::map<std::string, Token> pairs;
 
-            while (identifier.type != R_BRACE)
+            std::cout << "Reading meta data" << std::endl;
+
+            while (tokenQueue.front().type != R_BRACE)
             {
                 // we expect an identifier : literal pair
                 // this should be validated by the isValidSequence function
+                Token identifier = tokenQueue.front();
+                tokenQueue.pop();
                 std::string identifierStr = identifier.value;
+
                 tokenQueue.pop(); // eat the colon
+
                 Token value = tokenQueue.front();
                 tokenQueue.pop();
+
+                std::cout << "Meta eval: " << identifierStr << " : " << value.value << std::endl;
 
                 // now we can add the pair to the map
                 // first check if the identifier is not already in the map
@@ -271,7 +282,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     return Parser::ParsingResult::invalidSequence(identifier.type, 0, "Duplicate identifier in meta data");
                 
                 pairs[identifierStr] = value;
+
+                // eat the semicolon
+                tokenQueue.pop();
             }
+
+            // eat the right brace
+            tokenQueue.pop();
 
             // now validate the pairs
             ParsingResult metaPairValidation = this->_validateMetaFields(pairs);
@@ -285,6 +302,9 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             break;
         }
     }
+
+    out = schema;
+    return Parser::ParsingResult::ok();
 }
 
 int Parser::_levensteinDistance(const std::string &word1, const std::string &word2) const
