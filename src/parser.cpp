@@ -13,6 +13,8 @@
 #include "tokenizer.hpp"
 #include "parser.hpp"
 
+using namespace daq::impl;
+
 Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
 {
     Parser::ParserScope scope = Parser::ParserScope::GLOBAL_SCOPE;

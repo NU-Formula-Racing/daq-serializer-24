@@ -3,6 +3,8 @@
 #include "testing_suite.hpp"
 #include "datatype_factory.hpp"
 
+using namespace daq::impl;
+
 void test_value_int(void)
 {
     Value value = 123;

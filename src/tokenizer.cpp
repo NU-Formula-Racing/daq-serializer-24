@@ -10,6 +10,8 @@
 
 #include "tokenizer.hpp"
 
+using namespace daq::impl;
+
 std::vector<Token> Tokenizer::tokenize()
 {
     std::vector<Token> tokens;
@@ -86,7 +88,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
             token.value = word.substr(1, word.size() - 2);
             return token;
         }
-        
+
         token.value = word;
         return token;
     }

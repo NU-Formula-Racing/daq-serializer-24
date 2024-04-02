@@ -7,6 +7,8 @@
 #include "tokenizer.hpp"
 #include "testing_suite.hpp"
 
+using namespace daq::impl;
+
 void test_integer_literal(void)
 {
     Tokenizer tokenizer;

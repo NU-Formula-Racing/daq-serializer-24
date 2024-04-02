@@ -4,6 +4,8 @@
 #include "datatype_factory.hpp"
 #include "frame.hpp"
 
+using namespace daq::impl;
+
 DataType build_example_datatype()
 {
     Field field1 = Field::emptyField("field1", FieldType::INT);

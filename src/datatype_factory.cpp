@@ -8,6 +8,8 @@
 
 #include "datatype_factory.hpp"
 
+using namespace daq::impl;
+
 #pragma region Field
 
 // STATIC METHODS
