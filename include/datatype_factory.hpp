@@ -456,6 +456,13 @@ namespace daq::impl
         /// @param fieldName The name of the custom DataType field to remove
         void removeCustomField(const std::string &fieldName);
 
+        ///@brief Gets a custom field from the DataType
+        ///@param fieldName The name of the field to get
+        ///@return Field
+        std::shared_ptr<DataType> getCustomField(const std::string &fieldName) const;
+
+        bool hasField(const std::string &fieldName) const;
+
         /// @brief Gets the size of the DataType
         /// @return std::size_t
         std::size_t getSize() const

@@ -142,6 +142,14 @@ namespace daq::impl
                 return result;
             }
 
+            static ParsingResult cyclicDependency(std::string type)
+            {
+                ParsingResult result;
+                result.isValid = false;
+                result.message << "Cyclic dependency: " << type << std::endl;
+                return result;
+            }
+
             static ParsingResult ok(std::string message = "")
             {
                 ParsingResult result;
@@ -186,7 +194,7 @@ namespace daq::impl
             {"int", [](std::string name)
              { return Field::emptyField(name, FieldType::INT); }},
             {"long", [](std::string name)
-             { return Field::emptyField(name, FieldType::INT); }},
+             { return Field::emptyField(name, FieldType::LONG); }},
             {"version", [](std::string name)
              { return Field::emptyField(name, FieldType::VERSION); }}};
 

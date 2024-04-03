@@ -38,6 +38,9 @@ Field Field::emptyField(const std::string &name, FieldType type)
     case FieldType::VERSION:
         field.size = sizeof(int[3]);
         break;
+    case FieldType::LONG:
+        field.size = sizeof(long);
+        break;
     default:
         throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
     }
@@ -59,6 +62,8 @@ std::string Field::fieldTypeToString(FieldType type)
         return "string";
     case FieldType::VERSION:
         return "version";
+    case FieldType::LONG:
+        return "long";
     default:
         throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
     }
@@ -283,19 +288,50 @@ void DataType::removeCustomField(const std::string &fieldName)
     this->customDataTypes.erase(fieldName);
 };
 
+std::shared_ptr<DataType> DataType::getCustomField(const std::string &fieldName) const
+{
+    if (this->customDataTypes.find(fieldName) == this->customDataTypes.end())
+    {
+        throw std::invalid_argument("Custom field does not exist");
+    }
+
+    return std::make_shared<DataType>(this->customDataTypes.at(fieldName));
+};
+
+bool DataType::hasField(const std::string &fieldName) const
+{
+    return this->fields.find(fieldName) != this->fields.end() || this->customDataTypes.find(fieldName) != this->customDataTypes.end();
+};
+
 DataMember DataType::getMember(const std::string &fieldName) const
 {
+    // split the field name if it has a dot
+    std::size_t dotIndex = fieldName.find(".");
+    if (dotIndex != std::string::npos)
+    {
+        std::string customFieldName = fieldName.substr(0, dotIndex);
+        std::string subFieldName = fieldName.substr(dotIndex + 1);
+        if (this->customDataTypes.find(customFieldName) != this->customDataTypes.end())
+        {
+            return this->customDataTypes.at(customFieldName).getMember(subFieldName);
+        }
+        else
+        {
+            std::stringstream ss;
+            ss << "Custom field " << customFieldName << " does not exist in DataType " << this->name;
+            throw std::invalid_argument(ss.str());
+        }
+    }
+
     if (this->fields.find(fieldName) != this->fields.end())
     {
         return DataMember(this->fields.at(fieldName));
     }
-    else if (this->customDataTypes.find(fieldName) != this->customDataTypes.end())
-    {
-        return DataMember(this->customDataTypes.at(fieldName));
-    }
     else
     {
-        throw std::invalid_argument("Field does not exist");
+        std::stringstream ss;
+        ss << "Field " << fieldName << " does not exist in DataType " << this->name;
+        throw std::invalid_argument(ss.str());
     }
 };
 

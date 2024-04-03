@@ -336,13 +336,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 tokenQueue.pop();
                 std::string nameStr = name.value;
 
-                std::cout << "Data type eval: " << typeNameStr << " : " << nameStr << std::endl;
+                std::cout << "Data type eval: " << typeNameStr << " " << nameStr << std::endl;
 
                 // check if this is a primitive type
                 if (this->_isPrimative(typeNameStr))
                 {
                     // add the primitive type to the data type
-                    std::cout << "Adding primative field to data type: " << typeNameStr << " : " << nameStr << std::endl;
+                    std::cout << "Adding primative field to data type " << definitionStr << " : " << nameStr << std::endl;
                     Field field = this->_createPrimativeField(typeNameStr, nameStr);
                     dataType.addField(field);
                 }
@@ -350,7 +350,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     // this is a custom data type
                     // we will skip it for now, and add it to the dependencies later
-                    std::cout << "Adding custom field to data type: " << typeNameStr << " : " << nameStr << std::endl;
+                    std::cout << "Adding custom field to data type " << definitionStr << " : " << nameStr << std::endl;
                     if (dependencies.find(definitionStr) == dependencies.end())
                         dependencies[definitionStr] = std::vector<std::tuple<std::string,std::string>>{std::make_tuple(typeNameStr, nameStr)};
                     else
@@ -384,22 +384,26 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             if (dataTypes.find(frameNameStr) == dataTypes.end())
                 return Parser::ParsingResult::undefinedType(frameNameStr);
 
-
+            std::set<std::string> resolvedDependencies;
             // now, we need to resolve dependencies
-            if (dependencies.find(frameNameStr) != dependencies.end())
+            for (auto &dependendentDependencyListPair : dependencies)
             {
-                for (auto &dependency : dependencies.at(frameNameStr))
+                std::string dependentType = dependendentDependencyListPair.first;
+                std::vector<std::tuple<std::string,std::string>> dependencyList = dependendentDependencyListPair.second;
+                DataType dependentDataType = dataTypes[dependentType];
+
+                // lets try to resolve the dependencies
+                for (auto &dependency : dependencyList)
                 {
-                    std::string typeName = std::get<0>(dependency);
-                    std::string name = std::get<1>(dependency);
+                    std::string dependencyType = std::get<0>(dependency);
+                    std::string dependencyName = std::get<1>(dependency);
 
-                    // check if the type has been defined
-                    if (dataTypes.find(typeName) == dataTypes.end())
-                        return Parser::ParsingResult::undefinedType(typeName);
-
-                    // add the field to the data type
-                    dataTypes.at(frameNameStr).addCustomField(name, dataTypes.at(typeName));
+                    DataType dependencyDataType = dataTypes.at(dependencyType);
+                    std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
+                    dependentDataType.addCustomField(dependencyName, dependencyDataType);
                 }
+
+                dataTypes[dependentType] = dependentDataType;
             }
 
             // now we can build the frame using the data type
