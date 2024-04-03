@@ -2,14 +2,8 @@
 meta
 {
 	# required meta-information (denoted with the '.')
-	.schema : "multiple-double-layer";
+	.schema : "multiple-double-layer-backward";
 	.version : 1.0.0;
-}
-
-# definitions
-def DateTime
-{
-	long timeSince1990;
 }
 
 def BMSData
@@ -18,6 +12,12 @@ def BMSData
 	float voltage;
 	float current;
 	float temperature;
+}
+
+# definitions
+def DateTime
+{
+	long timeSince1990;
 }
 
 def CarData
