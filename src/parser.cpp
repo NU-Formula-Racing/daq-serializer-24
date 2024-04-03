@@ -384,7 +384,6 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             if (dataTypes.find(frameNameStr) == dataTypes.end())
                 return Parser::ParsingResult::undefinedType(frameNameStr);
 
-            std::set<std::string> resolvedDependencies;
             // now, we need to resolve dependencies
             for (auto &dependendentDependencyListPair : dependencies)
             {
@@ -397,10 +396,12 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     std::string dependencyType = std::get<0>(dependency);
                     std::string dependencyName = std::get<1>(dependency);
-
+                    
                     DataType dependencyDataType = dataTypes.at(dependencyType);
                     std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
                     dependentDataType.addCustomField(dependencyName, dependencyDataType);
+
+                    std::cout << dependentDataType.toString() << std::endl;
                 }
 
                 dataTypes[dependentType] = dependentDataType;

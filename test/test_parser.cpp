@@ -232,7 +232,7 @@ void test_multiple_double_layer_backward(void)
 
 void test_ultimate(void)
 {
-    Tokenizer tokenizer("./test/static/test_test_ultimate.drive");
+    Tokenizer tokenizer("./test/static/test_ultimate.drive");
     Parser parser;
     std::vector<Token> tokens = tokenizer.tokenize();
     Schema out;
@@ -291,16 +291,19 @@ void test_ultimate(void)
 
     // Perform checks
     for (int i = 0; i < sizeof(headerFields)/sizeof(headerFields[0]); i++) {
+        std::cout << "Checking " << headerFields[i] << std::endl;
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(headerFields[i]), (std::string(headerFields[i]) + " not found in frame template").c_str());
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(headerFields[i]).type == headerFieldTypes[i], (std::string(headerFields[i]) + " is not of correct type").c_str());
     }
 
     for (int i = 0; i < sizeof(bmsDataFields)/sizeof(bmsDataFields[0]); i++) {
+        std::cout << "Checking " << bmsDataFields[i] << std::endl;
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(bmsDataFields[i]), (std::string(bmsDataFields[i]) + " not found in frame template").c_str());
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(bmsDataFields[i]).type == bmsDataFieldTypes[i], (std::string(bmsDataFields[i]) + " is not of correct type").c_str());
     }
 
     for (int i = 0; i < sizeof(tireFields)/sizeof(tireFields[0]); i++) {
+        std::cout << "Checking " << tireFields[i] << std::endl;
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(tireFields[i]), (std::string(tireFields[i]) + " not found in frame template").c_str());
         TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(tireFields[i]).type == tireFieldTypes[i], (std::string(tireFields[i]) + " is not of correct type").c_str());
     }

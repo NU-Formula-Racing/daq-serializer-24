@@ -222,7 +222,6 @@ DataType::DataType(const DataType &other)
     // std::cout << "DataType::DataType(const DataType &other)" << std::endl;
     this->name = other.name;
     this->size = other.size;
-    // ideally this would be a deep copy...
     this->fields = other.fields;
     this->customDataTypes = other.customDataTypes;
 }
@@ -365,7 +364,7 @@ std::map<std::string, Field> DataType::flattenFull() const
         std::map<std::string, Field> flattenedCustomDataType = customDataType.second.flattenFull();
         for (auto &field : flattenedCustomDataType)
         {
-            std::cout << "Adding field " << field.first << std::endl;
+            // std::cout << "Adding field " << field.first << std::endl;
             flattened[customDataType.first + "." + field.first] = field.second;
         }
     }
