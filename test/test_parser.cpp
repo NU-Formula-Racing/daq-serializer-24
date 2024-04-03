@@ -228,9 +228,87 @@ void test_multiple_double_layer_backward(void)
     TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.current").type == FieldType::FLOAT, "bmsData.current is not of type FLOAT");
     TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.temperature").type == FieldType::FLOAT, "bmsData.temperature is not of type FLOAT");
     TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.timestamp.timeSince1990").type == FieldType::LONG, "bmsData.timestamp.timeSince1990 is not of type LONG");
-
-
 }
+
+void test_ultimate(void)
+{
+    Tokenizer tokenizer("./test/static/test_test_ultimate.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out);
+
+    TEST_ASSERT_TRUE_MESSAGE(result.isValid, result.message.str().c_str());
+    TEST_ASSERT_EQUAL_STRING("test-ultimate", out.schemaName.c_str());
+    int version[3] = {1, 0, 0};
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL(version[i], out.versionNumber[i]);
+    }
+
+    FrameTemplate frameTemplate = *out.frameTemplate;
+
+    // Checking the header fields
+    const char* headerFields[] = {
+        "header.timestamp.year", "header.timestamp.month", "header.timestamp.day",
+        "header.timestamp.hour", "header.timestamp.minute", "header.timestamp.second",
+        "header.timeSinceLastSample"
+    };
+    FieldType headerFieldTypes[] = {
+        FieldType::INT, FieldType::INT, FieldType::INT,
+        FieldType::INT, FieldType::INT, FieldType::INT,
+        FieldType::FLOAT
+    };
+
+    // Checking the BMSData fields
+    const char* bmsDataFields[] = {
+        "bmsData.timestamp.year", "bmsData.timestamp.month", "bmsData.timestamp.day",
+        "bmsData.timestamp.hour", "bmsData.timestamp.minute", "bmsData.timestamp.second",
+        "bmsData.voltage", "bmsData.current", "bmsData.temperature"
+    };
+    FieldType bmsDataFieldTypes[] = {
+        FieldType::INT, FieldType::INT, FieldType::INT,
+        FieldType::INT, FieldType::INT, FieldType::INT,
+        FieldType::FLOAT, FieldType::FLOAT, FieldType::FLOAT
+    };
+
+    // Checking TireData fields for all tires
+    const char* tireFields[] = {
+        "lfTire.pressure", "lfTire.temperature", "lfTire.rpm",
+        "rfTire.pressure", "rfTire.temperature", "rfTire.rpm",
+        "lrTire.pressure", "lrTire.temperature", "lrTire.rpm",
+        "rrTire.pressure", "rrTire.temperature", "rrTire.rpm",
+    };
+    FieldType tireFieldTypes[] = {
+        FieldType::FLOAT, FieldType::FLOAT, FieldType::FLOAT,
+        FieldType::FLOAT, FieldType::FLOAT, FieldType::FLOAT,
+        FieldType::FLOAT, FieldType::FLOAT, FieldType::FLOAT,
+        FieldType::FLOAT, FieldType::FLOAT, FieldType::FLOAT
+    };
+
+    // Checking ambient temperature
+    const char* ambientTempField = "ambientTemp";
+    FieldType ambientTempFieldType = FieldType::FLOAT;
+
+    // Perform checks
+    for (int i = 0; i < sizeof(headerFields)/sizeof(headerFields[0]); i++) {
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(headerFields[i]), (std::string(headerFields[i]) + " not found in frame template").c_str());
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(headerFields[i]).type == headerFieldTypes[i], (std::string(headerFields[i]) + " is not of correct type").c_str());
+    }
+
+    for (int i = 0; i < sizeof(bmsDataFields)/sizeof(bmsDataFields[0]); i++) {
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(bmsDataFields[i]), (std::string(bmsDataFields[i]) + " not found in frame template").c_str());
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(bmsDataFields[i]).type == bmsDataFieldTypes[i], (std::string(bmsDataFields[i]) + " is not of correct type").c_str());
+    }
+
+    for (int i = 0; i < sizeof(tireFields)/sizeof(tireFields[0]); i++) {
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(tireFields[i]), (std::string(tireFields[i]) + " not found in frame template").c_str());
+        TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(tireFields[i]).type == tireFieldTypes[i], (std::string(tireFields[i]) + " is not of correct type").c_str());
+    }
+
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField(ambientTempField), std::string(ambientTempField + std::string(" not found in frame template")).c_str());
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(ambientTempField).type == ambientTempFieldType, (std::string(ambientTempField) + " is not of correct type").c_str());
+}
+
 
 void TestingSuite::runParserTests()
 {
@@ -241,4 +319,5 @@ void TestingSuite::runParserTests()
     RUN_TEST(test_multiple_single_layer);
     RUN_TEST(test_multiple_double_layer);
     RUN_TEST(test_multiple_double_layer_backward);
+    RUN_TEST(test_ultimate);
 }

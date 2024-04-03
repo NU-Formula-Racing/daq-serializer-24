@@ -1,0 +1,52 @@
+# meta information about the serialization method
+meta
+{
+	# required meta-information (denoted with the '.')
+	.schema : "test-ultimate";
+	.version : 1.0.0;
+}
+
+def BMSData
+{
+	DateTime timestamp;
+	float voltage;
+	float current;
+	float temperature;
+}
+
+def DateTime
+{
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+}
+
+def TelemetryHeader
+{
+	DateTime timestamp;
+	float timeSinceLastSample;
+}
+
+def TireData
+{
+	float pressure;
+	float temperature;
+	float rpm;
+}
+
+def CarData
+{
+	TelemetryHeader header;
+	BMSData bmsData;
+	TireData lfTire;
+	TireData rfTire;
+	TireData lrTire;
+	TireData rrTire;
+	float ambientTemp;
+}
+
+# frame definition (a special required definition)
+frame(CarData);
