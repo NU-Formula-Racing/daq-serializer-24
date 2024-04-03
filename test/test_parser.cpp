@@ -90,10 +90,56 @@ void test_nested(void)
     TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("ambientTemp").type == FieldType::FLOAT, "ambientTemp is not of type FLOAT");
 }
 
+void test_multiple_single_layer(void)
+{
+    Tokenizer tokenizer("./test/static/test_multiple_single_layer.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out);
+
+    TEST_ASSERT_TRUE_MESSAGE(result.isValid, result.message.str().c_str());
+    TEST_ASSERT_EQUAL_STRING("multiple-single-layer", out.schemaName.c_str());
+    int version[3] = {1, 0, 0};
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL(version[i], out.versionNumber[i]);
+    }
+
+    // now test the frame template
+    // our frame should be of type CarData
+    // CarData has three fields:
+    // 1. A DateTime field called "timestamp" -- another custom type
+    // 2. A float called ambientTemp
+    // 3. A BMSData field called "bmsData" -- another custom type
+    // DateTime has one field:
+    // 1. A long called "timeSince1990"
+    // BMSData has two fields:
+    // 1. A float called "voltage"
+    // 2. A float called "current"
+    // 3. A float called "temperature"
+
+    FrameTemplate frameTemplate = *out.frameTemplate;
+    TEST_ASSERT_EQUAL(5, frameTemplate.getFieldNames().size());
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("timestamp.timeSince1990"), "timestamp.timeSince1990 not found in frame template");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("ambientTemp"), "ambientTemp not found in frame template");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("bmsData.voltage"), "bmsData.voltage not found in frame template");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("bmsData.current"), "bmsData.current not found in frame template");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.isField("bmsData.temperature"), "bmsData.temperature not found in frame template");
+
+    // test the types of the fields
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("timestamp.timeSince1990").type == FieldType::LONG, "timestamp.timeSince1990 is not of type LONG");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("ambientTemp").type == FieldType::FLOAT, "ambientTemp is not of type FLOAT");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.voltage").type == FieldType::FLOAT, "bmsData.voltage is not of type FLOAT");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.current").type == FieldType::FLOAT, "bmsData.current is not of type FLOAT");
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField("bmsData.temperature").type == FieldType::FLOAT, "bmsData.temperature is not of type FLOAT");
+
+}
+
 void TestingSuite::runParserTests()
 {
     RUN_TEST(test_simple_sequence_validation);
     RUN_TEST(test_full_sequence_validation);
     RUN_TEST(test_simple);
     RUN_TEST(test_nested);
+    RUN_TEST(test_multiple_single_layer);
 }

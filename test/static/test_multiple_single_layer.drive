@@ -1,0 +1,30 @@
+# meta information about the serialization method
+meta
+{
+	# required meta-information (denoted with the '.')
+	.schema : "multiple-single-layer";
+	.version : 1.0.0;
+}
+
+# definitions
+def DateTime
+{
+	long timeSince1990;
+}
+
+def BMSData
+{
+	float voltage;
+	float current;
+	float temperature;
+}
+
+def CarData
+{
+	DateTime timestamp;
+	BMSData bmsData;
+	float ambientTemp;
+}
+
+# frame definition (a special required definition)
+frame(CarData);
