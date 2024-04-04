@@ -229,7 +229,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         Token currentToken = tokenQueue.front();
         tokenQueue.pop();
 
-        // std::cout << "Evaluting token in global scope: " << Tokenizer::tokenTypeToString(currentToken.type) << std::endl;
+        std::cout << "Evaluting token in global scope: " << Tokenizer::tokenTypeToString(currentToken.type) << std::endl;
 
         // scope checking
         switch (currentToken.type)
@@ -265,7 +265,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // now build identifier-value pairs
             std::map<std::string, Token> pairs;
 
-            // std::cout << "Reading meta data" << std::endl;
+            std::cout << "Reading meta data" << std::endl;
 
             while (tokenQueue.front().type != R_BRACE)
             {
@@ -280,7 +280,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 Token value = tokenQueue.front();
                 tokenQueue.pop();
 
-                // std::cout << "Meta eval: " << identifierStr << " : " << value.value << std::endl;
+                std::cout << "Meta eval: " << identifierStr << " : " << value.value << std::endl;
 
                 // now we can add the pair to the map
                 // first check if the identifier is not already in the map
@@ -314,7 +314,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             Token definition = tokenQueue.front();
             tokenQueue.pop();
             std::string definitionStr = definition.value;
-            // std::cout << "Reading data type: " << definitionStr << std::endl;
+            std::cout << "Reading data type: " << definitionStr << std::endl;
 
             // check if the data type has already been defined
             if (dataTypes.find(definitionStr) != dataTypes.end())
@@ -336,13 +336,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 tokenQueue.pop();
                 std::string nameStr = name.value;
 
-                // std::cout << "Data type eval: " << typeNameStr << " " << nameStr << std::endl;
+                std::cout << "Data type eval: " << typeNameStr << " " << nameStr << std::endl;
 
                 // check if this is a primitive type
                 if (this->_isPrimative(typeNameStr))
                 {
                     // add the primitive type to the data type
-                    // std::cout << "Adding primative field to data type " << definitionStr << " : " << nameStr << std::endl;
+                    std::cout << "Adding primative field to data type " << definitionStr << " : " << nameStr << std::endl;
                     Field field = this->_createPrimativeField(typeNameStr, nameStr);
                     dataType.addField(field);
                 }
@@ -350,7 +350,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     // this is a custom data type
                     // we will skip it for now, and add it to the dependencies later
-                    // std::cout << "Adding custom field to data type " << definitionStr << " : " << nameStr << std::endl;
+                    std::cout << "Adding custom field to data type " << definitionStr << " : " << nameStr << std::endl;
                     if (dependencies.find(definitionStr) == dependencies.end())
                         dependencies[definitionStr] = std::vector<std::tuple<std::string,std::string>>{std::make_tuple(typeNameStr, nameStr)};
                     else
@@ -384,120 +384,50 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             if (dataTypes.find(frameNameStr) == dataTypes.end())
                 return Parser::ParsingResult::undefinedType(frameNameStr);
 
-            // now, we need to resolve dependencies
-            // our dictionary maps from
-            // key : the data type that has dependencies
-            // value : a vector of tuples, each tuple is a pair of the type name and the field name
+            // we need to determine the order to resolve dependencies
+            // we should resolve the dependencies in the order from those with the least dependencies to those with the most (after resolving the least)
+            // we can do this by sorting the dependencies by the number of dependencies
+            std::map<std::string, std::vector<std::tuple<std::string,std::string>>> depCopy = dependencies;
+            std::vector<std::string> orderedDependencies;
 
-            // add the custom data types into this dictionary
-            // right now, it only contains the datatypes with dependencies
-            // we do this to prepare for the next step
-            for (auto const &dataType : dataTypes)
+            while (!depCopy.empty())
             {
-                if (dependencies.find(dataType.first) == dependencies.end())
+                std::string leastDependent;
+                int leastDependentCount = INT_MAX;
+                for (auto &dep : depCopy)
                 {
-                    std::cout << "Adding empty dependency for: " << dataType.first << std::endl;
-                    dependencies[dataType.first] = std::vector<std::tuple<std::string,std::string>>();
-                }
-            }
-            
-            for (auto const &dependency : dependencies)
-            {
-                std::cout << "Dependencies for: " << dependency.first << std::endl;
-                for (auto const &field : dependency.second)
-                {
-                    std::cout << std::get<0>(field) << " : " << std::get<1>(field) << std::endl;
-                }
-            }
-
-            // now we can resolve the dependencies
-            // the idea is that if we treat the data types as nodes in a graph
-            // that we should go through, and resolve dependencies from those with no dependencies upwards
-            std::function<int(std::map<std::string, std::vector<std::tuple<std::string, std::string>>>)> countDependencies = [](std::map<std::string, std::vector<std::tuple<std::string, std::string>>> dependencies) {
-                int count = 0;
-                for (auto const &dependency : dependencies)
-                {
-                    count += dependency.second.size();
-                }
-                // std::cout << "Counting dependencies: " << count << std::endl;
-                return count;
-            };
-
-            while(countDependencies(dependencies) > 0)
-            {
-                // find the data type with no dependencies
-                std::string noDependencyType;
-                bool found = false;
-                for (auto const &dependency : dependencies)
-                {
-                    if (dependency.second.size() == 0)
+                    if (dep.second.size() < leastDependentCount)
                     {
-                        noDependencyType = dependency.first;
-                        found = true;
-                        break;
-                    }
-                }
-                std::cout << "No dependency type: " << noDependencyType << std::endl;
-
-                if (!found)
-                {
-                    std::vector<std::string> unresolvedTypes;
-                    for (auto const &dependency : dependencies)
-                    {
-                        if (dependency.second.size() > 0)
-                            unresolvedTypes.push_back(dependency.first);
-                    }
-
-                    return Parser::ParsingResult::cyclicDependency(unresolvedTypes);
-                }
-
-                // now we can add the fields to the frame
-                for (auto dependency : dependencies)
-                {
-                    for (auto field : dependency.second)
-                    {
-                        std::cout << "Checking dependency: " << dependency.first << " : " << std::get<0>(field) << " " << std::get<1>(field) << std::endl;
-                        if (std::get<0>(field) == noDependencyType)
-                        {
-                            // add the field to the frame
-                            DataType fieldType = dataTypes.at(noDependencyType);
-                            DataType injectInto = dataTypes.at(dependency.first);
-                            std::string fieldName = std::get<1>(field);
-                            injectInto.addCustomField(fieldName, fieldType);
-
-                            dataTypes[dependency.first] = injectInto;
-
-                            // remove the dependency
-                            std::cout << "Removing dependency: " << noDependencyType << " from " << dependency.first << " for field: " << fieldName << std::endl;
-                            std::map<std::string, std::vector<std::tuple<std::string,std::string>>> newDependenciesMap;
-                            for (auto const &dep : dependencies)
-                            {
-                                std::vector<std::tuple<std::string,std::string>> newDependencies;
-                                for (auto const &f : dep.second)
-                                {
-                                    if (std::get<0>(f) != noDependencyType)
-                                        newDependencies.push_back(f);
-                                }
-
-                                for (auto const &newDep : newDependencies)
-                                {
-                                    std::cout << "New dependency: " << std::get<0>(newDep) << " : " << std::get<1>(newDep) << std::endl;
-                                }
-                                newDependenciesMap[dep.first] = newDependencies;
-                            }
-
-                            for (auto const &newDep : newDependenciesMap)
-                            {
-                                dependencies[newDep.first] = newDep.second;
-                            }
-                        }
+                        leastDependent = dep.first;
+                        leastDependentCount = dep.second.size();
                     }
                 }
 
-                // now remove the data type from the dependencies
-                dependencies.erase(noDependencyType);
+                orderedDependencies.push_back(leastDependent);
+                depCopy.erase(leastDependent);
             }
 
+            // now we can resolve the dependencies in the correct order
+            for (std::string dependentType : orderedDependencies)
+            {
+                std::vector<std::tuple<std::string,std::string>> dependencyList = dependencies.at(dependentType);
+                DataType dependentDataType = dataTypes[dependentType];
+
+                // lets try to resolve the dependencies
+                for (auto &dependency : dependencyList)
+                {
+                    std::string dependencyType = std::get<0>(dependency);
+                    std::string dependencyName = std::get<1>(dependency);
+                    
+                    DataType dependencyDataType = dataTypes.at(dependencyType);
+                    std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
+                    dependentDataType.addCustomField(dependencyName, dependencyDataType);
+
+                    std::cout << dependentDataType.toString() << std::endl;
+                }
+
+                dataTypes[dependentType] = dependentDataType;
+            }
 
             // now we can build the frame using the data type
             schema.frameTemplate = std::make_shared<FrameTemplate>(dataTypes.at(frameNameStr));
