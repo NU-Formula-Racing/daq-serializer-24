@@ -456,7 +456,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     for (auto field : dependency.second)
                     {
-                        if (dependency.first == noDependencyType)
+                        if (std::get<0>(field) == noDependencyType)
                         {
                             // add the field to the frame
                             DataType fieldType = dataTypes.at(noDependencyType);
