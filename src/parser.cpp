@@ -456,6 +456,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     for (auto field : dependency.second)
                     {
+                        std::cout << "Checking dependency: " << dependency.first << " : " << std::get<0>(field) << " " << std::get<1>(field) << std::endl;
                         if (std::get<0>(field) == noDependencyType)
                         {
                             // add the field to the frame
@@ -468,6 +469,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
 
                             // remove the dependency
                             std::cout << "Removing dependency: " << noDependencyType << " from " << dependency.first << " for field: " << fieldName << std::endl;
+                            std::map<std::string, std::vector<std::tuple<std::string,std::string>>> newDependenciesMap;
                             for (auto const &dep : dependencies)
                             {
                                 std::vector<std::tuple<std::string,std::string>> newDependencies;
@@ -481,7 +483,12 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                                 {
                                     std::cout << "New dependency: " << std::get<0>(newDep) << " : " << std::get<1>(newDep) << std::endl;
                                 }
-                                dependencies[dep.first] = newDependencies;
+                                newDependenciesMap[dep.first] = newDependencies;
+                            }
+
+                            for (auto const &newDep : newDependenciesMap)
+                            {
+                                dependencies[newDep.first] = newDep.second;
                             }
                         }
                     }
