@@ -142,11 +142,15 @@ namespace daq::impl
                 return result;
             }
 
-            static ParsingResult cyclicDependency(std::string type)
+            static ParsingResult cyclicDependency(std::vector<std::string> types)
             {
                 ParsingResult result;
                 result.isValid = false;
-                result.message << "Cyclic dependency: " << type << std::endl;
+                result.message << "Cyclic dependency, types could not be resolved: " << std::endl;
+                for (auto type : types)
+                {
+                    result.message << type << ", ";
+                }
                 return result;
             }
 
