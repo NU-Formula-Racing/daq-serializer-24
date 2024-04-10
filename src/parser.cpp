@@ -390,6 +390,29 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             std::map<std::string, std::vector<std::tuple<std::string,std::string>>> depCopy = dependencies;
             std::vector<std::string> orderedDependencies;
 
+            // add in all the types that have no dependencies into the depCopy
+            for (auto &dataType : dataTypes)
+            {
+                std::cout << "Adding data type to depCopy: " << dataType.first << std::endl;
+                if (depCopy.find(dataType.first) == depCopy.end())
+                    depCopy[dataType.first] = std::vector<std::tuple<std::string,std::string>>();
+            }
+
+            // make sure that each dependency does not directly depend on itself, if so, throw a parser error
+            for (auto &dep : depCopy)
+            {
+                for (auto &dependency : dep.second)
+                {
+                    if (dep.first == std::get<0>(dependency))
+                    {
+                        std::vector<std::string> depNames;
+                        for (auto &dep : depCopy)
+                            depNames.push_back(dep.first);
+                        return Parser::ParsingResult::cyclicDependency(depNames);
+                    }
+                }
+            }
+
             while (!depCopy.empty())
             {
                 std::string leastDependent;
@@ -401,6 +424,27 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                         leastDependent = dep.first;
                         leastDependentCount = dep.second.size();
                     }
+                }
+                std::cout << "Least dependent: " << leastDependent << std::endl;
+
+                if (leastDependentCount != 0)
+                {
+                    std::vector<std::string> depNames;
+                    for (auto &dep : depCopy)
+                        depNames.push_back(dep.first);
+                    return Parser::ParsingResult::cyclicDependency(depNames);
+                }
+
+                // now remove the least dependent from every dependency list
+                for (auto &dep : depCopy)
+                {
+                    std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
+                    std::vector<std::tuple<std::string,std::string>> &dependencyList = dep.second;
+                    dependencyList.erase(std::remove_if(dependencyList.begin(), dependencyList.end(), [leastDependent](std::tuple<std::string,std::string> &dep) {
+                        return std::get<0>(dep) == leastDependent;
+                    }), dependencyList.end());
+
+                    depCopy[dep.first] = dependencyList;
                 }
 
                 orderedDependencies.push_back(leastDependent);
