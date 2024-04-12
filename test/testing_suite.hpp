@@ -44,10 +44,10 @@ public:
     }
 
 private:
-    const bool RUN_TOKENIZER_TESTS = false;
+    const bool RUN_TOKENIZER_TESTS = true;
     const bool RUN_PARSER_TESTS = true;
-    const bool RUN_DATATYPE_FACTORY_TESTS = false;
-    const bool RU_FRAME_TESTS = false;
+    const bool RUN_DATATYPE_FACTORY_TESTS = true;
+    const bool RU_FRAME_TESTS = true;
     void runTokenizerTests();
     void runParserTests();
     void runDataTypeFactoryTests();
