@@ -1,0 +1,20 @@
+meta # define metadata about the schema
+{
+    # schema name
+    .schema : "test-cyclic-two-layer";
+    .version : 1.0.1;
+}
+
+def TestType
+{
+    ReverseTestType reverse;
+    float value;
+}
+
+def ReverseTestType
+{
+    TestType test;
+}
+
+
+frame(TestType);

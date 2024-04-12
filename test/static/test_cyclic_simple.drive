@@ -1,0 +1,14 @@
+meta # define metadata about the schema
+{
+    # schema name
+    .schema : "test-cyclic-simple";
+    .version : 1.0.1;
+}
+
+def TestType
+{
+    TestType fail;
+    float value;
+}
+
+frame(TestType);

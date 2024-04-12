@@ -312,6 +312,48 @@ void test_ultimate(void)
     TEST_ASSERT_TRUE_MESSAGE(frameTemplate.getField(ambientTempField).type == ambientTempFieldType, (std::string(ambientTempField) + " is not of correct type").c_str());
 }
 
+void test_cyclic_simple(void)
+{
+    // data type with cyclic dependency
+    // parsing should fail
+    Tokenizer tokenizer("./test/static/test_cyclic_simple.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out);
+
+    std::cout << result.message.str() << std::endl;
+    TEST_ASSERT_FALSE_MESSAGE(result.isValid, result.message.str().c_str());
+}
+
+void test_cyclic_two_layer(void)
+{
+    // data type with cyclic dependency
+    // parsing should fail
+    Tokenizer tokenizer("./test/static/test_cyclic_two_layer.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out);
+
+    std::cout << result.message.str() << std::endl;
+    TEST_ASSERT_FALSE_MESSAGE(result.isValid, result.message.str().c_str());
+}
+
+void test_cyclic_advanced(void)
+{
+    // data type with cyclic dependency
+    // parsing should fail
+    Tokenizer tokenizer("./test/static/test_cyclic_advanced.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out);
+
+    std::cout << result.message.str() << std::endl;
+    TEST_ASSERT_FALSE_MESSAGE(result.isValid, result.message.str().c_str());
+}
+
 
 void TestingSuite::runParserTests()
 {
@@ -323,4 +365,7 @@ void TestingSuite::runParserTests()
     RUN_TEST(test_multiple_double_layer);
     RUN_TEST(test_multiple_double_layer_backward);
     RUN_TEST(test_ultimate);
+    RUN_TEST(test_cyclic_simple);
+    RUN_TEST(test_cyclic_two_layer);
+    RUN_TEST(test_cyclic_advanced);
 }

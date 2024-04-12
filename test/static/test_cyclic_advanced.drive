@@ -1,0 +1,34 @@
+meta # define metadata about the schema
+{
+    # schema name
+    .schema : "test-cyclic-advanced";
+    .version : 1.0.1;
+}
+
+def TestType
+{
+    NodeOne one;
+    float value;
+}
+
+def NodeOne
+{
+    NodeTwo two;
+    float value;
+}
+
+def NodeTwo
+{
+    NodeThree three;
+    TestType test;
+    float value;
+}
+
+def NodeThree
+{
+    NodeOne one;
+    float value;
+}
+
+
+frame(TestType);
