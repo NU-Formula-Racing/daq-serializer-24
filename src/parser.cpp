@@ -204,7 +204,7 @@ bool Parser::_isScopeClosed(const std::vector<Token> &tokens, int openingScopeIn
     return false;
 }
 
-Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Schema &out)
+Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Schema &out, bool onlyMeta)
 {
     // first check if the sequence is valid
     Parser::ParsingResult result = isValidSequence(tokens);
@@ -220,8 +220,8 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
     for (auto token : tokens)
         tokenQueue.push(token);
 
-    std::map<std::string, DataType> dataTypes; // holds the data types that have been defined
-    std::map<std::string, std::vector<std::tuple<std::string,std::string>>> dependencies; // holds the dependencies for each data type, maps from data type to a vector of dependencies 
+    std::map<std::string, DataType> dataTypes;                                             // holds the data types that have been defined
+    std::map<std::string, std::vector<std::tuple<std::string, std::string>>> dependencies; // holds the dependencies for each data type, maps from data type to a vector of dependencies
 
     while (!tokenQueue.empty())
     {
@@ -305,6 +305,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // now we can add the meta data to the schema
             schema.schemaName = pairs.at(".schema").value;
             schema.versionNumber = this->_parseVersion(pairs.at(".version").value);
+
+            if (onlyMeta)
+            {
+                out = schema;
+                return Parser::ParsingResult::ok();
+            }
+
             break;
         }
         case Parser::ParserScope::DATA_TYPE_SCOPE:
@@ -327,6 +334,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
 
             while (tokenQueue.front().type != R_BRACE)
             {
+                if (onlyMeta)
+                {
+                    // just eat the tokens
+                    tokenQueue.pop();
+                    continue;
+                }
+
                 // our token sequence should be IDENTIFIER IDENTIFIER SEMICOLON
                 Token typeName = tokenQueue.front();
                 tokenQueue.pop();
@@ -352,7 +366,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     // we will skip it for now, and add it to the dependencies later
                     std::cout << "Adding custom field to data type " << definitionStr << " : " << nameStr << std::endl;
                     if (dependencies.find(definitionStr) == dependencies.end())
-                        dependencies[definitionStr] = std::vector<std::tuple<std::string,std::string>>{std::make_tuple(typeNameStr, nameStr)};
+                        dependencies[definitionStr] = std::vector<std::tuple<std::string, std::string>>{std::make_tuple(typeNameStr, nameStr)};
                     else
                         dependencies[definitionStr].push_back(std::make_tuple(typeNameStr, nameStr));
                 }
@@ -370,6 +384,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         }
         case Parser::ParserScope::FRAME_SCOPE:
         {
+            if (onlyMeta)
+            {
+                // just eat the tokens
+                tokenQueue.pop();
+                continue;
+            }
+
             // we need to read the frame
             // eat the left parentheses
             tokenQueue.pop();
@@ -387,7 +408,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // we need to determine the order to resolve dependencies
             // we should resolve the dependencies in the order from those with the least dependencies to those with the most (after resolving the least)
             // we can do this by sorting the dependencies by the number of dependencies
-            std::map<std::string, std::vector<std::tuple<std::string,std::string>>> depCopy = dependencies;
+            std::map<std::string, std::vector<std::tuple<std::string, std::string>>> depCopy = dependencies;
             std::vector<std::string> orderedDependencies;
 
             // add in all the types that have no dependencies into the depCopy
@@ -395,7 +416,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             {
                 std::cout << "Adding data type to depCopy: " << dataType.first << std::endl;
                 if (depCopy.find(dataType.first) == depCopy.end())
-                    depCopy[dataType.first] = std::vector<std::tuple<std::string,std::string>>();
+                    depCopy[dataType.first] = std::vector<std::tuple<std::string, std::string>>();
             }
 
             // make sure that each dependency does not directly depend on itself, if so, throw a parser error
@@ -421,7 +442,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     if (dep.second.size() < leastDependentCount)
                     {
-                        leastDependent = dep.first;  
+                        leastDependent = dep.first;
                         leastDependentCount = dep.second.size();
                     }
                 }
@@ -441,7 +462,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     // std::cout << "Attempting to remove " << leastDependent << " from " << dep.first << std::endl;
                     // std::cout << "Dependency list size: " << dep.second.size() << std::endl;
-                    std::vector<std::tuple<std::string,std::string>> &dependencyList = dep.second;
+                    std::vector<std::tuple<std::string, std::string>> &dependencyList = dep.second;
 
                     if (dependencyList.empty())
                         continue;
@@ -451,9 +472,9 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
 
                     std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
 
-                    dependencyList.erase(std::remove_if(dependencyList.begin(), dependencyList.end(), [leastDependent](std::tuple<std::string,std::string> &dep) {
-                        return std::get<0>(dep) == leastDependent;
-                    }), dependencyList.end());
+                    dependencyList.erase(std::remove_if(dependencyList.begin(), dependencyList.end(), [leastDependent](std::tuple<std::string, std::string> &dep)
+                                                        { return std::get<0>(dep) == leastDependent; }),
+                                         dependencyList.end());
 
                     depCopy[dep.first] = dependencyList;
                 }
@@ -478,7 +499,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     continue;
 
                 std::cout << "Resolving dependencies for " << dependentType << std::endl;
-                std::vector<std::tuple<std::string,std::string>> dependencyList = dependencies.at(dependentType);
+                std::vector<std::tuple<std::string, std::string>> dependencyList = dependencies.at(dependentType);
                 DataType dependentDataType = dataTypes[dependentType];
 
                 // lets try to resolve the dependencies
@@ -486,7 +507,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     std::string dependencyType = std::get<0>(dependency);
                     std::string dependencyName = std::get<1>(dependency);
-                    
+
                     DataType dependencyDataType = dataTypes.at(dependencyType);
                     std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
                     dependentDataType.addCustomField(dependencyName, dependencyDataType);

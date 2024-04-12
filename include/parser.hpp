@@ -177,7 +177,7 @@ namespace daq::impl
             }
         };
 
-        ParsingResult buildSchema(const std::vector<Token> &tokens, Schema &out);
+        ParsingResult buildSchema(const std::vector<Token> &tokens, Schema &out, bool onlyMeta = false);
         ParsingResult isValidSequence(const std::vector<Token> &tokens);
 
     private:

@@ -354,6 +354,27 @@ void test_cyclic_advanced(void)
     TEST_ASSERT_FALSE_MESSAGE(result.isValid, result.message.str().c_str());
 }
 
+void test_only_parse_meta(void)
+{
+    // just parse the meta information from test_ulimate.drive
+    Tokenizer tokenizer("./test/static/test_ultimate.drive");
+    Parser parser;
+    std::vector<Token> tokens = tokenizer.tokenize();
+    Schema out;
+    Parser::ParsingResult result = parser.buildSchema(tokens, out, true);
+
+    TEST_ASSERT_TRUE_MESSAGE(result.isValid, result.message.str().c_str());
+    TEST_ASSERT_EQUAL_STRING("test-ultimate", out.schemaName.c_str());
+    int version[3] = {1, 0, 0};
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL(version[i], out.versionNumber[i]);
+    }
+
+    FrameTemplate *frameTemplate = &(*out.frameTemplate);
+    TEST_ASSERT_TRUE_MESSAGE(frameTemplate == nullptr, "Frame template should be null");
+
+}
+
 
 void TestingSuite::runParserTests()
 {
@@ -368,4 +389,5 @@ void TestingSuite::runParserTests()
     RUN_TEST(test_cyclic_simple);
     RUN_TEST(test_cyclic_two_layer);
     RUN_TEST(test_cyclic_advanced);
+    RUN_TEST(test_only_parse_meta);
 }
