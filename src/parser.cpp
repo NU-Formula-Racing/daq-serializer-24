@@ -421,11 +421,12 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 {
                     if (dep.second.size() < leastDependentCount)
                     {
-                        leastDependent = dep.first;
+                        leastDependent = dep.first;  
                         leastDependentCount = dep.second.size();
                     }
                 }
                 std::cout << "Least dependent: " << leastDependent << std::endl;
+                // std::cout << "Least dependent count: " << leastDependentCount << std::endl;
 
                 if (leastDependentCount != 0)
                 {
@@ -438,8 +439,18 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 // now remove the least dependent from every dependency list
                 for (auto &dep : depCopy)
                 {
-                    std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
+                    // std::cout << "Attempting to remove " << leastDependent << " from " << dep.first << std::endl;
+                    // std::cout << "Dependency list size: " << dep.second.size() << std::endl;
                     std::vector<std::tuple<std::string,std::string>> &dependencyList = dep.second;
+
+                    if (dependencyList.empty())
+                        continue;
+
+                    if (dep.first == leastDependent) // these cyclic dependencies have already detected
+                        continue;
+
+                    std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
+
                     dependencyList.erase(std::remove_if(dependencyList.begin(), dependencyList.end(), [leastDependent](std::tuple<std::string,std::string> &dep) {
                         return std::get<0>(dep) == leastDependent;
                     }), dependencyList.end());
@@ -447,13 +458,26 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     depCopy[dep.first] = dependencyList;
                 }
 
+                std::cout << "Adding " << leastDependent << " to ordered dependencies" << std::endl;
+
                 orderedDependencies.push_back(leastDependent);
-                depCopy.erase(leastDependent);
+                if (depCopy.find(leastDependent) != depCopy.end())
+                    depCopy.erase(leastDependent);
             }
+
+            std::cout << "Ordered dependencies! " << std::endl;
+
+            for (auto &dep : orderedDependencies)
+                std::cout << dep << std::endl;
 
             // now we can resolve the dependencies in the correct order
             for (std::string dependentType : orderedDependencies)
             {
+                // skip it if it has no dependencies
+                if (dependencies.find(dependentType) == dependencies.end())
+                    continue;
+
+                std::cout << "Resolving dependencies for " << dependentType << std::endl;
                 std::vector<std::tuple<std::string,std::string>> dependencyList = dependencies.at(dependentType);
                 DataType dependentDataType = dataTypes[dependentType];
 
@@ -467,7 +491,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
                     dependentDataType.addCustomField(dependencyName, dependencyDataType);
 
-                    std::cout << dependentDataType.toString() << std::endl;
+                    // std::cout << dependentDataType.toString() << std::endl;
                 }
 
                 dataTypes[dependentType] = dependentDataType;
