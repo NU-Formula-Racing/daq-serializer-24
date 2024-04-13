@@ -10,12 +10,10 @@
 
 #include "datatype_factory.hpp"
 #include "frame.hpp"
+#include "tokenizer.hpp"
 
 namespace daq::impl
 {
-
-    struct Token;
-
     struct Schema
     {
         std::string schemaName;

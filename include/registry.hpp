@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "parser.hpp"
 #include "tokenizer.hpp"
@@ -13,23 +14,33 @@ namespace daq::impl
     class Registry
     {
     public:
-        // These are configuration values that are set in the implementation file
-        // See src/registry.cpp
-        static std::string LATEST_SCHEMA_FILE;
-        static std::vector<std::string> REGISTERED_SCHEMA_FILES;
+#if defined(NATIVE)
+        std::string LATEST_SCHEMA_FILE = "./test/static/test_ultimate.drive";
+#else
+        std::string LATEST_SCHEMA_FILE = "latest_schema.drive";
+#endif
 
-        Registry();
-        ~Registry();
+#if defined(NATIVE)
+        std::vector<std::string> REGISTERED_SCHEMA_FILES = {
+            "./test/static/demo.drive",
+            "./test/static/test_cyclic_advanced.drive",
+            "./test/static/test_ultimate.drive",
+        };
+#else
+        std::vector<std::string> REGISTERED_SCHEMA_FILES = {"schema.drive"};
+#endif
 
-        static void Initialize()
+        Registry() = default;
+
+        void Initialize()
         {
             schemaRegistry.clear();
 
             // also add the latest schema file, just in case
-            Registry::REGISTERED_SCHEMA_FILES.push_back(Registry::LATEST_SCHEMA_FILE);
+            REGISTERED_SCHEMA_FILES.push_back(LATEST_SCHEMA_FILE);
 
             Parser parser;
-            for (std::string schemaFile : Registry::REGISTERED_SCHEMA_FILES)
+            for (std::string schemaFile : REGISTERED_SCHEMA_FILES)
             {
                 Tokenizer tokenizer(schemaFile);
                 std::vector<Token> tokens = tokenizer.tokenize();
@@ -51,9 +62,9 @@ namespace daq::impl
             std::cout << "Schema registry initialized with " << schemaRegistry.size() << " schemas" << std::endl;
         }
 
-        Schema getSchema(std::string schemaName, int versionNumber)
+        Schema getSchema(std::string schemaName, int* versionNumber)
         {
-            SchemaMetadata metadata = {schemaName, &versionNumber};
+            SchemaMetadata metadata = {schemaName, versionNumber};
 
             if (schemaRegistry.find(metadata) == schemaRegistry.end())
             {
@@ -82,7 +93,7 @@ namespace daq::impl
 
         Schema curSchema()
         {
-            Tokenizer tokenizer(Registry::LATEST_SCHEMA_FILE);
+            Tokenizer tokenizer(LATEST_SCHEMA_FILE);
             std::vector<Token> tokens = tokenizer.tokenize();
             Schema schema;
             Parser parser;
@@ -94,7 +105,7 @@ namespace daq::impl
             }
             else
             {
-                std::cerr << "Error parsing schema file: " << Registry::LATEST_SCHEMA_FILE << std::endl;
+                std::cerr << "Error parsing schema file: " << LATEST_SCHEMA_FILE << std::endl;
                 std::cerr << res.message.str() << std::endl;
                 return Schema();
             }
@@ -102,16 +113,29 @@ namespace daq::impl
             return schema;
         }
 
+        int numSchemas()
+        {
+            return schemaRegistry.size();
+        }
+
     private:
         struct SchemaMetadata
         {
             std::string schemaName;
             int *versionNumber;
+
+            bool operator<(const SchemaMetadata &other) const
+            {
+                if (schemaName != other.schemaName)
+                {
+                    return schemaName < other.schemaName;
+                }
+                return *versionNumber < *other.versionNumber;
+            }
         };
 
-        static std::map<SchemaMetadata, std::string> schemaRegistry;
+        std::map<SchemaMetadata, std::string> schemaRegistry;
     };
 } // namespace daq::impl
-
 
 #endif // __REGISTRY_H__
