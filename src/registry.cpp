@@ -3,7 +3,7 @@
 
 #include "registry.hpp"
 
-namespace daq::impl
+namespace daqser::impl
 {
 
 }

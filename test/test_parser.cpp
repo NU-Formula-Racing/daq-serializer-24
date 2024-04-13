@@ -8,7 +8,7 @@
 #include "tokenizer.hpp"
 #include "parser.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 void test_sequence(std::string filename)
 {

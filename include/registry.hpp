@@ -9,7 +9,7 @@
 #include "parser.hpp"
 #include "tokenizer.hpp"
 
-namespace daq::impl
+namespace daqser::impl
 {
     class Registry
     {
@@ -136,6 +136,6 @@ namespace daq::impl
 
         std::map<SchemaMetadata, std::string> schemaRegistry;
     };
-} // namespace daq::impl
+} // namespace daqser::impl
 
 #endif // __REGISTRY_H__

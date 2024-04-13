@@ -19,7 +19,7 @@
 
 #include "datatype_factory.hpp"
 
-namespace daq::impl
+namespace daqser::impl
 {
 
 #pragma region Frame
@@ -152,6 +152,6 @@ namespace daq::impl
 
 #pragma endregion
 
-} // namespace daq::impl
+} // namespace daqser::impl
 
 #endif // __FRAME_H__

@@ -8,7 +8,7 @@
 
 #include "datatype_factory.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 #pragma region Field
 

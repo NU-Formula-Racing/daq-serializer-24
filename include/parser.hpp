@@ -12,7 +12,7 @@
 #include "frame.hpp"
 #include "tokenizer.hpp"
 
-namespace daq::impl
+namespace daqser::impl
 {
     struct Schema
     {
@@ -211,6 +211,6 @@ namespace daq::impl
         int *_parseVersion(const std::string &versionString) const;
     };
 
-} // namespace daq::impl
+} // namespace daqser::impl
 
 #endif // __PARSER_H__

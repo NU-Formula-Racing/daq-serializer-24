@@ -10,7 +10,7 @@
 
 #include "tokenizer.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 std::vector<Token> Tokenizer::tokenize()
 {

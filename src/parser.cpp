@@ -13,7 +13,7 @@
 #include "tokenizer.hpp"
 #include "parser.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
 {

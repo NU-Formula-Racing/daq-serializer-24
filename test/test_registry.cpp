@@ -7,7 +7,7 @@
 #include "testing_suite.hpp"
 #include "registry.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 void test_registry_initialize()
 {

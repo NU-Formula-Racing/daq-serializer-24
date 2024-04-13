@@ -11,7 +11,7 @@
 #include <sstream>
 #include <vector>
 
-namespace daq::impl
+namespace daqser::impl
 {
     /// @brief
     // DataTypes have a name, size and a map of fields from fieldName to field values
@@ -492,5 +492,5 @@ namespace daq::impl
         /// @return std::string
         std::string toString();
     };
-} // namespace daq::impl
+} // namespace daqser::impl
 #endif // __DATATYPE_FACTORY_H__

@@ -4,7 +4,7 @@
 #include "datatype_factory.hpp"
 #include "frame.hpp"
 
-using namespace daq::impl;
+using namespace daqser::impl;
 
 DataType build_example_datatype()
 {

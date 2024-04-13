@@ -7,7 +7,7 @@
 #include <map>
 #include <variant>
 
-namespace daq::impl
+namespace daqser::impl
 {
     enum TokenType
     {
@@ -116,5 +116,5 @@ namespace daq::impl
         Token getNextToken(std::ifstream &file);
     };
 
-} // namespace daq::impl
+} // namespace daqser::impl
 #endif // __TOKENIZER_H__
