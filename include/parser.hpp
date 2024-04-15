@@ -19,6 +19,33 @@ namespace daqser::impl
         std::string schemaName;
         int *versionNumber;
         std::shared_ptr<FrameTemplate> frameTemplate;
+
+        std::vector<std::uint8_t> serialize()
+        {
+            // encode the schema name
+            // format is: 
+            // len(name) -- one byte
+            // schemaName bytes
+            // version number -- 3 bytes
+            std::vector<std::uint8_t> data;
+            std::uint8_t len = schemaName.length();   
+            data.push_back(len);
+
+            for (auto c : this->schemaName)
+            {
+                std::uint8_t translate = (std::uint8_t)c;
+                data.push_back(c);
+            }
+
+            // now push back each of the version numbers
+            for (int i = 0; i < 3; i++)
+            {
+                std::uint8_t shorten = (std::uint8_t)this->versionNumber[i];
+                data.push_back(shorten);
+            }
+
+            return data;
+        }
     };
 
     class Parser

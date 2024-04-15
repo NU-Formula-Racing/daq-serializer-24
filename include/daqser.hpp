@@ -2,6 +2,7 @@
 #define __DAQSER_H__
 
 #include <string>
+#include <vector>
 
 #include "parser.hpp"
 #include "tokenizer.hpp"
@@ -50,18 +51,46 @@ namespace daqser
         g_activeSchema = std::make_shared<Schema>(schema);
     }
 
-    void printSchema()
+    bool _validateRequest()
     {
         if (g_activeSchema == nullptr)
         {
-            std::cerr << "No active schema" << std::endl;
-            return;
+            std::cerr << "daqser::No active schema." << std::endl;
+            std::cerr << "Please ensure that you call daqser::initalize(), then set a schema before making any daqser method calls!" << std::endl;
+            return false;
         }
+
+        if (g_activeSchema->frameTemplate == NULL)
+        {
+            std::cerr << "daqser::Something went wrong when parsing your schema!" << std::endl;
+            std::cerr << "Please correct your schema file!" << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
+    void printSchema()
+    {
+        bool valid = _validateRequest();
+        if (!valid) return;
 
         std::cout << "Active schema: " << g_activeSchema->schemaName << " ";
         std::cout << g_activeSchema->versionNumber[0] << ".";
         std::cout << g_activeSchema->versionNumber[1] << ".";
         std::cout << g_activeSchema->versionNumber[2] << std::endl;
+    }
+
+    std::vector<std::uint8_t> serializeSchema()
+    {
+        bool valid = _validateRequest();
+        if (!valid)
+        {
+            std::vector<std::uint8_t> nothing;
+            return nothing;
+        }
+
+        return g_activeSchema->serialize();
     }
 }
 

@@ -12,6 +12,14 @@ void test_basic_use(void)
     daqser::initialize();
     daqser::setSchema("test-api-basic", 1, 0, 1);
     daqser::printSchema();
+
+    std::vector<std::uint8_t> schemaSer = daqser::serializeSchema();
+    for (std::uint8_t byte : schemaSer)
+    {
+        std::cout << (char)byte;
+    }
+
+    std::cout << std::endl;
 }
 
 /// @brief I would imagine that the logger project would use these aspects of the API
