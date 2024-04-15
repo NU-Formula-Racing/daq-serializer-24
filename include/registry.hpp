@@ -25,6 +25,9 @@ namespace daqser::impl
             "./test/static/demo.drive",
             "./test/static/test_cyclic_advanced.drive",
             "./test/static/test_ultimate.drive",
+            "./test/static/test_api_basic.drive",
+            "./test/static/test_api_wireless_sim.drive",
+            "./test/static/test_api_logger_sim.drive",
         };
 #else
         std::vector<std::string> REGISTERED_SCHEMA_FILES = {"schema.drive"};
@@ -32,7 +35,7 @@ namespace daqser::impl
 
         Registry() = default;
 
-        void Initialize()
+        void initialize()
         {
             schemaRegistry.clear();
 

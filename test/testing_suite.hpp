@@ -45,6 +45,12 @@ public:
             runRegistryTests();
             std::cout << "*** FINISHED RUNNING REGISTRY TESTS ***" << std::endl;
         }
+        if (RUN_API_TESTS)
+        {
+            std::cout << "*** RUNNING API TESTS ***" << std::endl;
+            runApiTests();
+            std::cout << "*** FINISHED RUNNING API TESTS ***" << std::endl;
+        }
         std::cout << "*** FINISHED RUNNING TESTS ***" << std::endl;
         UNITY_END();
     }
@@ -55,11 +61,13 @@ private:
     const bool RUN_DATATYPE_FACTORY_TESTS = true;
     const bool RUN_FRAME_TESTS = true;
     const bool RUN_REGISTRY_TESTS = true;
+    const bool RUN_API_TESTS = true;
     void runTokenizerTests();
     void runParserTests();
     void runDataTypeFactoryTests();
     void runFrameTests();
     void runRegistryTests();
+    void runApiTests();
 };
 
 #endif // __TESTING_SUITE_H__

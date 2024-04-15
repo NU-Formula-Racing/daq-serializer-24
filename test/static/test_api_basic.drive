@@ -1,0 +1,22 @@
+# meta information about the serialization method
+meta
+{
+	# required meta-information (denoted with the '.')
+	.schema : "test-api-basic";
+	.version : 1.0.1;
+}
+
+# definitions
+def DateTime
+{
+	long timeSince1990;
+}
+
+def CarData
+{
+	DateTime timestamp;
+	float ambientTemp;
+}
+
+# frame definition (a special required definition)
+frame(CarData);

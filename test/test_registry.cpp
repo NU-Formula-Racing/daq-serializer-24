@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 #include "testing_suite.hpp"
 #include "registry.hpp"
@@ -12,14 +13,14 @@ using namespace daqser::impl;
 void test_registry_initialize()
 {
     Registry registry;
-    registry.Initialize();
-    TEST_ASSERT_EQUAL(3, registry.numSchemas());
+    registry.initialize();
+    TEST_ASSERT_EQUAL(6, registry.numSchemas());
 }   
 
 void test_registry_get_schema()
 {
     Registry registry;
-    registry.Initialize();
+    registry.initialize();
     int version[] = { 1, 0, 1 };
     Schema schema = registry.getSchema("df", version);
     TEST_ASSERT_EQUAL_STRING("df", schema.schemaName.c_str());
@@ -41,7 +42,7 @@ void test_registry_get_cur_schema()
     // }
 
     Registry registry;
-    registry.Initialize();
+    registry.initialize();
     Schema schema = registry.curSchema();
     TEST_ASSERT_EQUAL_STRING("test-ultimate", schema.schemaName.c_str());
     int version[] = { 1, 0, 0 };

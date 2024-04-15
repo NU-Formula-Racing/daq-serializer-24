@@ -175,6 +175,12 @@ namespace daqser::impl
             }
         };
 
+        Parser() = default;
+        Parser operator=(const Parser &other)
+        {
+            return Parser();
+        }
+
         ParsingResult buildSchema(const std::vector<Token> &tokens, Schema &out, bool onlyMeta = false);
         ParsingResult isValidSequence(const std::vector<Token> &tokens);
 
