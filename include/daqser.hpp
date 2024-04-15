@@ -89,12 +89,6 @@ namespace daqser
         g_activeSchema = std::make_shared<Schema>(schema);
     }
 
-    Schema getSchema()
-    {
-        // if (!_validateRequest()) return Schema();
-        return *g_activeSchema;
-    }
-
     bool _validateRequest()
     {
         if (g_activeSchema == nullptr)
@@ -104,7 +98,7 @@ namespace daqser
             return false;
         }
 
-        if (g_activeSchema->frameTemplate == NULL)
+        if (g_activeSchema->schemaName == "")
         {
             std::cerr << "daqser::Something went wrong when parsing your schema!" << std::endl;
             std::cerr << "Please correct your schema file!" << std::endl;
@@ -112,6 +106,12 @@ namespace daqser
         }
 
         return true;
+    }
+
+    Schema getSchema()
+    {
+        if (!_validateRequest()) return Schema();
+        return *g_activeSchema;
     }
 
     void printSchema()
