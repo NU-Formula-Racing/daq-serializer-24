@@ -18,8 +18,23 @@ void test_basic_use(void)
     {
         std::cout << (char)byte;
     }
-
     std::cout << std::endl;
+
+
+    // now try to deserialize the schema
+    std::string schemaName = "test-api-basic";
+    int version[] = {1, 0, 1};
+
+    daqser::setSchemaFromSerializedMeta(schemaSer);
+    Schema schema = daqser::getSchema();
+    TEST_ASSERT_EQUAL_STRING(schemaName.c_str(), schema.schemaName.c_str());
+    TEST_ASSERT_EQUAL_INT(version[0], schema.versionNumber[0]);
+    TEST_ASSERT_EQUAL_INT(version[1], schema.versionNumber[1]);
+    TEST_ASSERT_EQUAL_INT(version[2], schema.versionNumber[2]);
+    TEST_ASSERT_TRUE_MESSAGE(schema.frameTemplate != nullptr, "Frame template is null");
+
+    daqser::printSchema();
+
 }
 
 /// @brief I would imagine that the logger project would use these aspects of the API

@@ -46,6 +46,34 @@ namespace daqser::impl
 
             return data;
         }
+
+        static std::tuple<std::string, int*> deserialize(std::vector<std::uint8_t> data)
+        {
+            std::string schemaName;
+            int versionNumber[3];
+
+            // decode the schema name
+            std::uint8_t len = data[0];
+
+            // ensure that the data is valid
+            if (data.size() < len + 4) // add 4 for the version number, and the schema name length
+            {
+                return std::make_tuple("", nullptr);
+            }
+
+            for (int i = 1; i <= len; i++)
+            {
+                schemaName.push_back((char)data[i]);
+            }
+
+            // now decode the version number
+            for (int i = len + 1; i < len + 4; i++)
+            {
+                versionNumber[i - len - 1] = (int)data[i];
+            }
+
+            return std::make_tuple(schemaName, versionNumber);
+        }
     };
 
     class Parser

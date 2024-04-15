@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 #include "parser.hpp"
 #include "tokenizer.hpp"
@@ -28,6 +29,7 @@ namespace daqser
         g_registry.initialize();
     }
 
+
     void setSchema(std::string schemaName, int major, int minor, int patch)
     {
         if (g_registry.numSchemas() == 0)
@@ -40,7 +42,7 @@ namespace daqser
 
         Schema schema = g_registry.getSchema(schemaName, version);
 
-        if (schema.frameTemplate == nullptr)
+        if (schema.schemaName == "")
         {
             std::cerr << "Schema not found: " << schemaName << " ";
             std::cerr << version[0] << "." << version[1] << "." << version[2] << std::endl;
@@ -49,6 +51,48 @@ namespace daqser
         }
 
         g_activeSchema = std::make_shared<Schema>(schema);
+    }
+    
+    void setSchemaFromSerializedMeta(std::vector<std::uint8_t> serializedSchemaMeta)
+    {
+        std::tuple<std::string, int*> deserialize = Schema::deserialize(serializedSchemaMeta);
+        std::string schemaName = std::get<0>(deserialize);
+        int* version = std::get<1>(deserialize);
+
+        if (schemaName == "" || version == nullptr)
+        {
+            std::cerr << "Error deserializing schema metadata" << std::endl;
+            return;
+        }
+
+        setSchema(schemaName, version[0], version[1], version[2]);        
+    }
+
+    void setSchemaToCur()
+    {
+        if (g_registry.numSchemas() == 0)
+        {
+            std::cerr << "No schemas registered. Make sure to call daqser::initialize() first!" << std::endl;
+            return;
+        }
+
+        Schema schema = g_registry.curSchema();
+
+        if (schema.schemaName == "")
+        {
+            std::cerr << "Schema not found: " << schema.schemaName << " ";
+            std::cerr << schema.versionNumber[0] << "." << schema.versionNumber[1] << "." << schema.versionNumber[2] << std::endl;
+            std::cerr << "Make that the schema is registered in the registry" << std::endl;
+            return;
+        }
+
+        g_activeSchema = std::make_shared<Schema>(schema);
+    }
+
+    Schema getSchema()
+    {
+        // if (!_validateRequest()) return Schema();
+        return *g_activeSchema;
     }
 
     bool _validateRequest()
