@@ -87,6 +87,8 @@ namespace daqser::impl
             return this->_values[index].get<T>();
         }
 
+        /// @brief Serializes the frame template into a binary frame
+        /// @return The binary frame
         std::vector<std::uint8_t> serializeFrame() const
         {
             std::vector<std::uint8_t> frame;
@@ -101,6 +103,8 @@ namespace daqser::impl
             return frame;
         }
 
+        /// @brief Deserializes a binary frame into the frame template
+        /// @param frame The binary frame to deserialize
         void deserializeFrame(std::vector<std::uint8_t> frame)
         {
             // Iterate through the fields and deserialize them
@@ -108,12 +112,19 @@ namespace daqser::impl
             int index = 0;
             for (auto &field : this->_fieldNames)
             {
+                std::cout << "Deserializing field: " << field << std::endl;
                 // Get the field
-                Value f = this->_values[position];
+                Value f = this->_values[index];
                 // Get the size of the field
                 int size = f.valueSize;
                 // Get the bytes for the field
                 std::vector<std::uint8_t> fieldBytes(frame.begin() + position, frame.begin() + position + size);
+                std::cout << "Field bytes: ";
+                for (auto &byte : fieldBytes)
+                {
+                    std::cout << (int)byte << " ";
+                }
+                std::cout << std::endl;
                 this->_values[index].setFromBinary(fieldBytes);
                 // Increment the position
                 position += size;
