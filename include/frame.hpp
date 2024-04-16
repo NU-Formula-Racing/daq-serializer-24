@@ -80,14 +80,14 @@ namespace daqser::impl
                 throw std::invalid_argument(err.str());
             }
 
-            std::cout << "Field exists" << std::endl;
+            // std::cout << "Field exists" << std::endl;
             // Get the index of the field
             auto index = std::distance(this->_fieldNames.begin(), std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName));
-            std::cout << "Index: " << index << std::endl;
+            // std::cout << "Index: " << index << std::endl;
             return this->_values[index].get<T>();
         }
 
-        std::vector<std::uint8_t> buildFrame() const
+        std::vector<std::uint8_t> serializeFrame() const
         {
             std::vector<std::uint8_t> frame;
 
@@ -99,6 +99,26 @@ namespace daqser::impl
             }
 
             return frame;
+        }
+
+        void deserializeFrame(std::vector<std::uint8_t> frame)
+        {
+            // Iterate through the fields and deserialize them
+            int position = 0;
+            int index = 0;
+            for (auto &field : this->_fieldNames)
+            {
+                // Get the field
+                Value f = this->_values[position];
+                // Get the size of the field
+                int size = f.valueSize;
+                // Get the bytes for the field
+                std::vector<std::uint8_t> fieldBytes(frame.begin() + position, frame.begin() + position + size);
+                this->_values[index].setFromBinary(fieldBytes);
+                // Increment the position
+                position += size;
+                index++;
+            }
         }
 
         std::vector<std::string> getFieldNames() const
@@ -141,11 +161,19 @@ namespace daqser::impl
             std::map<std::string, Field> flattenedFields = this->_baseType->flattenFull();
             // std::cout << "Flattening from:" << std::endl;
             std::cout << this->_baseType->toString() << std::endl;
+
+            std::vector<std::string> keys;
             for (auto &field : flattenedFields)
             {
-                // std::cout << "field: " << field.first << std::endl;
-                this->_fieldNames.push_back(field.first);
-                this->_values.push_back(field.second.value);
+                keys.push_back(field.first);
+            }
+
+            std::sort(keys.begin(), keys.end());
+
+            for (auto &key : keys)
+            {
+                this->_fieldNames.push_back(key);
+                this->_values.push_back(flattenedFields[key].value);
             }
         }
     };

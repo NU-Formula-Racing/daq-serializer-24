@@ -54,14 +54,60 @@ void test_frame_template_set()
     TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
 }
 
-void test_frameteplate_buildFrame()
+void test_frameteplate_serialize_frame()
 {
+    DataType type = build_example_datatype();
+    FrameTemplate frameTemplate = FrameTemplate(type);
+    frameTemplate.set("field4", "test");
+    frameTemplate.set("innerField.field1", 1);
+    frameTemplate.set("innerField.field2", 2.0f);
+    frameTemplate.set("innerField.field3", true);
 
+    // now we build the frame
+    std::vector<std::uint8_t> frame = frameTemplate.serializeFrame();
+
+    // print out the binary
+    for (std::uint8_t byte : frame)
+    {
+        std::cout << (int)byte << " ";
+    }
+
+    std::cout << std::endl;
+
+    // check that the frame is the correct size
+    TEST_ASSERT_EQUAL(17, frame.size());
+
+    // check that the values haven't changed
+    TEST_ASSERT_EQUAL_STRING("test", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL(1, frameTemplate.get<int>("innerField.field1"));
+    TEST_ASSERT_EQUAL(2.0f, frameTemplate.get<float>("innerField.field2"));
+    TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
+
+    // now set the values to something else
+    frameTemplate.set("field4", "test2");
+    frameTemplate.set("innerField.field1", 2);
+    frameTemplate.set("innerField.field2", 3.0f);
+    frameTemplate.set("innerField.field3", false);
+
+    // check that the values have changed
+    TEST_ASSERT_EQUAL_STRING("test2", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL(2, frameTemplate.get<int>("innerField.field1"));
+    TEST_ASSERT_EQUAL(3.0f, frameTemplate.get<float>("innerField.field2"));
+    TEST_ASSERT_EQUAL(false, frameTemplate.get<bool>("innerField.field3"));
+
+    // now deserialize the frame
+    frameTemplate.deserializeFrame(frame);
+
+    // check that the values are back to the original values
+    TEST_ASSERT_EQUAL_STRING("test", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL(1, frameTemplate.get<int>("innerField.field1"));
+    TEST_ASSERT_EQUAL(2.0f, frameTemplate.get<float>("innerField.field2"));
+    TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
 }
 
 void TestingSuite::runFrameTests()
 {
     RUN_TEST(test_frame_template_constructor);
     RUN_TEST(test_frame_template_set);
-    RUN_TEST(test_frameteplate_buildFrame);
+    RUN_TEST(test_frameteplate_serialize_frame);
 }

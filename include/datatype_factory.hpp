@@ -99,6 +99,31 @@ namespace daqser::impl
             return *this;
         };
 
+        /// @brief Sets the value from a binary representation
+        /// @param binary The binary representation of the value
+        Value setFromBinary(std::vector<std::uint8_t> binary)
+        {
+            std::cout << "Value::setFromBinary()" << std::endl;
+            for (std::uint8_t byte : binary)
+            {
+                std::cout << (char)byte << "";
+            }
+            std::cout << std::endl;
+
+            // copy this data to the valuePtr
+            std::uint8_t *rawData = new std::uint8_t[binary.size()];
+            std::copy(binary.begin(), binary.end(), rawData);
+
+            // Create a std::shared_ptr to manage the raw_data
+            std::shared_ptr<void> ptr(rawData, [](void *p)
+                                      { delete[] static_cast<std::uint8_t *>(p); });
+
+            this->valuePtr = ptr;
+
+            this->valueSize = binary.size();
+            return *this;
+        }
+
         /// @brief Equality operator for Value
         /// @details The value is stored as a void pointer, as well as the size of the value
         /// @details The size of the value is stored as well, so that we can do type checking
@@ -189,7 +214,7 @@ namespace daqser::impl
         template <typename T>
         T get() const
         {
-            std::cout << "Value::get<T>()" << std::endl;
+            // std::cout << "Value::get<T>()" << std::endl;
             return *(T *)(this->valuePtr.get());
         }
 
@@ -216,15 +241,32 @@ namespace daqser::impl
         /// @return std::vector<std::uint8_t>
         std::vector<std::uint8_t> toBinary() const
         {
+            std::cout << "Value::toBinary()" << std::endl;
             std::vector<std::uint8_t> binary;
             if (this->valuePtr.get() == nullptr)
             {
                 return binary;
             }
 
-            // copy the valuePtr into the binary vector
-            binary.resize(this->valueSize);
-            memcpy(binary.data(), this->valuePtr.get(), this->valueSize);
+            // set the size of the binary
+            binary.reserve(this->valueSize);
+
+            // copy the value to the binary
+            for (int i = 0; i < this->valueSize; i++)
+            {
+                binary.push_back(((std::uint8_t *)this->valuePtr.get())[i]);
+            }
+
+            binary.shrink_to_fit();
+
+            // print out the binary
+            for (std::uint8_t byte : binary)
+            {
+                std::cout << byte << "";
+            }
+
+            std::cout << std::endl;
+
             return binary;
         }
     };
@@ -235,16 +277,16 @@ namespace daqser::impl
     template <>
     inline std::string Value::get<std::string>() const
     {
-        std::cout << "Value::get<std::string>()" << std::endl;
+        // std::cout << "Value::get<std::string>()" << std::endl;
         if (this->valueSize == sizeof(char *))
         {
             // this is probably a c-style string
-            std::cout << "Value is a c-string" << std::endl;
+            // std::cout << "Value is a c-string" << std::endl;
             char *cString = *(char **)(this->valuePtr.get());
             return std::string(cString);
         }
 
-        std::cout << "Value is a std::string" << std::endl;
+        // std::cout << "Value is a std::string" << std::endl;
         // this is probably a std::string
         return *(std::string *)(this->valuePtr.get());
     }
@@ -353,6 +395,10 @@ namespace daqser::impl
         /// @brief Returns a string representation of the Field
         /// @return A string representation of the Field
         std::string toString() const;
+
+        /// @brief Returns a byte representation of the Field
+        /// @return A byte representation of the Field
+        std::vector<std::uint8_t> toBinary() const;
     };
 
 #pragma endregion Node Types

@@ -115,6 +115,12 @@ std::string Field::toString() const
     return ss.str();
 }
 
+std::vector<std::uint8_t> Field::toBinary() const
+{
+    // convert the value to binary
+    return value.toBinary();
+}
+
 #pragma endregion
 
 #pragma region DataMember
