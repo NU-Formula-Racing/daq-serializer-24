@@ -136,6 +136,66 @@ namespace daqser
 
         return g_activeSchema->serialize();
     }
+
+    void set(std::string field, std::string value)
+    {
+        bool valid = _validateRequest();
+        if (!valid) return;
+
+        g_activeSchema->frameTemplate->set(field, value);
+    }
+
+    template <typename T>
+    void set(std::string field, T value)
+    {
+        bool valid = _validateRequest();
+        if (!valid) return;
+
+        // make sure that the field exists
+        if (!g_activeSchema->frameTemplate->isField(field))
+        {
+            std::cerr << "Field does not exist: " << field << std::endl;
+            return;
+        }
+
+        g_activeSchema->frameTemplate->set(field, value);
+    }
+
+    template <typename T>
+    T get(std::string field)
+    {
+        bool valid = _validateRequest();
+        if (!valid) return T();
+
+        // make sure that the field exists
+        if (!g_activeSchema->frameTemplate->isField(field))
+        {
+            std::cerr << "Field does not exist: " << field << std::endl;
+            return T();
+        }
+
+        return g_activeSchema->frameTemplate->get<T>(field);
+    }
+
+    std::vector<std::uint8_t> serializeFrame()
+    {
+        bool valid = _validateRequest();
+        if (!valid)
+        {
+            std::vector<std::uint8_t> nothing;
+            return nothing;
+        }
+
+        return g_activeSchema->frameTemplate->serializeFrame();
+    }
+
+    void deserializeFrame(std::vector<std::uint8_t> frame)
+    {
+        bool valid = _validateRequest();
+        if (!valid) return;
+
+        g_activeSchema->frameTemplate->deserializeFrame(frame);
+    }
 }
 
 #endif // __DAQSER_H__

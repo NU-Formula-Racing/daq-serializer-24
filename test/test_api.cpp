@@ -20,7 +20,6 @@ void test_basic_use(void)
     }
     std::cout << std::endl;
 
-
     // now try to deserialize the schema
     std::string schemaName = "test-api-basic";
     int version[] = {1, 0, 1};
@@ -35,6 +34,36 @@ void test_basic_use(void)
 
     daqser::printSchema();
 
+    // now we will set some values
+    daqser::set<long>("timestamp.timeSince1990", 1234567890);
+    daqser::set("ambientTemp", 25.0f);
+
+    // now serialize the frame
+    std::vector<std::uint8_t> frameSer = daqser::serializeFrame();
+    for (std::uint8_t byte : frameSer)
+    {
+        std::cout << (int)byte << " ";
+    }
+
+    // now lets change the values
+    daqser::set<long>("timestamp.timeSince1990", 1234567891);
+    daqser::set("ambientTemp", 26.0f);
+
+    // now check that the values have changed
+    TEST_ASSERT_EQUAL(1234567891, daqser::get<long>("timestamp.timeSince1990"));
+    TEST_ASSERT_EQUAL(26.0f, daqser::get<float>("ambientTemp"));
+
+    // now deserialize the frame
+    daqser::deserializeFrame(frameSer);
+
+    // now check that the values have changed back
+    TEST_ASSERT_EQUAL(1234567890, daqser::get<long>("timestamp.timeSince1990"));
+    TEST_ASSERT_EQUAL(25.0f, daqser::get<float>("ambientTemp"));
+
+    // now ensure that the api does not allow setting of nonexistent fields
+    // but also does not crash
+    daqser::set("nonexistent", 1);
+    TEST_ASSERT_EQUAL(0, daqser::get<int>("nonexistent"));
 }
 
 /// @brief I would imagine that the logger project would use these aspects of the API
