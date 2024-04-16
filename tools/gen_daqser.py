@@ -12,6 +12,31 @@ import re
 import csv
 import argparse
 
+def board_messages(dbc_file_path, board):
+    messages = []
+    with open(dbc_file_path, "r") as dbc_file:
+        reader = csv.DictReader(dbc_file)
+        for row in reader:
+            senders_raw = row["Sender"]
+            senders = senders_raw[1:-1].split(", ")
+            if board in senders:
+                message = row["Message Name"]
+                if message not in messages:
+                    messages.append(message)
+    return messages
+
+def message_signals(dbc_file_path, message):
+    signals = []
+    with open(dbc_file_path, "r") as dbc_file:
+        reader = csv.DictReader(dbc_file)
+        for row in reader:
+            if row["Message Name"] == message:
+                signal = row["Signal Name"]
+                if signal not in signals:
+                    signals.append(signal)
+    return signals
+
+
 # UTILITIES
 def all_boards(dbc_file_path):
     boards = []
@@ -26,7 +51,6 @@ def all_boards(dbc_file_path):
                     boards.append(sender)
 
     return boards
-
 
 
 def gen_drive(dbc_file_path):
@@ -75,8 +99,22 @@ def gen_drive(dbc_file_path):
     drive_file_path = os.path.join(path, f"{schema_name}_v{version}.drive")
     with open(drive_file_path, "w") as drive_file:
         # write the schema name and version
-        drive_file.write(f"Schema: {schema_name}\n")
-        drive_file.write(f"Version: {version}\n")
+        drive_file.write(f"meta {{\n")
+        drive_file.write(f"\t.schema: '{schema_name}';\n")
+        drive_file.write(f"\t.version: {version}\n")
+        drive_file.write(f"}}\n\n")
+
+        # write the board's signals
+        for board in selected_boards:
+            drive_file.write(f"# {board}\n")
+            messages = board_messages(dbc_file_path, board)
+
+            for message in messages:
+                drive_file.write(f"message {message} {{\n")
+                signals = message_signals(dbc_file_path, message)
+                for signal in signals:
+                    drive_file.write(f"\t{signal}\n")
+                drive_file.write(f"}}\n\n")
 
     
 def gen_cpp(dbc_file_path):

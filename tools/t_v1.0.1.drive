@@ -1,0 +1,414 @@
+meta {
+	.schema: 't';
+	.version: 1.0.1
+}
+
+# 'BMS'
+message BMS_Voltages_0 {
+	Cell_V_0
+	Cell_V_1
+	Cell_V_2
+	Cell_V_3
+	Cell_V_4
+	Cell_V_5
+	Cell_V_6
+	Cell_OCV_Offset_0
+}
+
+message BMS_Voltages_1 {
+	Cell_V_7
+	Cell_V_8
+	Cell_V_9
+	Cell_V_10
+	Cell_V_11
+	Cell_V_12
+	Cell_V_13
+	Cell_OCV_Offset_1
+}
+
+message BMS_Voltages_2 {
+	Cell_V_14
+	Cell_V_15
+	Cell_V_16
+	Cell_V_17
+	Cell_V_18
+	Cell_V_19
+	Cell_V_20
+	Cell_OCV_Offset_2
+}
+
+message BMS_Voltages_3 {
+	Cell_V_21
+	Cell_V_22
+	Cell_V_23
+	Cell_V_24
+	Cell_V_25
+	Cell_V_26
+	Cell_V_27
+	Cell_OCV_Offset_3
+}
+
+message BMS_Voltages_4 {
+	Cell_V_28
+	Cell_V_29
+	Cell_V_30
+	Cell_V_31
+	Cell_V_32
+	Cell_V_33
+	Cell_V_34
+	Cell_OCV_Offset_4
+}
+
+message BMS_Voltages_5 {
+	Cell_V_35
+	Cell_V_36
+	Cell_V_37
+	Cell_V_38
+	Cell_V_39
+	Cell_V_40
+	Cell_V_41
+	Cell_OCV_Offset_5
+}
+
+message BMS_Voltages_6 {
+	Cell_V_42
+	Cell_V_43
+	Cell_V_44
+	Cell_V_45
+	Cell_V_46
+	Cell_V_47
+	Cell_V_48
+	Cell_OCV_Offset_6
+}
+
+message BMS_Voltages_7 {
+	Cell_V_49
+	Cell_V_50
+	Cell_V_51
+	Cell_V_52
+	Cell_V_53
+	Cell_V_54
+	Cell_V_55
+	Cell_OCV_Offset_7
+}
+
+message BMS_Voltages_8 {
+	Cell_V_56
+	Cell_V_57
+	Cell_V_58
+	Cell_V_59
+	Cell_V_60
+	Cell_V_61
+	Cell_V_62
+	Cell_OCV_Offset_8
+}
+
+message BMS_Voltages_9 {
+	Cell_V_63
+	Cell_V_64
+	Cell_V_65
+	Cell_V_66
+	Cell_V_67
+	Cell_V_68
+	Cell_V_69
+	Cell_OCV_Offset_9
+}
+
+message BMS_Voltages_10 {
+	Cell_V_70
+	Cell_V_71
+	Cell_V_72
+	Cell_V_73
+	Cell_V_74
+	Cell_V_75
+	Cell_V_76
+	Cell_OCV_Offset_110
+}
+
+message BMS_Voltages_11 {
+	Cell_V_77
+	Cell_V_78
+	Cell_V_79
+	Cell_V_80
+	Cell_V_81
+	Cell_V_82
+	Cell_V_83
+	Cell_OCV_Offset_211
+}
+
+message BMS_Voltages_12 {
+	Cell_V_84
+	Cell_V_85
+	Cell_V_86
+	Cell_V_87
+	Cell_V_88
+	Cell_V_89
+	Cell_V_90
+	Cell_OCV_Offset_212
+}
+
+message BMS_Voltages_13 {
+	Cell_V_91
+	Cell_V_92
+	Cell_V_93
+	Cell_V_94
+	Cell_V_95
+	Cell_V_96
+	Cell_V_97
+	Cell_OCV_Offset_213
+}
+
+message BMS_Voltages_14 {
+	Cell_V_98
+	Cell_V_99
+	Cell_V_100
+	Cell_V_101
+	Cell_V_102
+	Cell_V_103
+	Cell_V_104
+	Cell_OCV_Offset_214
+}
+
+message BMS_Voltages_15 {
+	Cell_V_105
+	Cell_V_106
+	Cell_V_107
+	Cell_V_108
+	Cell_V_109
+	Cell_V_110
+	Cell_V_111
+	Cell_OCV_Offset_115
+}
+
+message BMS_Voltages_16 {
+	Cell_V_112
+	Cell_V_113
+	Cell_V_114
+	Cell_V_115
+	Cell_V_116
+	Cell_V_117
+	Cell_V_118
+	Cell_OCV_Offset_216
+}
+
+message BMS_Voltages_17 {
+	Cell_V_119
+	Cell_V_120
+	Cell_V_121
+	Cell_V_122
+	Cell_V_123
+	Cell_V_124
+	Cell_V_125
+	Cell_OCV_Offset_217
+}
+
+message BMS_Voltages_18 {
+	Cell_V_126
+	Cell_V_127
+	Cell_V_128
+	Cell_V_129
+	Cell_V_130
+	Cell_V_131
+	Cell_V_132
+	Cell_OCV_Offset_218
+}
+
+message BMS_Voltages_19 {
+	Cell_V_133
+	Cell_V_134
+	Cell_V_135
+	Cell_V_136
+	Cell_V_137
+	Cell_V_138
+	Cell_V_139
+	Cell_OCV_Offset_219
+}
+
+message BMS_Temperatures_0 {
+	Cell_T_0
+	Cell_T_1
+	Cell_T_2
+	Cell_T_3
+	Cell_T_4
+	Cell_T_5
+	Cell_T_6
+}
+
+message BMS_Temperatures_1 {
+	Cell_T_7
+	Cell_T_8
+	Cell_T_9
+	Cell_T_10
+	Cell_T_11
+	Cell_T_12
+	Cell_T_13
+}
+
+message BMS_Temperatures_2 {
+	Cell_T_14
+	Cell_T_15
+	Cell_T_16
+	Cell_T_17
+	Cell_T_18
+	Cell_T_19
+	Cell_T_20
+}
+
+message BMS_Temperatures_3 {
+	Cell_T_21
+	Cell_T_22
+	Cell_T_23
+	Cell_T_24
+	Cell_T_25
+	Cell_T_26
+	Cell_T_27
+}
+
+message BMS_Temperatures_4 {
+	Cell_T_28
+	Cell_T_29
+	Cell_T_30
+	Cell_T_31
+	Cell_T_32
+	Cell_T_33
+	Cell_T_34
+}
+
+message BMS_Temperatures_5 {
+	Cell_T_35
+	Cell_T_36
+	Cell_T_37
+	Cell_T_38
+	Cell_T_39
+	Cell_T_40
+	Cell_T_41
+}
+
+message BMS_Temperatures_6 {
+	Cell_T_42
+	Cell_T_43
+	Cell_T_44
+	Cell_T_45
+	Cell_T_46
+	Cell_T_47
+	Cell_T_48
+}
+
+message BMS_Temperatures_7 {
+	Cell_T_49
+	Cell_T_50
+	Cell_T_51
+	Cell_T_52
+	Cell_T_53
+	Cell_T_54
+	Cell_T_55
+}
+
+message BMS_Temperatures_8 {
+	Cell_T_56
+	Cell_T_57
+	Cell_T_58
+	Cell_T_59
+	Cell_T_60
+	Cell_T_61
+	Cell_T_62
+}
+
+message BMS_Temperatures_9 {
+	Cell_T_63
+	Cell_T_64
+	Cell_T_65
+	Cell_T_66
+	Cell_T_67
+	Cell_T_68
+	Cell_T_69
+}
+
+message BMS_Temperatures_10 {
+	Cell_T_70
+	Cell_T_71
+	Cell_T_72
+	Cell_T_73
+	Cell_T_74
+	Cell_T_75
+	Cell_T_76
+}
+
+message BMS_Temperatures_11 {
+	Cell_T_77
+	Cell_T_78
+	Cell_T_79
+	Cell_T_80
+	Cell_T_81
+	Cell_T_82
+	Cell_T_83
+}
+
+message BMS_Temperatures_12 {
+	Cell_T_84
+	Cell_T_85
+	Cell_T_86
+	Cell_T_87
+	Cell_T_88
+	Cell_T_89
+	Cell_T_90
+}
+
+message BMS_Temperatures_13 {
+	Cell_T_91
+	Cell_T_92
+	Cell_T_93
+	Cell_T_94
+	Cell_T_95
+	Cell_T_96
+	Cell_T_97
+}
+
+message BMS_Temperatures_14 {
+	Cell_T_98
+	Cell_T_99
+	Cell_T_100
+	Cell_T_101
+	Cell_T_102
+	Cell_T_103
+	Cell_T_104
+}
+
+message BMS_Temperatures_15 {
+	Cell_T_105
+	Cell_T_106
+	Cell_T_107
+	Cell_T_108
+	Cell_T_109
+	Cell_T_110
+	Cell_T_111
+}
+
+message BMS_SOE {
+	Max_Discharge_Current
+	Max_Regen_Current
+	Battery_Voltage
+	Battery_Temperature
+	Battery_Current
+}
+
+message BMS_Faults {
+	Fault_Summary
+	Undervoltage_Fault
+	Overvoltage_Fault
+	Undertemperature_Fault
+	Overtemperature_Fault
+	Overcurrent_Fault
+	External_Kill_Fault
+	Open_Wire_Fault
+}
+
+message BMS_Status {
+	BMS_State
+	Max_Cell_Temp
+	Min_Cell_Temp
+	Max_Cell_Voltage
+	Min_Cell_Voltage
+	BMS_SOC
+}
+
