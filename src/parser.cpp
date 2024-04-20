@@ -9,6 +9,7 @@
 #include <regex>
 #include <sstream>
 #include <queue>
+#include <climits>
 
 #include "tokenizer.hpp"
 #include "parser.hpp"

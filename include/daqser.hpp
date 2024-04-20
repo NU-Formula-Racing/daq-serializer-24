@@ -12,7 +12,10 @@
 
 using namespace daqser::impl;
 
-#define VERSION(major, minor, patch) {major, minor, patch}
+#define VERSION(major, minor, patch) \
+    {                                \
+        major, minor, patch          \
+    }
 
 namespace daqser
 {
@@ -28,7 +31,6 @@ namespace daqser
 
         g_registry.initialize();
     }
-
 
     void setSchema(std::string schemaName, int major, int minor, int patch)
     {
@@ -52,12 +54,12 @@ namespace daqser
 
         g_activeSchema = std::make_shared<Schema>(schema);
     }
-    
+
     void setSchemaFromSerializedMeta(std::vector<std::uint8_t> serializedSchemaMeta)
     {
-        std::tuple<std::string, int*> deserialize = Schema::deserialize(serializedSchemaMeta);
+        std::tuple<std::string, int *> deserialize = Schema::deserialize(serializedSchemaMeta);
         std::string schemaName = std::get<0>(deserialize);
-        int* version = std::get<1>(deserialize);
+        int *version = std::get<1>(deserialize);
 
         if (schemaName == "" || version == nullptr)
         {
@@ -65,7 +67,7 @@ namespace daqser
             return;
         }
 
-        setSchema(schemaName, version[0], version[1], version[2]);        
+        setSchema(schemaName, version[0], version[1], version[2]);
     }
 
     void setSchemaToCur()
@@ -110,14 +112,16 @@ namespace daqser
 
     Schema getSchema()
     {
-        if (!_validateRequest()) return Schema();
+        if (!_validateRequest())
+            return Schema();
         return *g_activeSchema;
     }
 
     void printSchema()
     {
         bool valid = _validateRequest();
-        if (!valid) return;
+        if (!valid)
+            return;
 
         std::cout << "Active schema: " << g_activeSchema->schemaName << " ";
         std::cout << g_activeSchema->versionNumber[0] << ".";
@@ -140,7 +144,8 @@ namespace daqser
     void set(std::string field, std::string value)
     {
         bool valid = _validateRequest();
-        if (!valid) return;
+        if (!valid)
+            return;
 
         g_activeSchema->frameTemplate->set(field, value);
     }
@@ -149,7 +154,8 @@ namespace daqser
     void set(std::string field, T value)
     {
         bool valid = _validateRequest();
-        if (!valid) return;
+        if (!valid)
+            return;
 
         // make sure that the field exists
         if (!g_activeSchema->frameTemplate->isField(field))
@@ -165,7 +171,8 @@ namespace daqser
     T get(std::string field)
     {
         bool valid = _validateRequest();
-        if (!valid) return T();
+        if (!valid)
+            return T();
 
         // make sure that the field exists
         if (!g_activeSchema->frameTemplate->isField(field))
@@ -192,7 +199,8 @@ namespace daqser
     void deserializeFrame(std::vector<std::uint8_t> frame)
     {
         bool valid = _validateRequest();
-        if (!valid) return;
+        if (!valid)
+            return;
 
         g_activeSchema->frameTemplate->deserializeFrame(frame);
     }

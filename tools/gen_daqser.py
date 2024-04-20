@@ -12,30 +12,121 @@ import re
 import csv
 import argparse
 
-def board_messages(dbc_file_path, board):
-    messages = []
+class CANSignal:
+    def __init__(self, name, start_bit, size, factor, offset, min_val, max_val, unit):
+        self.name = name
+        self.start_bit = start_bit
+        self.size = size
+        self.factor = factor
+        self.offset = offset
+        self.min_val = min_val
+        self.max_val = max_val
+        self.unit = unit
+        self.data_type = None
+
+    def set_data_type(self, data_type):
+        self.data_type = data_type
+
+    def get_data_type(self):
+        if self.data_type:
+            return self.data_type
+        
+        # determine the data type based on the size of the signal
+        if self.size <= 8:
+            self.data_type = "bool"
+        elif self.size <= 16:
+            self.data_type = "float"
+        elif self.size <= 32:
+            self.data_type = "double"
+
+        return self.data_type
+    
+class CANMessage:
+    def __init__(self, name, id, sender, cycle_time):
+        self.name = name
+        self.id = id
+        self.sender = sender
+        self.cycle_time = cycle_time
+        self.signals = []
+
+    def add_signal(self, signal):
+        self.signals.append(signal)
+
+    def get_signals(self):
+        return self.signals
+
+    def get_signal(self, signal_name):
+        for signal in self.signals:
+            if signal.name == signal_name:
+                return signal
+        return None
+
+
+def parse_dbc(dbc_file_path):
+    def not_number(s):
+        try:
+            float(s)
+            return False
+        except ValueError:
+            return True
+        
+    messages = {}
     with open(dbc_file_path, "r") as dbc_file:
         reader = csv.DictReader(dbc_file)
         for row in reader:
-            senders_raw = row["Sender"]
-            senders = senders_raw[1:-1].split(", ")
-            if board in senders:
-                message = row["Message Name"]
-                if message not in messages:
-                    messages.append(message)
-    return messages
+            message_id = row["Message ID"]
+            message_name = row["Message Name"]
+            sender = row["Sender"]
+            # remove the brackets from the cycle time
+            sender = sender[1:-1]
+            # remove the quotes, either ' or ", from the sender
+            sender = sender.replace("'", "").replace('"', "")
+            print(sender)
 
-def message_signals(dbc_file_path, message):
-    signals = []
-    with open(dbc_file_path, "r") as dbc_file:
-        reader = csv.DictReader(dbc_file)
-        for row in reader:
-            if row["Message Name"] == message:
-                signal = row["Signal Name"]
-                if signal not in signals:
-                    signals.append(signal)
-    return signals
+            cycle_time = row["Cycle Time"]
 
+            if not message_id or not message_name or not sender or not cycle_time:
+                print("Invalid row. Skipping...")
+                continue
+
+            # make sure that the signal name, start bit, and size are not empty
+            if not_number(row["Start Bit"]) or not_number(row["Size"]) or not row["Signal Name"]:
+                print("Invalid signal. Skipping...")
+                continue
+
+            # we if factor, offset, min, and max are not provided, default them
+            if not_number(row["Factor"]):
+                row["Factor"] = 1.0
+            if not_number(row["Offset"]):
+                row["Offset"] = 0.0
+            if not_number(row["Min"]):
+                row["Min"] = 0.0
+            if not_number(row["Max"]):  
+                row["Max"] = 0.0
+
+            # print(row)
+
+            signal_name = row["Signal Name"]
+            start_bit = int(row["Start Bit"])
+            size = int(row["Size"])
+            factor = float(row["Factor"])
+            offset = float(row["Offset"])
+            min_val = float(row["Min"])
+            max_val = float(row["Max"])
+
+            unit = row["Unit"]
+
+            signal = CANSignal(signal_name, start_bit, size, factor, offset, min_val, max_val, unit)
+            # find the message in the dictionary by message_name
+            if message_name in messages:
+                message = messages[message_name]
+            else:
+                message = CANMessage(message_name, message_id, sender, cycle_time)
+                messages[message_name] = message
+
+            message.add_signal(signal)
+
+    return messages.values()
 
 # UTILITIES
 def all_boards(dbc_file_path):
@@ -47,6 +138,8 @@ def all_boards(dbc_file_path):
             # get rid of the brackets, and split the string into a list
             senders = senders_raw[1:-1].split(", ")
             for sender in senders:
+                # remove ' and "
+                sender = sender.replace("'", "").replace('"', "")
                 if sender not in boards:
                     boards.append(sender)
 
@@ -101,20 +194,19 @@ def gen_drive(dbc_file_path):
         # write the schema name and version
         drive_file.write(f"meta {{\n")
         drive_file.write(f"\t.schema: '{schema_name}';\n")
-        drive_file.write(f"\t.version: {version}\n")
+        drive_file.write(f"\t.version: {version};\n")
         drive_file.write(f"}}\n\n")
 
         # write the board's signals
+        messages = parse_dbc(dbc_file_path)
         for board in selected_boards:
-            drive_file.write(f"# {board}\n")
-            messages = board_messages(dbc_file_path, board)
-
+            drive_file.write(f"# {board} Messages\n")
             for message in messages:
-                drive_file.write(f"message {message} {{\n")
-                signals = message_signals(dbc_file_path, message)
-                for signal in signals:
-                    drive_file.write(f"\t{signal}\n")
-                drive_file.write(f"}}\n\n")
+                if message.sender == board:
+                    drive_file.write(f"def {message.name} {{\n")
+                    for signal in message.signals:
+                        drive_file.write(f"\t{signal.get_data_type()} {signal.name}; # {signal.unit};\n")
+                    drive_file.write(f"}}\n\n")
 
     
 def gen_cpp(dbc_file_path):

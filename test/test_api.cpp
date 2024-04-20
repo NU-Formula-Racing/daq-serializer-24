@@ -6,6 +6,7 @@
 
 #include "daqser.hpp"
 #include "testing_suite.hpp"
+#include "daqser_can.hpp"
 
 void test_basic_use(void)
 {
