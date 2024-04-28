@@ -1,0 +1,52 @@
+meta {
+	.schema: 'test_drive_file';
+	.version: 1.2.1;
+}
+
+# IMD Messages
+def IMD {
+	float transmit_resistance; # IMD output decoding;
+	bool transmit_status; # 1_is_good_0_is_bad;
+}
+
+# PDM Messages
+def PDM_Current_Sensing {
+	double Unreg_A; # A;
+	double FiveVolt_A; # A;
+}
+
+# WHEEL Messages
+def Wheel_Message {
+	float Wheel_Temp; # °C;
+	float Wheel_Speed; # RPS;
+}
+
+# SHUTDOWN Messages
+def Shutdown_Status {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_1 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_2 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_3 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_4 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_5 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_6 {
+	bool Voltage_Sag; # Boolean;
+}
+

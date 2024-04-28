@@ -210,7 +210,48 @@ def gen_drive(dbc_file_path):
 
     
 def gen_cpp(dbc_file_path):
-    pass
+    template_file = input("Enter the path to the template file: ")
+    while not os.path.exists(template_file):
+        print("Invalid path. Please enter a valid path")
+        template_file = input("Enter the path to the template file: ")
+
+    output_file = input("Enter the path to save the output file: ")
+    while not os.path.isdir(output_file):
+        print("Invalid path. Please enter a valid path")
+        output_file = input("Enter the path to save the output file: ")
+
+    messages = parse_dbc(dbc_file_path)
+
+    # generate the insertion points for the template file
+    # generate signals
+    signals = ""
+    for message in messages:
+        signals += f"    // {message.name} Signals\n"
+        for signal in message.signals:
+            signals += f"    MakeSignedCANSignal({signal.get_data_type()}, {signal.start_bit}, {signal.size}, {signal.factor}, {signal.offset}) s_{signal.name}{{}};\n"
+
+    # insert the signals into the template file
+    template_content = ""
+    with open(template_file, "r") as template:
+        template_content = template.read()
+        template_content = template_content.replace("    // <INSERT_SIGNALS_HERE>", signals)
+
+    # generate the messages
+    message_definitions = ""
+    for message in messages:
+        num_signals = len(message.signals)
+        message_definitions += f"    // {message.name}\n"
+        # message_definitions += f"    CANMessage<{num_signals}> {message.name}Message({message.id}, {message.cycle_time}, {num_signals});\n"
+        message_definitions += f"    CANRXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, [](){{}}, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+
+    # insert the messages into the template file
+    template_content = template_content.replace("    // <INSERT_MESSAGES_HERE>", message_definitions)
+
+    # write the output file
+    output_file_path = os.path.join(output_file, "daqser_can.hpp")
+    with open(output_file_path, "w") as output_file:
+        output_file.write(template_content)
+
 
 # main
 def main():
