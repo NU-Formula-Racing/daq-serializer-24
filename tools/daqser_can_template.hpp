@@ -6,8 +6,8 @@
 #include <map>
 #include <vector>
 
-#include "frame.hpp"
-#include "daqser.hpp"
+#include <frame.hpp>
+#include <daqser.hpp>
 
 namespace daqser
 {
@@ -27,19 +27,14 @@ namespace daqser
     // functions to update daqser
 
     std::map<std::string, std::function<void()>> g_signalMap = {
-        {"exampleSignal", []()
-         {
-             daqser::set("exampleSignal", (std::int8_t)exampleSignal);
-         }},
-
         // <INSERT_MAP_HERE>
     };
 
-    void updateSignals(std::vector<std::string> signalNames)
+    void updateSignals()
     {
-        for (auto signalName : signalNames)
+        for (auto signalFunc : g_signalMap)
         {
-            g_signalMap[signalName]();
+            signalFunc.second();
         }
 
         g_canBus.Tick();

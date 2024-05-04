@@ -12,6 +12,8 @@ import re
 import csv
 import argparse
 
+FRAME_NAME = "Car_Data"
+
 class CANSignal:
     def __init__(self, name, start_bit, size, factor, offset, min_val, max_val, unit):
         self.name = name
@@ -50,7 +52,7 @@ class CANSignal:
     
     def generate_signal_func(self):
         func = f'{{ "{self.name}", []() {{\n'
-        func += f'    daqser::set("{self.name}", ({self.get_data_type()})s_{self.name});\n'
+        func += f'    daqser::set("{FRAME_NAME}.{self.message_name}.{self.signal_name}", ({self.get_data_type()})s_{self.name});\n'
         func += f"}}}}, // {self.name}\n"
         return func
     
@@ -227,6 +229,19 @@ def gen_drive(dbc_file_path):
                     for signal in message.signals:
                         drive_file.write(f"\t{signal.get_data_type()} {signal.name}; # {signal.unit};\n")
                     drive_file.write(f"}}\n\n")
+
+        # now write the final definition, which includes all the messages
+        drive_file.write(f"def {FRAME_NAME} {{\n")
+        for board in selected_boards:
+            for message in messages:
+                if message.sender == board:
+                    drive_file.write(f"\t{message.name} {message.name};\n")
+        drive_file.write(f"}}\n\n")
+
+        # write the frame definition
+        drive_file.write(f"frame({FRAME_NAME});")
+
+            
 
     
 def gen_cpp(dbc_file_path):
