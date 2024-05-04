@@ -32,6 +32,7 @@ namespace daqser
              daqser::set("exampleSignal", (std::int8_t)exampleSignal);
          }},
 
+        // <INSERT_MAP_HERE>
     };
 
     void updateSignals(std::vector<std::string> signalNames)

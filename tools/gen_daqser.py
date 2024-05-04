@@ -23,6 +23,13 @@ class CANSignal:
         self.max_val = max_val
         self.unit = unit
         self.data_type = None
+        self.signal_name = name
+        self.message_name = ""
+
+    def attach_message(self, message):
+        self.message = message
+        self.message_name = message.name
+        self.name = f"{message.name}_{self.name}"
 
     def set_data_type(self, data_type):
         self.data_type = data_type
@@ -41,16 +48,27 @@ class CANSignal:
 
         return self.data_type
     
+    def generate_signal_func(self):
+        func = f'{{ "{self.name}", []() {{\n'
+        func += f'    daqser::set("{self.name}", ({self.get_data_type()})s_{self.name});\n'
+        func += f"}}}}, // {self.name}\n"
+        return func
+    
 class CANMessage:
     def __init__(self, name, id, sender, cycle_time):
         self.name = name
-        self.id = id
+        # remove any characters that are not numbers or a-f
+        if id is "":
+            self.id = 0
+        else:
+            self.id = "".join([c for c in id if c.isdigit() or c.isalpha() and c.lower() in "abcdef"])
         self.sender = sender
         self.cycle_time = cycle_time
         self.signals = []
 
     def add_signal(self, signal):
         self.signals.append(signal)
+        signal.attach_message(self)
 
     def get_signals(self):
         return self.signals
@@ -60,6 +78,8 @@ class CANMessage:
             if signal.name == signal_name:
                 return signal
         return None
+
+
 
 
 def parse_dbc(dbc_file_path):
@@ -247,10 +267,22 @@ def gen_cpp(dbc_file_path):
     # insert the messages into the template file
     template_content = template_content.replace("    // <INSERT_MESSAGES_HERE>", message_definitions)
 
+    map_content = "    "
+    for message in messages:
+        for signal in message.signals:
+            signal_func = signal.generate_signal_func()
+            # prefix each line with two tabs
+            signal_func = signal_func.replace("\n", "\n        ")
+            map_content += signal_func
+
+    # insert the map content into the template file
+    template_content = template_content.replace("    // <INSERT_MAP_HERE>", map_content)
+
     # write the output file
     output_file_path = os.path.join(output_file, "daqser_can.hpp")
     with open(output_file_path, "w") as output_file:
         output_file.write(template_content)
+        
 
 
 # main
