@@ -241,7 +241,8 @@ def gen_drive(dbc_file_path):
         # write the frame definition
         drive_file.write(f"frame({FRAME_NAME});")
 
-            
+def board_env_name(board):
+    return f"RX_{board.upper()}"
 
     
 def gen_cpp(dbc_file_path):
@@ -257,13 +258,26 @@ def gen_cpp(dbc_file_path):
 
     messages = parse_dbc(dbc_file_path)
 
+    board_to_messages = {}
+    for message in messages:
+        print(f"Message: {message.name}")
+        print(f"Sender: {message.sender}")
+        if message.sender in board_to_messages:
+            board_to_messages[message.sender].append(message)
+        else:
+            board_to_messages[message.sender] = [message]
+
     # generate the insertion points for the template file
     # generate signals
     signals = ""
-    for message in messages:
-        signals += f"    // {message.name} Signals\n"
-        for signal in message.signals:
-            signals += f"    MakeSignedCANSignal({signal.get_data_type()}, {signal.start_bit}, {signal.size}, {signal.factor}, {signal.offset}) s_{signal.name}{{}};\n"
+    for board, messages in board_to_messages.items():
+        cap_board = board_env_name(board)
+        signals += f"#ifdef {cap_board}\n"
+        for message in messages:
+            signals += f"    // {message.name} Signals\n"
+            for signal in message.signals:
+                signals += f"    MakeSignedCANSignal({signal.get_data_type()}, {signal.start_bit}, {signal.size}, {signal.factor}, {signal.offset}) s_{signal.name}{{}};\n"
+        signals += f"#endif\n"
 
     # insert the signals into the template file
     template_content = ""
@@ -273,11 +287,16 @@ def gen_cpp(dbc_file_path):
 
     # generate the messages
     message_definitions = ""
-    for message in messages:
-        num_signals = len(message.signals)
-        message_definitions += f"    // {message.name}\n"
-        # message_definitions += f"    CANMessage<{num_signals}> {message.name}Message({message.id}, {message.cycle_time}, {num_signals});\n"
-        message_definitions += f"    CANRXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, [](){{}}, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+    for board, messages in board_to_messages.items():
+        # wrap in an ifdef
+        cap_board = board_env_name(board)
+        message_definitions += f"#ifdef {cap_board}\n"
+        for message in messages:
+            num_signals = len(message.signals)
+            message_definitions += f"    // {message.name}\n"
+            # message_definitions += f"    CANMessage<{num_signals}> {message.name}Message({message.id}, {message.cycle_time}, {num_signals});\n"
+            message_definitions += f"    CANRXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, [](){{}}, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+        message_definitions += f"#endif\n"
 
     # insert the messages into the template file
     template_content = template_content.replace("    // <INSERT_MESSAGES_HERE>", message_definitions)
