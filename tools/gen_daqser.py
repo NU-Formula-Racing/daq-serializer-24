@@ -51,9 +51,7 @@ class CANSignal:
         return self.data_type
     
     def generate_signal_func(self):
-        func = f'{{ "{self.name}", []() {{\n'
-        func += f'    daqser::set("{FRAME_NAME}.{self.message_name}.{self.signal_name}", ({self.get_data_type()})s_{self.name});\n'
-        func += f"}}}}, // {self.name}\n"
+        func = f'    daqser::set("{FRAME_NAME}.{self.message_name}.{self.signal_name}", ({self.get_data_type()})s_{self.name});\n'
         return func
     
 class CANMessage:
@@ -81,8 +79,27 @@ class CANMessage:
                 return signal
         return None
 
+def query_boards(dbc_file_path):
+    available_boards = all_boards(dbc_file_path)
+    print("Please select the boards to include in the schema:")
+    for i, board in enumerate(available_boards):
+        print(f"{i+1}. {board}")
 
-
+    selected_boards = []
+    while True:
+        selection = input("Enter the number of the board to include, or 'done' to finish: ")
+        if selection == "done":
+            break
+        try:
+            selection = int(selection)
+            if selection < 1 or selection > len(available_boards):
+                print("Invalid selection. Please enter a valid number")
+                continue
+            selected_boards.append(available_boards[selection-1])
+        except ValueError:
+            print("Invalid selection. Please enter a valid number")
+            continue
+    return selected_boards
 
 def parse_dbc(dbc_file_path):
     def not_number(s):
@@ -186,25 +203,7 @@ def gen_drive(dbc_file_path):
         print("Invalid path. Please enter a valid path")
         path = input("Enter the path to save the .drive file: ")
 
-    available_boards = all_boards(dbc_file_path)
-    print("Please select the boards to include in the schema:")
-    for i, board in enumerate(available_boards):
-        print(f"{i+1}. {board}")
-
-    selected_boards = []
-    while True:
-        selection = input("Enter the number of the board to include, or 'done' to finish: ")
-        if selection == "done":
-            break
-        try:
-            selection = int(selection)
-            if selection < 1 or selection > len(available_boards):
-                print("Invalid selection. Please enter a valid number")
-                continue
-            selected_boards.append(available_boards[selection-1])
-        except ValueError:
-            print("Invalid selection. Please enter a valid number")
-            continue
+    selected_boards = query_boards(dbc_file_path)
 
     print(f"Generating .drive file for {schema_name} version {version} with the following boards:")
     for board in selected_boards:
@@ -301,24 +300,40 @@ def gen_cpp(dbc_file_path):
     # insert the messages into the template file
     template_content = template_content.replace("    // <INSERT_MESSAGES_HERE>", message_definitions)
 
-    map_content = "    "
-    for message in messages:
-        for signal in message.signals:
-            signal_func = signal.generate_signal_func()
-            # prefix each line with two tabs
-            signal_func = signal_func.replace("\n", "\n        ")
-            map_content += signal_func
+    # generate updateSignal functions
+    update_signals_content = ""
+    for board, messages in board_to_messages.items():
+        cap_board = board_env_name(board)
+        # wrap in an ifdef
+        update_signals_content += f"#ifdef {cap_board}\n"
+        for message in messages:
+            update_signals_content += f"    // {message.name}\n"
+            for signal in message.signals:
+                update_signals_content += signal.generate_signal_func()
+        update_signals_content += f"#endif\n"
 
     # insert the map content into the template file
-    template_content = template_content.replace("    // <INSERT_MAP_HERE>", map_content)
+    template_content = template_content.replace("        // <INSERT_UPDATE_SIGNALS_HERE>", update_signals_content)
 
     # write the output file
     output_file_path = os.path.join(output_file, "daqser_can.hpp")
     with open(output_file_path, "w") as output_file:
         output_file.write(template_content)
+
+    print(f"Generated daqser_can.hpp at {output_file_path}")
+    # Now query the user for the boards to include in the schema, and output something they can copy-paste into their code
+    selected_boards = query_boards(dbc_file_path)
+    print("Selected boards:")
+    for board in selected_boards:
+        print(board)
+
+    print("\n")
+    print("To include the boards in your code, add the following to your code, ideally in your main.cpp:\n")
+    board_macros = ""
+    for board in selected_boards:
+        board_macros += f"#define {board_env_name(board)}\n"
+    print(board_macros)
         
-
-
 # main
 def main():
     # commands for the user

@@ -16,8 +16,6 @@ namespace daqser
 
     // auto generated signals!
 
-    MakeSignedCANSignal(int8_t, 0, 8, 1, 0) exampleSignal{}; // one byte
-
     // <INSERT_SIGNALS_HERE>
 
     // auto generated messages!
@@ -26,18 +24,9 @@ namespace daqser
 
     // functions to update daqser
 
-    std::map<std::string, std::function<void()>> g_signalMap = {
-        // <INSERT_MAP_HERE>
-    };
-
     void updateSignals()
     {
-        for (auto signalFunc : g_signalMap)
-        {
-            signalFunc.second();
-        }
-
-        g_canBus.Tick();
+        // <INSERT_UPDATE_SIGNALS_HERE>
     }
 
 }

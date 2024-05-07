@@ -1,2 +1,5 @@
 ./daqser_can_template.hpp
 ../include
+1
+2
+done
