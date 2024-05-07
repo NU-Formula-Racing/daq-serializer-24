@@ -9,13 +9,22 @@
 #include <frame.hpp>
 #include <daqser.hpp>
 
+/// @brief 
+/// This file is a template for the CAN communication of the daqser project.
+/// This file is generated via a python script, and based on the current DBC file for the car
+/// To enable listening to CANMessages, define macros for the messages you want to listen to
+/// The macros are folllw the following format:
+/// #define RX_<BoardName>
+// This is not intended for use in for boards that listen to a small number of messages
+// Rather, it is intended for use in interface boards that listen to a large number of messages
+// Primarily, Wireless and Logger boards
+
 namespace daqser
 {
     VirtualTimerGroup g_timerGroup;
     CAN g_canBus{};
 
     // auto generated signals!
-
 #ifdef RX_IMD
     // IMD Signals
     MakeSignedCANSignal(float, 0, 16, 1e-05, 0.0) s_IMD_transmit_resistance{};
@@ -392,7 +401,6 @@ namespace daqser
 
 
     // auto generated messages!
-
 #ifdef RX_IMD
     // IMD
     CANRXMessage<2> m_IMD { 0x300, [](){}, s_IMD_transmit_resistance, s_IMD_transmit_status };
@@ -512,8 +520,6 @@ namespace daqser
     CANRXMessage<1> m_Drive_Status { 0x000, [](){}, s_Drive_Status_Drive_State };
 #endif
 
-
-    // functions to update daqser
 
     void updateSignals()
     {
