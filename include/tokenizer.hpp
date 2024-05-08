@@ -113,7 +113,7 @@ namespace daqser::impl
     private:
         std::string _fileName;
 
-        Token getNextToken(std::ifstream &file);
+        Token getNextToken(std::istream &file);
     };
 
 } // namespace daqser::impl

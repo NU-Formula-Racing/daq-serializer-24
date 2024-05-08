@@ -11,15 +11,21 @@
 #include "tokenizer.hpp"
 
 #ifdef ARDUINO_ARCH_ESP32
-#define USE_LittleFS
-
+#define USE_LITTLEFS_ESP32
 #include <FS.h>
-#ifdef USE_LittleFS
-  #define SPIFFS LITTLEFS
-  #include <LITTLEFS.h> 
+#ifdef USE_LITTLEFS_ESP32
+#define SPIFFS LITTLEFS
+#include <LITTLEFS.h>
 #else
-  #include <SPIFFS.h>
-#endif 
+#include <SPIFFS.h>
+#endif
+#endif
+
+#if defined(ARDUINO_TEENSY40) || defined(ARDUINO_TEENSY41)
+#define USE_LITTLEFS_TEENSY
+#include <LITTLEFS.h>
+LittleFS_Program g_littleFS;
+#define chipSelect 6
 
 #endif
 
@@ -27,7 +33,7 @@ using namespace daqser::impl;
 
 std::vector<Token> Tokenizer::tokenize()
 {
-#ifdef USE_LittleFS
+#ifdef USE_LITTLEFS_ESP32
     if (!SPIFFS.begin(true))
     {
         std::cerr << "Error mounting SPIFFS" << std::endl;
@@ -38,7 +44,19 @@ std::vector<Token> Tokenizer::tokenize()
     _fileName = "/spiffs/" + _fileName;
 #endif
 
+#ifdef USE_LITTLEFS_TEENSY
+    if (!g_littleFS.begin(chipSelect))
+    {
+        std::cerr << "Error mounting LITTLEFS" << std::endl;
+        return {};
+    }
+
+    g_littleFS.quickFormat();
+
+#endif
+
     std::vector<Token> tokens;
+#ifndef USE_LITTLEFS_TEENSY
     std::ifstream file(_fileName);
     if (!file.is_open())
     {
@@ -46,6 +64,18 @@ std::vector<Token> Tokenizer::tokenize()
         err << "Error opening file: " << _fileName << std::endl;
         throw std::invalid_argument(err.str());
     }
+#else
+    File f = g_littleFS.open(_fileName.c_str(), FILE_READ);
+    if (!f)
+    {
+        std::cerr << "Error opening file: " << _fileName << std::endl;
+        return {};
+    }
+    std::stringstream ss;
+    ss << f.readString();
+    std::string fileContent = ss.str();
+    std::istringstream file(fileContent);
+#endif
 
     while (file.good())
     {
@@ -55,11 +85,15 @@ std::vector<Token> Tokenizer::tokenize()
             break;
     }
 
+#ifndef USE_LITTLEFS_TEENSY
     file.close();
+#else
+    f.close();
+#endif
     return tokens;
 }
 
-Token Tokenizer::getNextToken(std::ifstream &file)
+Token Tokenizer::getNextToken(std::istream &file)
 {
     Token token;
     char c;
@@ -82,7 +116,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
         }
 
         if (c == '{' || c == '}' || c == ';' || c == '(' || c == ')' || c == ':') // code smelly
-        { // Handle symbols
+        {                                                                         // Handle symbols
             if (!word.empty())
             {
                 file.unget(); // Push back the symbol to the stream to be able to read it in the next call
@@ -116,7 +150,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
         token.value = word;
         return token;
     }
-       
+
     // if it is not a literal, then we are going to assume that it is an identifier, given that it's a valid name
     if (isValidIdentifier(word))
     {
@@ -124,7 +158,7 @@ Token Tokenizer::getNextToken(std::ifstream &file)
         token.value = word;
         return token;
     }
-    
+
     token.type = INVALID;
     token.value = word;
     return token;
@@ -213,20 +247,24 @@ bool Tokenizer::isValidIdentifier(const std::string &word)
     // the first number cannot be a digit, but it can be a period
     // the only character allowed to be a period is the first character
     // the last character cannot be a period
-    
-    if (word.empty()) {
+
+    if (word.empty())
+    {
         return false;
     }
-    
-    if (!isalpha(word[0]) && word[0] != '_' && word[0] != '.') {
+
+    if (!isalpha(word[0]) && word[0] != '_' && word[0] != '.')
+    {
         return false;
     }
-    
-    for (size_t i = 1; i < word.size(); i++) {
-        if (!isalnum(word[i]) && word[i] != '_') {
+
+    for (size_t i = 1; i < word.size(); i++)
+    {
+        if (!isalnum(word[i]) && word[i] != '_')
+        {
             return false;
-        }      
+        }
     }
-    
+
     return true;
 }

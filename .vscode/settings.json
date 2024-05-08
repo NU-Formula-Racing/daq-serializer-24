@@ -64,8 +64,10 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "set": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "numbers": "cpp"
     },
     "cmake.sourceDirectory": "D:/Documents/Code/School/NFR_23-24/daq-serializer-24/.pio/libdeps/esp32dev/Unity",
     "editor.fontLigatures": true,
+    "search.useIgnoreFiles": true,
 }
