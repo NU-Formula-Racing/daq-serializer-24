@@ -15,7 +15,7 @@ void test_integer_literal(void)
     TokenType type;
     bool result = tokenizer.isLiteral("123", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for integer literal");
-    TEST_ASSERT_EQUAL_INT(INT_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_INT_LITERAL, type);
 }
 
 void test_float_literal(void)
@@ -24,7 +24,7 @@ void test_float_literal(void)
     TokenType type;
     bool result = tokenizer.isLiteral("123.456", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for float literal");
-    TEST_ASSERT_EQUAL_INT(FLOAT_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_FLOAT_LITERAL, type);
 }
 
 void test_string_literal(void)
@@ -33,7 +33,7 @@ void test_string_literal(void)
     TokenType type;
     bool result = tokenizer.isLiteral("\"hello world\"", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for string literal");
-    TEST_ASSERT_EQUAL_INT(STRING_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_STRING_LITERAL, type);
 }
 
 void test_boolean_literals(void)
@@ -44,20 +44,20 @@ void test_boolean_literals(void)
     // Testing without quotes
     bool result = tokenizer.isLiteral("true", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for true boolean literal");
-    TEST_ASSERT_EQUAL_INT(BOOL_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_BOOL_LITERAL, type);
 
     result = tokenizer.isLiteral("false", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for false boolean literal");
-    TEST_ASSERT_EQUAL_INT(BOOL_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_BOOL_LITERAL, type);
     
     // Testing with quotes
     result = tokenizer.isLiteral("\"true\"", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for '\"true\"' string literal representing boolean");
-    TEST_ASSERT_EQUAL_INT(STRING_LITERAL, type); // This should probably be STRING_LITERAL, not BOOL_LITERAL
+    TEST_ASSERT_EQUAL_INT(TOKEN_STRING_LITERAL, type); // This should probably be STRING_LITERAL, not BOOL_LITERAL
 
     result = tokenizer.isLiteral("\"false\"", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for '\"false\"' string literal representing boolean");
-    TEST_ASSERT_EQUAL_INT(STRING_LITERAL, type); // This should probably be STRING_LITERAL, not BOOL_LITERAL
+    TEST_ASSERT_EQUAL_INT(TOKEN_STRING_LITERAL, type); // This should probably be STRING_LITERAL, not BOOL_LITERAL
 }
 
 void test_version_literals(void) {
@@ -67,16 +67,16 @@ void test_version_literals(void) {
     // Testing valid version literals
     bool result = tokenizer.isLiteral("1.2.3", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid version literal '1.2.3'");
-    TEST_ASSERT_EQUAL_INT(VERSION_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_VERSION_LITERAL, type);
 
     result = tokenizer.isLiteral("0.0.0", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid version literal '0.0.0'");
-    TEST_ASSERT_EQUAL_INT(VERSION_LITERAL, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_VERSION_LITERAL, type);
 
     // Testing invalid version literals
     result = tokenizer.isLiteral("1.2", type); // Missing patch version
     // TEST_ASSERT_FALSE_MESSAGE(result, "Expected false for invalid version literal '1.2'");
-    TEST_ASSERT_NOT_EQUAL_INT(VERSION_LITERAL, type);
+    TEST_ASSERT_NOT_EQUAL_INT(TOKEN_VERSION_LITERAL, type);
 
     result = tokenizer.isLiteral("a.b.c", type); // Non-numeric characters
     TEST_ASSERT_FALSE_MESSAGE(result, "Expected false for invalid version literal 'a.b.c'");
@@ -92,11 +92,11 @@ void test_isSymbol_valid(void)
     TokenType type;
     bool result = tokenizer.isSymbol("{", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid symbol '{'");
-    TEST_ASSERT_EQUAL_INT(L_BRACE, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_L_BRACE, type);
 
     result = tokenizer.isSymbol("}", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid symbol '}'");
-    TEST_ASSERT_EQUAL_INT(R_BRACE, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_R_BRACE, type);
 
     // Test for other symbols...
 }
@@ -118,11 +118,11 @@ void test_isKeyword_valid(void)
     TokenType type;
     bool result = tokenizer.isKeyword("meta", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid keyword 'meta'");
-    TEST_ASSERT_EQUAL_INT(META, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_META, type);
 
     result = tokenizer.isKeyword("def", type);
     TEST_ASSERT_TRUE_MESSAGE(result, "Expected true for valid keyword 'def'");
-    TEST_ASSERT_EQUAL_INT(DEF, type);
+    TEST_ASSERT_EQUAL_INT(TOKEN_DEF, type);
 
     // Test for other keywords...
 }
@@ -145,10 +145,10 @@ void test_valid_meta(void)
     std::string fileName = std::string("./test/static/test_valid_meta.drive");
     Tokenizer Tokenizer(fileName);
     TokenType expected[] = {
-        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE,  // meta
-        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def TestType
-        FRAME, L_PARENTHESES, IDENTIFIER, R_PARENTHESES, SEMICOLON,
-        END_OF_FILE
+        TOKEN_META, TOKEN_L_BRACE, TOKEN_IDENTIFIER, TOKEN_COLON, TOKEN_STRING_LITERAL, TOKEN_SEMICOLON, TOKEN_IDENTIFIER, TOKEN_COLON, TOKEN_VERSION_LITERAL, TOKEN_SEMICOLON, TOKEN_R_BRACE,  // meta
+        TOKEN_DEF, TOKEN_IDENTIFIER, TOKEN_L_BRACE, TOKEN_IDENTIFIER, TOKEN_IDENTIFIER, TOKEN_SEMICOLON, TOKEN_R_BRACE, // def TestType
+        TOKEN_FRAME, TOKEN_L_PARENTHESES, TOKEN_IDENTIFIER, TOKEN_R_PARENTHESES, TOKEN_SEMICOLON,
+        TOKEN_END_OF_FILE
     };
 
     std::vector<Token> tokens  = Tokenizer.tokenize();
@@ -166,10 +166,10 @@ void test_full(void)
     std::string filename = std::string("./test/static/test_full.drive");
     Tokenizer Tokenizer(filename);
     TokenType expected[] = {
-        META, L_BRACE, IDENTIFIER, COLON, STRING_LITERAL, SEMICOLON, IDENTIFIER, COLON, VERSION_LITERAL, SEMICOLON, R_BRACE, // meta
-        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def DateTime
-        DEF, IDENTIFIER, L_BRACE, IDENTIFIER, IDENTIFIER, SEMICOLON, IDENTIFIER, IDENTIFIER, SEMICOLON, R_BRACE, // def CarData
-        FRAME, L_PARENTHESES, IDENTIFIER, R_PARENTHESES, SEMICOLON, END_OF_FILE // frame (CarData)
+        TOKEN_META, TOKEN_L_BRACE, TOKEN_IDENTIFIER, TOKEN_COLON, TOKEN_STRING_LITERAL, TOKEN_SEMICOLON, TOKEN_IDENTIFIER, TOKEN_COLON, TOKEN_VERSION_LITERAL, TOKEN_SEMICOLON, TOKEN_R_BRACE, // meta
+        TOKEN_DEF, TOKEN_IDENTIFIER, TOKEN_L_BRACE, TOKEN_IDENTIFIER, TOKEN_IDENTIFIER, TOKEN_SEMICOLON, TOKEN_R_BRACE, // def DateTime
+        TOKEN_DEF, TOKEN_IDENTIFIER, TOKEN_L_BRACE, TOKEN_IDENTIFIER, TOKEN_IDENTIFIER, TOKEN_SEMICOLON, TOKEN_IDENTIFIER, TOKEN_IDENTIFIER, TOKEN_SEMICOLON, TOKEN_R_BRACE, // def CarData
+        TOKEN_FRAME, TOKEN_L_PARENTHESES, TOKEN_IDENTIFIER, TOKEN_R_PARENTHESES, TOKEN_SEMICOLON, TOKEN_END_OF_FILE // frame (CarData)
     };
 
     std::vector<Token> tokens = Tokenizer.tokenize();

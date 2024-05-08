@@ -12,32 +12,32 @@ namespace daqser::impl
     enum TokenType
     {
         // Inavlid
-        INVALID,
+        TOKEN_INVALID,
 
         // Keywords
-        META,
-        DEF,
-        FRAME,
+        TOKEN_META,
+        TOKEN_DEF,
+        TOKEN_FRAME,
 
         // Symbols
-        L_BRACE,
-        R_BRACE,
-        L_PARENTHESES,
-        R_PARENTHESES,
-        COLON,
-        SEMICOLON,
-        END_OF_FILE,
+        TOKEN_L_BRACE,
+        TOKEN_R_BRACE,
+        TOKEN_L_PARENTHESES,
+        TOKEN_R_PARENTHESES,
+        TOKEN_COLON,
+        TOKEN_SEMICOLON,
+        TOKEN_END_OF_FILE,
 
         // Identifiers
-        DATA_TYPE,  // data type names -- this is actually not used lol
-        IDENTIFIER, // variable names
+        TOKEN_DATA_TYPE,  // data type names -- this is actually not used lol
+        TOKEN_IDENTIFIER, // variable names
 
         // Literals
-        INT_LITERAL,
-        FLOAT_LITERAL,
-        BOOL_LITERAL,
-        STRING_LITERAL,
-        VERSION_LITERAL,
+        TOKEN_INT_LITERAL,
+        TOKEN_FLOAT_LITERAL,
+        TOKEN_BOOL_LITERAL,
+        TOKEN_STRING_LITERAL,
+        TOKEN_VERSION_LITERAL,
     };
 
     struct Token
@@ -67,24 +67,24 @@ namespace daqser::impl
         static std::string tokenTypeToString(const TokenType &tokenType)
         {
             static std::map<int, std::string> tokenMap{
-                {INVALID, "INVALID"},
-                {META, "META"},
-                {DEF, "DEF"},
-                {FRAME, "FRAME"},
-                {L_BRACE, "L_BRACE"},
-                {R_BRACE, "R_BRACE"},
-                {L_PARENTHESES, "L_PARENTHESES"},
-                {R_PARENTHESES, "R_PARENTHESES"},
-                {COLON, "COLON"},
-                {SEMICOLON, "SEMICOLON"},
-                {END_OF_FILE, "END_OF_FILE"},
-                {DATA_TYPE, "DATA_TYPE"},
-                {IDENTIFIER, "IDENTIFIER"},
-                {INT_LITERAL, "INT_LITERAL"},
-                {FLOAT_LITERAL, "FLOAT_LITERAL"},
-                {BOOL_LITERAL, "BOOL_LITERAL"},
-                {STRING_LITERAL, "STRING_LITERAL"},
-                {VERSION_LITERAL, "VERSION_LITERAL"}};
+                {TOKEN_INVALID, "INVALID"},
+                {TOKEN_META, "META"},
+                {TOKEN_DEF, "DEF"},
+                {TOKEN_FRAME, "FRAME"},
+                {TOKEN_L_BRACE, "L_BRACE"},
+                {TOKEN_R_BRACE, "R_BRACE"},
+                {TOKEN_L_PARENTHESES, "L_PARENTHESES"},
+                {TOKEN_R_PARENTHESES, "R_PARENTHESES"},
+                {TOKEN_COLON, "COLON"},
+                {TOKEN_SEMICOLON, "SEMICOLON"},
+                {TOKEN_END_OF_FILE, "END_OF_FILE"},
+                {TOKEN_DATA_TYPE, "DATA_TYPE"},
+                {TOKEN_IDENTIFIER, "IDENTIFIER"},
+                {TOKEN_INT_LITERAL, "INT_LITERAL"},
+                {TOKEN_FLOAT_LITERAL, "FLOAT_LITERAL"},
+                {TOKEN_BOOL_LITERAL, "BOOL_LITERAL"},
+                {TOKEN_STRING_LITERAL, "STRING_LITERAL"},
+                {TOKEN_VERSION_LITERAL, "VERSION_LITERAL"}};
 
             auto it = tokenMap.find(tokenType);
 

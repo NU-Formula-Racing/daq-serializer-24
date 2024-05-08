@@ -25,11 +25,11 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
     for (int i = 0; i < tokens.size(); i++)
     {
         Token token = tokens[i];
-        if (token.type == META)
+        if (token.type == TOKEN_META)
             metaCount++;
 
         if (metaCount > 1)
-            return Parser::ParsingResult::duplicateDefinition(META, i);
+            return Parser::ParsingResult::duplicateDefinition(TOKEN_META, i);
     }
 
     if (metaCount == 0)
@@ -40,11 +40,11 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
     for (int i = 0; i < tokens.size(); i++)
     {
         Token token = tokens[i];
-        if (token.type == FRAME)
+        if (token.type == TOKEN_FRAME)
             frameCount++;
 
         if (frameCount > 1)
-            return Parser::ParsingResult::duplicateDefinition(FRAME, i);
+            return Parser::ParsingResult::duplicateDefinition(TOKEN_FRAME, i);
     }
 
     if (frameCount == 0)
@@ -53,7 +53,7 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
     for (int i = 0; i < tokens.size();)
     {
         // scope checking
-        if (tokens[i].type == L_BRACE || tokens[i].type == L_PARENTHESES)
+        if (tokens[i].type == TOKEN_L_BRACE || tokens[i].type == TOKEN_L_PARENTHESES)
         {
             if (!_isScopeClosed(tokens, i))
                 return Parser::ParsingResult::unclosedScope(tokens[i].type, i);
@@ -67,38 +67,38 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         // CHECK FOR DECLARATIONS
         // def, and frames must be followed by an identifier, then followed by a scope
         // the scope should be left brace for def, and left parentheses for frames
-        if (tokens[i].type == DEF)
+        if (tokens[i].type == TOKEN_DEF)
         {
-            if (tokens[i + 1].type != IDENTIFIER)
+            if (tokens[i + 1].type != TOKEN_IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier after def");
-            if (tokens[i + 2].type != L_BRACE)
+            if (tokens[i + 2].type != TOKEN_L_BRACE)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected scope after definition identifier");
         }
 
         // now check that the next scope is opened with the proper type
-        if (tokens[i].type == DEF && tokens[i + 2].type != L_BRACE)
+        if (tokens[i].type == TOKEN_DEF && tokens[i + 2].type != TOKEN_L_BRACE)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left brace after def");
-        if (tokens[i].type == FRAME && tokens[i + 1].type != L_PARENTHESES)
+        if (tokens[i].type == TOKEN_FRAME && tokens[i + 1].type != TOKEN_L_PARENTHESES)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left parentheses after frame");
-        if (tokens[i].type == META && tokens[i + 1].type != L_BRACE)
+        if (tokens[i].type == TOKEN_META && tokens[i + 1].type != TOKEN_L_BRACE)
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected left brace after meta");
 
         // now progress the index based on the scope type
-        if (tokens[i].type == DEF)
+        if (tokens[i].type == TOKEN_DEF)
         {
             // std::cout << "Found valid def token, changing scope" << std::endl;
             scope = Parser::ParserScope::DATA_TYPE_SCOPE;
             i += 2;
             continue;
         }
-        if (tokens[i].type == FRAME)
+        if (tokens[i].type == TOKEN_FRAME)
         {
             // std::cout << "Found valid frame token, changing scope" << std::endl;
             scope = Parser::ParserScope::FRAME_SCOPE;
             i += 1;
             continue;
         }
-        if (tokens[i].type == META)
+        if (tokens[i].type == TOKEN_META)
         {
             // std::cout << "Found valid meta token, changing scope" << std::endl;
             scope = Parser::ParserScope::META_SCOPE;
@@ -114,58 +114,58 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
         case Parser::ParserScope::GLOBAL_SCOPE:
             // we should not be in the global scope at this point of the code
             // only def, frame, and meta are allowed in the global scope
-            if (tokens[i].type == END_OF_FILE)
+            if (tokens[i].type == TOKEN_END_OF_FILE)
                 // we have reached the end of the file, so we are done -- but we haven't found a frame
                 return Parser::ParsingResult::ok("No frame found in file, but file is valid");
             return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected def, frame, or meta");
         case Parser::ParserScope::DATA_TYPE_SCOPE:
             // we should only be in the data type scope if we are in a def
             // the only valid tokens in this scope are identifiers, and data types
-            if (tokens[i].type == R_BRACE)
+            if (tokens[i].type == TOKEN_R_BRACE)
             {
                 scope = Parser::ParserScope::GLOBAL_SCOPE;
                 i++;
                 continue;
             }
-            if (tokens[i].type != IDENTIFIER)
+            if (tokens[i].type != TOKEN_IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i + 1].type != IDENTIFIER)
+            if (tokens[i + 1].type != TOKEN_IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected identifier type");
-            if (tokens[i + 2].type != SEMICOLON)
+            if (tokens[i + 2].type != TOKEN_SEMICOLON)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 2].type, i + 2, "Expected semicolon");
             i += 3;
             continue;
         case Parser::ParserScope::META_SCOPE:
             // we should only be in the meta scope if we are in a meta
             // the only valid tokens in this scope are identifiers, and data types
-            if (tokens[i].type == R_BRACE)
+            if (tokens[i].type == TOKEN_R_BRACE)
             {
                 scope = Parser::ParserScope::GLOBAL_SCOPE;
                 i++;
                 continue;
             }
-            if (tokens[i].type != IDENTIFIER)
+            if (tokens[i].type != TOKEN_IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i + 1].type != COLON)
+            if (tokens[i + 1].type != TOKEN_COLON)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected colon");
-            if (tokens[i + 2].type < INT_LITERAL || tokens[i + 2].type > VERSION_LITERAL)
+            if (tokens[i + 2].type < TOKEN_INT_LITERAL || tokens[i + 2].type > TOKEN_VERSION_LITERAL)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 2].type, i + 2, "Expected a literal");
-            if (tokens[i + 3].type != SEMICOLON)
+            if (tokens[i + 3].type != TOKEN_SEMICOLON)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 3].type, i + 3, "Expected semicolon");
             i += 4;
             continue;
         case Parser::ParserScope::FRAME_SCOPE:
-            if (tokens[i].type != IDENTIFIER)
+            if (tokens[i].type != TOKEN_IDENTIFIER)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected identifier type");
-            if (tokens[i + 1].type != R_PARENTHESES)
+            if (tokens[i + 1].type != TOKEN_R_PARENTHESES)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected right parentheses");
             i += 2;
             scope = Parser::ParserScope::POST_FRAME_SCOPE;
             continue;
         case Parser::ParserScope::POST_FRAME_SCOPE:
-            if (tokens[i].type != SEMICOLON)
+            if (tokens[i].type != TOKEN_SEMICOLON)
                 return Parser::ParsingResult::invalidSequence(tokens[i].type, i, "Expected semicolon");
-            if (tokens[i + 1].type != END_OF_FILE)
+            if (tokens[i + 1].type != TOKEN_END_OF_FILE)
                 return Parser::ParsingResult::invalidSequence(tokens[i + 1].type, i + 1, "Expected end of file");
             i += 2;
             continue;
@@ -182,14 +182,14 @@ Parser::ParsingResult Parser::isValidSequence(const std::vector<Token> &tokens)
 bool Parser::_isScopeClosed(const std::vector<Token> &tokens, int openingScopeIndex) const
 {
     TokenType openType = tokens[openingScopeIndex].type;
-    if (openType != L_BRACE && openType != L_PARENTHESES)
+    if (openType != TOKEN_L_BRACE && openType != TOKEN_L_PARENTHESES)
         throw std::invalid_argument("Invalid opening scope type");
 
     int scopeCount = 0;
-    bool isParentheses = openType == L_PARENTHESES;
+    bool isParentheses = openType == TOKEN_L_PARENTHESES;
 
-    TokenType openingScopeType = isParentheses ? L_PARENTHESES : L_BRACE;
-    TokenType closingScopeType = isParentheses ? R_PARENTHESES : R_BRACE;
+    TokenType openingScopeType = isParentheses ? TOKEN_L_PARENTHESES : TOKEN_L_BRACE;
+    TokenType closingScopeType = isParentheses ? TOKEN_R_PARENTHESES : TOKEN_R_BRACE;
 
     for (int i = openingScopeIndex; i < tokens.size(); i++)
     {
@@ -235,16 +235,16 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         // scope checking
         switch (currentToken.type)
         {
-        case META:
+        case TOKEN_META:
             scope = Parser::ParserScope::META_SCOPE;
             break;
-        case DEF:
+        case TOKEN_DEF:
             scope = Parser::ParserScope::DATA_TYPE_SCOPE;
             break;
-        case FRAME:
+        case TOKEN_FRAME:
             scope = Parser::ParserScope::FRAME_SCOPE;
             break;
-        case END_OF_FILE:
+        case TOKEN_END_OF_FILE:
             continue;
         default:
             // this should have been caught by the isValidSequence function
@@ -268,7 +268,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
 
             std::cout << "Reading meta data" << std::endl;
 
-            while (tokenQueue.front().type != R_BRACE)
+            while (tokenQueue.front().type != TOKEN_R_BRACE)
             {
                 // we expect an identifier : literal pair
                 // this should be validated by the isValidSequence function
@@ -333,7 +333,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // eat the left brace
             tokenQueue.pop();
 
-            while (tokenQueue.front().type != R_BRACE)
+            while (tokenQueue.front().type != TOKEN_R_BRACE)
             {
                 if (onlyMeta)
                 {

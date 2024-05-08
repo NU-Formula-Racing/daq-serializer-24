@@ -81,7 +81,7 @@ std::vector<Token> Tokenizer::tokenize()
     {
         Token token = getNextToken(file);
         tokens.push_back(token);
-        if (token.type == END_OF_FILE)
+        if (token.type == TOKEN_END_OF_FILE)
             break;
     }
 
@@ -131,7 +131,7 @@ Token Tokenizer::getNextToken(std::istream &file)
 
     if (file.eof() && word.empty())
     {
-        token.type = END_OF_FILE;
+        token.type = TOKEN_END_OF_FILE;
         token.value = "EOF";
         return token;
     }
@@ -140,7 +140,7 @@ Token Tokenizer::getNextToken(std::istream &file)
         isSymbol(word, token.type) ||
         isLiteral(word, token.type))
     {
-        if (token.type == STRING_LITERAL)
+        if (token.type == TOKEN_STRING_LITERAL)
         {
             // remove the quotes from the string
             token.value = word.substr(1, word.size() - 2);
@@ -154,12 +154,12 @@ Token Tokenizer::getNextToken(std::istream &file)
     // if it is not a literal, then we are going to assume that it is an identifier, given that it's a valid name
     if (isValidIdentifier(word))
     {
-        token.type = IDENTIFIER;
+        token.type = TOKEN_IDENTIFIER;
         token.value = word;
         return token;
     }
 
-    token.type = INVALID;
+    token.type = TOKEN_INVALID;
     token.value = word;
     return token;
 }
@@ -167,9 +167,9 @@ Token Tokenizer::getNextToken(std::istream &file)
 bool Tokenizer::isKeyword(const std::string &word, TokenType &type)
 {
     static std::map<std::string, TokenType> keywords{
-        {"meta", META},
-        {"def", DEF},
-        {"frame", FRAME},
+        {"meta", TOKEN_META},
+        {"def", TOKEN_DEF},
+        {"frame", TOKEN_FRAME},
     };
 
     auto it = keywords.find(word);
@@ -184,12 +184,12 @@ bool Tokenizer::isKeyword(const std::string &word, TokenType &type)
 bool Tokenizer::isSymbol(const std::string &word, TokenType &type)
 {
     static std::map<std::string, TokenType> symbols{
-        {"{", L_BRACE},
-        {"}", R_BRACE},
-        {":", COLON},
-        {";", SEMICOLON},
-        {"(", L_PARENTHESES},
-        {")", R_PARENTHESES},
+        {"{", TOKEN_L_BRACE},
+        {"}", TOKEN_R_BRACE},
+        {":", TOKEN_COLON},
+        {";", TOKEN_SEMICOLON},
+        {"(", TOKEN_L_PARENTHESES},
+        {")", TOKEN_R_PARENTHESES},
     };
 
     auto it = symbols.find(word);
@@ -206,35 +206,35 @@ bool Tokenizer::isLiteral(const std::string &word, TokenType &type)
     // Integer Literal
     if (std::regex_match(word, std::regex("^-?[0-9]+$")))
     {
-        type = INT_LITERAL;
+        type = TOKEN_INT_LITERAL;
         return true;
     }
 
     // Float/Double Literal
     if (std::regex_match(word, std::regex("^-?[0-9]*\\.[0-9]+([eE][-+]?[0-9]+)?$")))
     {
-        type = FLOAT_LITERAL; // or DOUBLE_LITERAL depending on your requirement
+        type = TOKEN_FLOAT_LITERAL; // or DOUBLE_LITERAL depending on your requirement
         return true;
     }
 
     // Boolean Literal
     if (word == "true" || word == "false")
     {
-        type = BOOL_LITERAL;
+        type = TOKEN_BOOL_LITERAL;
         return true;
     }
 
     // String Literal
     if (std::regex_match(word, std::regex("^\".*\"$")))
     {
-        type = STRING_LITERAL;
+        type = TOKEN_STRING_LITERAL;
         return true;
     }
 
     // Version Literal
     if (std::regex_match(word, std::regex("^[0-9]+\\.[0-9]+\\.[0-9]+$")))
     {
-        type = VERSION_LITERAL;
+        type = TOKEN_VERSION_LITERAL;
         return true;
     }
 

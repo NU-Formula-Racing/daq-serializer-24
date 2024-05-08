@@ -186,9 +186,9 @@ namespace daqser::impl
             {
                 ParsingResult result(token, index);
                 result.isValid = false;
-                if (token == L_BRACE)
+                if (token == TOKEN_L_BRACE)
                     result.message << "Unclosed scope (Brace): " << token << std::endl;
-                else if (token == L_PARENTHESES)
+                else if (token == TOKEN_L_PARENTHESES)
                     result.message << "Unclosed scope (Parentheses): " << token << std::endl;
                 else
                     result.message << "Unclosed scope (Unknown): " << token << std::endl;
@@ -241,8 +241,8 @@ namespace daqser::impl
 
     private:
         const std::map<std::string, TokenType> _EXPECTED_META_FIELDS = {
-            {".schema", STRING_LITERAL},
-            {".version", VERSION_LITERAL}};
+            {".schema", TOKEN_STRING_LITERAL},
+            {".version", TOKEN_VERSION_LITERAL}};
 
         // const std::set<std::string> _SUPPORTED_PRIMATIVES_FIELD = {
         //     "float", "bool", "long", "string", "int", "version"};
