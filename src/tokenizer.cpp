@@ -10,10 +10,34 @@
 
 #include "tokenizer.hpp"
 
+#ifdef ARDUINO_ARCH_ESP32
+#define USE_LittleFS
+
+#include <FS.h>
+#ifdef USE_LittleFS
+  #define SPIFFS LITTLEFS
+  #include <LITTLEFS.h> 
+#else
+  #include <SPIFFS.h>
+#endif 
+
+#endif
+
 using namespace daqser::impl;
 
 std::vector<Token> Tokenizer::tokenize()
 {
+#ifdef USE_LittleFS
+    if (!SPIFFS.begin(true))
+    {
+        std::cerr << "Error mounting SPIFFS" << std::endl;
+        return {};
+    }
+
+    // also modify the _fileName for spiffs mounting, which is under the /spiffs directory
+    _fileName = "/spiffs/" + _fileName;
+#endif
+
     std::vector<Token> tokens;
     std::ifstream file(_fileName);
     if (!file.is_open())

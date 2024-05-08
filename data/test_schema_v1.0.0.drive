@@ -1,0 +1,463 @@
+meta {
+	.schema: 'test_schema';
+	.version: 1.0.0;
+}
+
+# IMD Messages
+def IMD {
+	float IMD_transmit_resistance; # IMD output decoding;
+	bool IMD_transmit_status; # 1_is_good_0_is_bad;
+}
+
+# BMS Messages
+def BMS_Voltages_0 {
+	bool BMS_Voltages_0_Cell_V_0; # V;
+	bool BMS_Voltages_0_Cell_V_1; # V;
+	bool BMS_Voltages_0_Cell_V_2; # V;
+	bool BMS_Voltages_0_Cell_V_3; # V;
+	bool BMS_Voltages_0_Cell_V_4; # V;
+	bool BMS_Voltages_0_Cell_V_5; # V;
+	bool BMS_Voltages_0_Cell_V_6; # V;
+	bool BMS_Voltages_0_Cell_OCV_Offset_0; # V;
+}
+
+def BMS_Voltages_1 {
+	bool BMS_Voltages_1_Cell_V_7; # V;
+	bool BMS_Voltages_1_Cell_V_8; # V;
+	bool BMS_Voltages_1_Cell_V_9; # V;
+	bool BMS_Voltages_1_Cell_V_10; # V;
+	bool BMS_Voltages_1_Cell_V_11; # V;
+	bool BMS_Voltages_1_Cell_V_12; # V;
+	bool BMS_Voltages_1_Cell_V_13; # V;
+	bool BMS_Voltages_1_Cell_OCV_Offset_1; # V;
+}
+
+def BMS_Voltages_2 {
+	bool BMS_Voltages_2_Cell_V_14; # V;
+	bool BMS_Voltages_2_Cell_V_15; # V;
+	bool BMS_Voltages_2_Cell_V_16; # V;
+	bool BMS_Voltages_2_Cell_V_17; # V;
+	bool BMS_Voltages_2_Cell_V_18; # V;
+	bool BMS_Voltages_2_Cell_V_19; # V;
+	bool BMS_Voltages_2_Cell_V_20; # V;
+	bool BMS_Voltages_2_Cell_OCV_Offset_2; # V;
+}
+
+def BMS_Voltages_3 {
+	bool BMS_Voltages_3_Cell_V_21; # V;
+	bool BMS_Voltages_3_Cell_V_22; # V;
+	bool BMS_Voltages_3_Cell_V_23; # V;
+	bool BMS_Voltages_3_Cell_V_24; # V;
+	bool BMS_Voltages_3_Cell_V_25; # V;
+	bool BMS_Voltages_3_Cell_V_26; # V;
+	bool BMS_Voltages_3_Cell_V_27; # V;
+	bool BMS_Voltages_3_Cell_OCV_Offset_3; # V;
+}
+
+def BMS_Voltages_4 {
+	bool BMS_Voltages_4_Cell_V_28; # V;
+	bool BMS_Voltages_4_Cell_V_29; # V;
+	bool BMS_Voltages_4_Cell_V_30; # V;
+	bool BMS_Voltages_4_Cell_V_31; # V;
+	bool BMS_Voltages_4_Cell_V_32; # V;
+	bool BMS_Voltages_4_Cell_V_33; # V;
+	bool BMS_Voltages_4_Cell_V_34; # V;
+	bool BMS_Voltages_4_Cell_OCV_Offset_4; # V;
+}
+
+def BMS_Voltages_5 {
+	bool BMS_Voltages_5_Cell_V_35; # V;
+	bool BMS_Voltages_5_Cell_V_36; # V;
+	bool BMS_Voltages_5_Cell_V_37; # V;
+	bool BMS_Voltages_5_Cell_V_38; # V;
+	bool BMS_Voltages_5_Cell_V_39; # V;
+	bool BMS_Voltages_5_Cell_V_40; # V;
+	bool BMS_Voltages_5_Cell_V_41; # V;
+	bool BMS_Voltages_5_Cell_OCV_Offset_5; # V;
+}
+
+def BMS_Voltages_6 {
+	bool BMS_Voltages_6_Cell_V_42; # V;
+	bool BMS_Voltages_6_Cell_V_43; # V;
+	bool BMS_Voltages_6_Cell_V_44; # V;
+	bool BMS_Voltages_6_Cell_V_45; # V;
+	bool BMS_Voltages_6_Cell_V_46; # V;
+	bool BMS_Voltages_6_Cell_V_47; # V;
+	bool BMS_Voltages_6_Cell_V_48; # V;
+	bool BMS_Voltages_6_Cell_OCV_Offset_6; # V;
+}
+
+def BMS_Voltages_7 {
+	bool BMS_Voltages_7_Cell_V_49; # V;
+	bool BMS_Voltages_7_Cell_V_50; # V;
+	bool BMS_Voltages_7_Cell_V_51; # V;
+	bool BMS_Voltages_7_Cell_V_52; # V;
+	bool BMS_Voltages_7_Cell_V_53; # V;
+	bool BMS_Voltages_7_Cell_V_54; # V;
+	bool BMS_Voltages_7_Cell_V_55; # V;
+	bool BMS_Voltages_7_Cell_OCV_Offset_7; # V;
+}
+
+def BMS_Voltages_8 {
+	bool BMS_Voltages_8_Cell_V_56; # V;
+	bool BMS_Voltages_8_Cell_V_57; # V;
+	bool BMS_Voltages_8_Cell_V_58; # V;
+	bool BMS_Voltages_8_Cell_V_59; # V;
+	bool BMS_Voltages_8_Cell_V_60; # V;
+	bool BMS_Voltages_8_Cell_V_61; # V;
+	bool BMS_Voltages_8_Cell_V_62; # V;
+	bool BMS_Voltages_8_Cell_OCV_Offset_8; # V;
+}
+
+def BMS_Voltages_9 {
+	bool BMS_Voltages_9_Cell_V_63; # V;
+	bool BMS_Voltages_9_Cell_V_64; # V;
+	bool BMS_Voltages_9_Cell_V_65; # V;
+	bool BMS_Voltages_9_Cell_V_66; # V;
+	bool BMS_Voltages_9_Cell_V_67; # V;
+	bool BMS_Voltages_9_Cell_V_68; # V;
+	bool BMS_Voltages_9_Cell_V_69; # V;
+	bool BMS_Voltages_9_Cell_OCV_Offset_9; # V;
+}
+
+def BMS_Voltages_10 {
+	bool BMS_Voltages_10_Cell_V_70; # V;
+	bool BMS_Voltages_10_Cell_V_71; # V;
+	bool BMS_Voltages_10_Cell_V_72; # V;
+	bool BMS_Voltages_10_Cell_V_73; # V;
+	bool BMS_Voltages_10_Cell_V_74; # V;
+	bool BMS_Voltages_10_Cell_V_75; # V;
+	bool BMS_Voltages_10_Cell_V_76; # V;
+	bool BMS_Voltages_10_Cell_OCV_Offset_110; # V;
+}
+
+def BMS_Voltages_11 {
+	bool BMS_Voltages_11_Cell_V_77; # V;
+	bool BMS_Voltages_11_Cell_V_78; # V;
+	bool BMS_Voltages_11_Cell_V_79; # V;
+	bool BMS_Voltages_11_Cell_V_80; # V;
+	bool BMS_Voltages_11_Cell_V_81; # V;
+	bool BMS_Voltages_11_Cell_V_82; # V;
+	bool BMS_Voltages_11_Cell_V_83; # V;
+	bool BMS_Voltages_11_Cell_OCV_Offset_211; # V;
+}
+
+def BMS_Voltages_12 {
+	bool BMS_Voltages_12_Cell_V_84; # V;
+	bool BMS_Voltages_12_Cell_V_85; # V;
+	bool BMS_Voltages_12_Cell_V_86; # V;
+	bool BMS_Voltages_12_Cell_V_87; # V;
+	bool BMS_Voltages_12_Cell_V_88; # V;
+	bool BMS_Voltages_12_Cell_V_89; # V;
+	bool BMS_Voltages_12_Cell_V_90; # V;
+	bool BMS_Voltages_12_Cell_OCV_Offset_212; # V;
+}
+
+def BMS_Voltages_13 {
+	bool BMS_Voltages_13_Cell_V_91; # V;
+	bool BMS_Voltages_13_Cell_V_92; # V;
+	bool BMS_Voltages_13_Cell_V_93; # V;
+	bool BMS_Voltages_13_Cell_V_94; # V;
+	bool BMS_Voltages_13_Cell_V_95; # V;
+	bool BMS_Voltages_13_Cell_V_96; # V;
+	bool BMS_Voltages_13_Cell_V_97; # V;
+	bool BMS_Voltages_13_Cell_OCV_Offset_213; # V;
+}
+
+def BMS_Voltages_14 {
+	bool BMS_Voltages_14_Cell_V_98; # V;
+	bool BMS_Voltages_14_Cell_V_99; # V;
+	bool BMS_Voltages_14_Cell_V_100; # V;
+	bool BMS_Voltages_14_Cell_V_101; # V;
+	bool BMS_Voltages_14_Cell_V_102; # V;
+	bool BMS_Voltages_14_Cell_V_103; # V;
+	bool BMS_Voltages_14_Cell_V_104; # V;
+	bool BMS_Voltages_14_Cell_OCV_Offset_214; # V;
+}
+
+def BMS_Voltages_15 {
+	bool BMS_Voltages_15_Cell_V_105; # V;
+	bool BMS_Voltages_15_Cell_V_106; # V;
+	bool BMS_Voltages_15_Cell_V_107; # V;
+	bool BMS_Voltages_15_Cell_V_108; # V;
+	bool BMS_Voltages_15_Cell_V_109; # V;
+	bool BMS_Voltages_15_Cell_V_110; # V;
+	bool BMS_Voltages_15_Cell_V_111; # V;
+	bool BMS_Voltages_15_Cell_OCV_Offset_115; # V;
+}
+
+def BMS_Voltages_16 {
+	bool BMS_Voltages_16_Cell_V_112; # V;
+	bool BMS_Voltages_16_Cell_V_113; # V;
+	bool BMS_Voltages_16_Cell_V_114; # V;
+	bool BMS_Voltages_16_Cell_V_115; # V;
+	bool BMS_Voltages_16_Cell_V_116; # V;
+	bool BMS_Voltages_16_Cell_V_117; # V;
+	bool BMS_Voltages_16_Cell_V_118; # V;
+	bool BMS_Voltages_16_Cell_OCV_Offset_216; # V;
+}
+
+def BMS_Voltages_17 {
+	bool BMS_Voltages_17_Cell_V_119; # V;
+	bool BMS_Voltages_17_Cell_V_120; # V;
+	bool BMS_Voltages_17_Cell_V_121; # V;
+	bool BMS_Voltages_17_Cell_V_122; # V;
+	bool BMS_Voltages_17_Cell_V_123; # V;
+	bool BMS_Voltages_17_Cell_V_124; # V;
+	bool BMS_Voltages_17_Cell_V_125; # V;
+	bool BMS_Voltages_17_Cell_OCV_Offset_217; # V;
+}
+
+def BMS_Voltages_18 {
+	bool BMS_Voltages_18_Cell_V_126; # V;
+	bool BMS_Voltages_18_Cell_V_127; # V;
+	bool BMS_Voltages_18_Cell_V_128; # V;
+	bool BMS_Voltages_18_Cell_V_129; # V;
+	bool BMS_Voltages_18_Cell_V_130; # V;
+	bool BMS_Voltages_18_Cell_V_131; # V;
+	bool BMS_Voltages_18_Cell_V_132; # V;
+	bool BMS_Voltages_18_Cell_OCV_Offset_218; # V;
+}
+
+def BMS_Voltages_19 {
+	bool BMS_Voltages_19_Cell_V_133; # V;
+	bool BMS_Voltages_19_Cell_V_134; # V;
+	bool BMS_Voltages_19_Cell_V_135; # V;
+	bool BMS_Voltages_19_Cell_V_136; # V;
+	bool BMS_Voltages_19_Cell_V_137; # V;
+	bool BMS_Voltages_19_Cell_V_138; # V;
+	bool BMS_Voltages_19_Cell_V_139; # V;
+	bool BMS_Voltages_19_Cell_OCV_Offset_219; # V;
+}
+
+def BMS_Temperatures_0 {
+	bool BMS_Temperatures_0_Cell_T_0; # C;
+	bool BMS_Temperatures_0_Cell_T_1; # C;
+	bool BMS_Temperatures_0_Cell_T_2; # C;
+	bool BMS_Temperatures_0_Cell_T_3; # C;
+	bool BMS_Temperatures_0_Cell_T_4; # C;
+	bool BMS_Temperatures_0_Cell_T_5; # C;
+	bool BMS_Temperatures_0_Cell_T_6; # C;
+}
+
+def BMS_Temperatures_1 {
+	bool BMS_Temperatures_1_Cell_T_7; # C;
+	bool BMS_Temperatures_1_Cell_T_8; # C;
+	bool BMS_Temperatures_1_Cell_T_9; # C;
+	bool BMS_Temperatures_1_Cell_T_10; # C;
+	bool BMS_Temperatures_1_Cell_T_11; # C;
+	bool BMS_Temperatures_1_Cell_T_12; # C;
+	bool BMS_Temperatures_1_Cell_T_13; # C;
+}
+
+def BMS_Temperatures_2 {
+	bool BMS_Temperatures_2_Cell_T_14; # C;
+	bool BMS_Temperatures_2_Cell_T_15; # C;
+	bool BMS_Temperatures_2_Cell_T_16; # C;
+	bool BMS_Temperatures_2_Cell_T_17; # C;
+	bool BMS_Temperatures_2_Cell_T_18; # C;
+	bool BMS_Temperatures_2_Cell_T_19; # C;
+	bool BMS_Temperatures_2_Cell_T_20; # C;
+}
+
+def BMS_Temperatures_3 {
+	bool BMS_Temperatures_3_Cell_T_21; # C;
+	bool BMS_Temperatures_3_Cell_T_22; # C;
+	bool BMS_Temperatures_3_Cell_T_23; # C;
+	bool BMS_Temperatures_3_Cell_T_24; # C;
+	bool BMS_Temperatures_3_Cell_T_25; # C;
+	bool BMS_Temperatures_3_Cell_T_26; # C;
+	bool BMS_Temperatures_3_Cell_T_27; # C;
+}
+
+def BMS_Temperatures_4 {
+	bool BMS_Temperatures_4_Cell_T_28; # C;
+	bool BMS_Temperatures_4_Cell_T_29; # C;
+	bool BMS_Temperatures_4_Cell_T_30; # C;
+	bool BMS_Temperatures_4_Cell_T_31; # C;
+	bool BMS_Temperatures_4_Cell_T_32; # C;
+	bool BMS_Temperatures_4_Cell_T_33; # C;
+	bool BMS_Temperatures_4_Cell_T_34; # C;
+}
+
+def BMS_Temperatures_5 {
+	bool BMS_Temperatures_5_Cell_T_35; # C;
+	bool BMS_Temperatures_5_Cell_T_36; # C;
+	bool BMS_Temperatures_5_Cell_T_37; # C;
+	bool BMS_Temperatures_5_Cell_T_38; # C;
+	bool BMS_Temperatures_5_Cell_T_39; # C;
+	bool BMS_Temperatures_5_Cell_T_40; # C;
+	bool BMS_Temperatures_5_Cell_T_41; # C;
+}
+
+def BMS_Temperatures_6 {
+	bool BMS_Temperatures_6_Cell_T_42; # C;
+	bool BMS_Temperatures_6_Cell_T_43; # C;
+	bool BMS_Temperatures_6_Cell_T_44; # C;
+	bool BMS_Temperatures_6_Cell_T_45; # C;
+	bool BMS_Temperatures_6_Cell_T_46; # C;
+	bool BMS_Temperatures_6_Cell_T_47; # C;
+	bool BMS_Temperatures_6_Cell_T_48; # C;
+}
+
+def BMS_Temperatures_7 {
+	bool BMS_Temperatures_7_Cell_T_49; # C;
+	bool BMS_Temperatures_7_Cell_T_50; # C;
+	bool BMS_Temperatures_7_Cell_T_51; # C;
+	bool BMS_Temperatures_7_Cell_T_52; # C;
+	bool BMS_Temperatures_7_Cell_T_53; # C;
+	bool BMS_Temperatures_7_Cell_T_54; # C;
+	bool BMS_Temperatures_7_Cell_T_55; # C;
+}
+
+def BMS_Temperatures_8 {
+	bool BMS_Temperatures_8_Cell_T_56; # C;
+	bool BMS_Temperatures_8_Cell_T_57; # C;
+	bool BMS_Temperatures_8_Cell_T_58; # C;
+	bool BMS_Temperatures_8_Cell_T_59; # C;
+	bool BMS_Temperatures_8_Cell_T_60; # C;
+	bool BMS_Temperatures_8_Cell_T_61; # C;
+	bool BMS_Temperatures_8_Cell_T_62; # C;
+}
+
+def BMS_Temperatures_9 {
+	bool BMS_Temperatures_9_Cell_T_63; # C;
+	bool BMS_Temperatures_9_Cell_T_64; # C;
+	bool BMS_Temperatures_9_Cell_T_65; # C;
+	bool BMS_Temperatures_9_Cell_T_66; # C;
+	bool BMS_Temperatures_9_Cell_T_67; # C;
+	bool BMS_Temperatures_9_Cell_T_68; # C;
+	bool BMS_Temperatures_9_Cell_T_69; # C;
+}
+
+def BMS_Temperatures_10 {
+	bool BMS_Temperatures_10_Cell_T_70; # C;
+	bool BMS_Temperatures_10_Cell_T_71; # C;
+	bool BMS_Temperatures_10_Cell_T_72; # C;
+	bool BMS_Temperatures_10_Cell_T_73; # C;
+	bool BMS_Temperatures_10_Cell_T_74; # C;
+	bool BMS_Temperatures_10_Cell_T_75; # C;
+	bool BMS_Temperatures_10_Cell_T_76; # C;
+}
+
+def BMS_Temperatures_11 {
+	bool BMS_Temperatures_11_Cell_T_77; # C;
+	bool BMS_Temperatures_11_Cell_T_78; # C;
+	bool BMS_Temperatures_11_Cell_T_79; # C;
+	bool BMS_Temperatures_11_Cell_T_80; # C;
+	bool BMS_Temperatures_11_Cell_T_81; # C;
+	bool BMS_Temperatures_11_Cell_T_82; # C;
+	bool BMS_Temperatures_11_Cell_T_83; # C;
+}
+
+def BMS_Temperatures_12 {
+	bool BMS_Temperatures_12_Cell_T_84; # C;
+	bool BMS_Temperatures_12_Cell_T_85; # C;
+	bool BMS_Temperatures_12_Cell_T_86; # C;
+	bool BMS_Temperatures_12_Cell_T_87; # C;
+	bool BMS_Temperatures_12_Cell_T_88; # C;
+	bool BMS_Temperatures_12_Cell_T_89; # C;
+	bool BMS_Temperatures_12_Cell_T_90; # C;
+}
+
+def BMS_Temperatures_13 {
+	bool BMS_Temperatures_13_Cell_T_91; # C;
+	bool BMS_Temperatures_13_Cell_T_92; # C;
+	bool BMS_Temperatures_13_Cell_T_93; # C;
+	bool BMS_Temperatures_13_Cell_T_94; # C;
+	bool BMS_Temperatures_13_Cell_T_95; # C;
+	bool BMS_Temperatures_13_Cell_T_96; # C;
+	bool BMS_Temperatures_13_Cell_T_97; # C;
+}
+
+def BMS_Temperatures_14 {
+	bool BMS_Temperatures_14_Cell_T_98; # C;
+	bool BMS_Temperatures_14_Cell_T_99; # C;
+	bool BMS_Temperatures_14_Cell_T_100; # C;
+	bool BMS_Temperatures_14_Cell_T_101; # C;
+	bool BMS_Temperatures_14_Cell_T_102; # C;
+	bool BMS_Temperatures_14_Cell_T_103; # C;
+	bool BMS_Temperatures_14_Cell_T_104; # C;
+}
+
+def BMS_Temperatures_15 {
+	bool BMS_Temperatures_15_Cell_T_105; # C;
+	bool BMS_Temperatures_15_Cell_T_106; # C;
+	bool BMS_Temperatures_15_Cell_T_107; # C;
+	bool BMS_Temperatures_15_Cell_T_108; # C;
+	bool BMS_Temperatures_15_Cell_T_109; # C;
+	bool BMS_Temperatures_15_Cell_T_110; # C;
+	bool BMS_Temperatures_15_Cell_T_111; # C;
+}
+
+def BMS_SOE {
+	float BMS_SOE_Max_Discharge_Current; # A;
+	float BMS_SOE_Max_Regen_Current; # A;
+	float BMS_SOE_Battery_Voltage; # V;
+	bool BMS_SOE_Battery_Temperature; # C;
+	float BMS_SOE_Battery_Current; # A;
+}
+
+def BMS_Faults {
+	bool BMS_Faults_Fault_Summary; # ;
+	bool BMS_Faults_Undervoltage_Fault; # ;
+	bool BMS_Faults_Overvoltage_Fault; # ;
+	bool BMS_Faults_Undertemperature_Fault; # ;
+	bool BMS_Faults_Overtemperature_Fault; # ;
+	bool BMS_Faults_Overcurrent_Fault; # ;
+	bool BMS_Faults_External_Kill_Fault; # ;
+	bool BMS_Faults_Open_Wire_Fault; # ;
+}
+
+def BMS_Status {
+	bool BMS_Status_Max_Cell_Temp; # A;
+	bool BMS_Status_Min_Cell_Temp; # A;
+	bool BMS_Status_Max_Cell_Voltage; # V;
+	bool BMS_Status_Min_Cell_Voltage; # V;
+	bool BMS_Status_BMS_SOC; # %;
+}
+
+def Car_Data {
+	IMD IMD;
+	BMS_Voltages_0 BMS_Voltages_0;
+	BMS_Voltages_1 BMS_Voltages_1;
+	BMS_Voltages_2 BMS_Voltages_2;
+	BMS_Voltages_3 BMS_Voltages_3;
+	BMS_Voltages_4 BMS_Voltages_4;
+	BMS_Voltages_5 BMS_Voltages_5;
+	BMS_Voltages_6 BMS_Voltages_6;
+	BMS_Voltages_7 BMS_Voltages_7;
+	BMS_Voltages_8 BMS_Voltages_8;
+	BMS_Voltages_9 BMS_Voltages_9;
+	BMS_Voltages_10 BMS_Voltages_10;
+	BMS_Voltages_11 BMS_Voltages_11;
+	BMS_Voltages_12 BMS_Voltages_12;
+	BMS_Voltages_13 BMS_Voltages_13;
+	BMS_Voltages_14 BMS_Voltages_14;
+	BMS_Voltages_15 BMS_Voltages_15;
+	BMS_Voltages_16 BMS_Voltages_16;
+	BMS_Voltages_17 BMS_Voltages_17;
+	BMS_Voltages_18 BMS_Voltages_18;
+	BMS_Voltages_19 BMS_Voltages_19;
+	BMS_Temperatures_0 BMS_Temperatures_0;
+	BMS_Temperatures_1 BMS_Temperatures_1;
+	BMS_Temperatures_2 BMS_Temperatures_2;
+	BMS_Temperatures_3 BMS_Temperatures_3;
+	BMS_Temperatures_4 BMS_Temperatures_4;
+	BMS_Temperatures_5 BMS_Temperatures_5;
+	BMS_Temperatures_6 BMS_Temperatures_6;
+	BMS_Temperatures_7 BMS_Temperatures_7;
+	BMS_Temperatures_8 BMS_Temperatures_8;
+	BMS_Temperatures_9 BMS_Temperatures_9;
+	BMS_Temperatures_10 BMS_Temperatures_10;
+	BMS_Temperatures_11 BMS_Temperatures_11;
+	BMS_Temperatures_12 BMS_Temperatures_12;
+	BMS_Temperatures_13 BMS_Temperatures_13;
+	BMS_Temperatures_14 BMS_Temperatures_14;
+	BMS_Temperatures_15 BMS_Temperatures_15;
+	BMS_SOE BMS_SOE;
+	BMS_Faults BMS_Faults;
+	BMS_Status BMS_Status;
+}
+
+frame(Car_Data);
