@@ -42,7 +42,9 @@ Field Field::emptyField(const std::string &name, FieldType type)
         field.size = sizeof(long);
         break;
     default:
-        throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        field.size = 0;
+        std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;
     }
 
     return field;
@@ -65,7 +67,9 @@ std::string Field::fieldTypeToString(FieldType type)
     case FieldType::LONG:
         return "long";
     default:
-        throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;
+        return "invalid";
     }
 }
 
@@ -158,7 +162,9 @@ DataMember DataMember::operator[](const std::string &fieldName)
 {
     if (!isDataType)
     {
-        throw std::invalid_argument("DataMember is a Field, not a DataType");
+        // throw std::invalid_argument("DataMember is a Field, not a DataType");
+        std::cout << "DataMember is a Field, not a DataType" << std::endl;
+        return DataMember();
     }
 
     DataType DataType = this->getDataType();
@@ -170,7 +176,9 @@ Field DataMember::getField()
 
     if (memberPtr == nullptr)
     {
-        throw std::invalid_argument("DataMember is null");
+        // throw std::invalid_argument("DataMember is null");
+        std::cout << "DataMember is null" << std::endl;
+        return Field();
     }
 
     if (isDataType)
@@ -178,7 +186,9 @@ Field DataMember::getField()
         DataType DataType = this->getDataType();
         std::stringstream ss;
         ss << "DataMember is a DataType, not a Field. DataType is: " << DataType.name;
-        throw std::invalid_argument(ss.str());
+        // throw std::invalid_argument(ss.str());
+        std::cout << ss.str() << std::endl;
+        return Field();
     }
 
     Field field = *(Field *)memberPtr;
@@ -189,7 +199,9 @@ DataType DataMember::getDataType()
 {
     if (memberPtr == nullptr)
     {
-        throw std::invalid_argument("DataMember is null");
+        // throw std::invalid_argument("DataMember is null");
+        std::cout << "DataMember is null" << std::endl;
+        return DataType();
     }
 
     if (!isDataType)
@@ -197,7 +209,9 @@ DataType DataMember::getDataType()
         Field field = *(Field *)memberPtr;
         std::stringstream ss;
         ss << "DataMember is a Field, not a DataType. Field is: " << field.name;
-        throw std::invalid_argument(ss.str());
+        // throw std::invalid_argument(ss.str());
+        std::cout << ss.str() << std::endl;
+        return DataType();
     }
 
     return *(DataType *)memberPtr;
@@ -267,7 +281,9 @@ void DataType::removeField(const std::string &fieldName)
 {
     if (fields.find(fieldName) == fields.end())
     {
-        throw std::invalid_argument("Field does not exist");
+        // throw std::invalid_argument("Field does not exist");
+        std::cout << "Field does not exist" << std::endl;
+        return;
     }
 
     this->size -= fields[fieldName].size;
@@ -286,7 +302,9 @@ void DataType::removeCustomField(const std::string &fieldName)
 {
     if (this->customDataTypes.find(fieldName) == this->customDataTypes.end())
     {
-        throw std::invalid_argument("Custom field does not exist");
+        // throw std::invalid_argument("Custom field does not exist");
+        std::cout << "Custom field does not exist" << std::endl;
+        return;
     }
 
     this->size -= customDataTypes[fieldName].size;
@@ -297,7 +315,9 @@ std::shared_ptr<DataType> DataType::getCustomField(const std::string &fieldName)
 {
     if (this->customDataTypes.find(fieldName) == this->customDataTypes.end())
     {
-        throw std::invalid_argument("Custom field does not exist");
+        // throw std::invalid_argument("Custom field does not exist");
+        std::cout << "Custom field does not exist" << std::endl;
+        return std::make_shared<DataType>();
     }
 
     return std::make_shared<DataType>(this->customDataTypes.at(fieldName));
@@ -324,7 +344,9 @@ DataMember DataType::getMember(const std::string &fieldName) const
         {
             std::stringstream ss;
             ss << "Custom field " << customFieldName << " does not exist in DataType " << this->name;
-            throw std::invalid_argument(ss.str());
+            // throw std::invalid_argument(ss.str());
+            std::cout << ss.str() << std::endl;
+            return DataMember();
         }
     }
 
@@ -336,7 +358,9 @@ DataMember DataType::getMember(const std::string &fieldName) const
     {
         std::stringstream ss;
         ss << "Field " << fieldName << " does not exist in DataType " << this->name;
-        throw std::invalid_argument(ss.str());
+        // throw std::invalid_argument(ss.str());
+        std::cout << ss.str() << std::endl;
+        return DataMember();
     }
 };
 

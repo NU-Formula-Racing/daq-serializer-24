@@ -36,7 +36,7 @@ namespace daqser
     {
         if (g_registry.numSchemas() == 0)
         {
-            std::cerr << "No schemas registered. Make sure to call daqser::initialize() first!" << std::endl;
+            std::cout << "No schemas registered. Make sure to call daqser::initialize() first!" << std::endl;
             return;
         }
 
@@ -46,9 +46,9 @@ namespace daqser
 
         if (schema.schemaName == "")
         {
-            std::cerr << "Schema not found: " << schemaName << " ";
-            std::cerr << version[0] << "." << version[1] << "." << version[2] << std::endl;
-            std::cerr << "Make that the schema is registered in the registry" << std::endl;
+            std::cout << "Schema not found: " << schemaName << " ";
+            std::cout << version[0] << "." << version[1] << "." << version[2] << std::endl;
+            std::cout << "Make that the schema is registered in the registry" << std::endl;
             return;
         }
 
@@ -63,7 +63,7 @@ namespace daqser
 
         if (schemaName == "" || version == nullptr)
         {
-            std::cerr << "Error deserializing schema metadata" << std::endl;
+            std::cout << "Error deserializing schema metadata" << std::endl;
             return;
         }
 
@@ -74,7 +74,7 @@ namespace daqser
     {
         if (g_registry.numSchemas() == 0)
         {
-            std::cerr << "No schemas registered. Make sure to call daqser::initialize() first!" << std::endl;
+            std::cout << "No schemas registered. Make sure to call daqser::initialize() first!" << std::endl;
             return;
         }
 
@@ -82,9 +82,9 @@ namespace daqser
 
         if (schema.schemaName == "")
         {
-            std::cerr << "Schema not found: " << schema.schemaName << " ";
-            std::cerr << schema.versionNumber[0] << "." << schema.versionNumber[1] << "." << schema.versionNumber[2] << std::endl;
-            std::cerr << "Make that the schema is registered in the registry" << std::endl;
+            std::cout << "Schema not found: " << schema.schemaName << " ";
+            std::cout << schema.versionNumber[0] << "." << schema.versionNumber[1] << "." << schema.versionNumber[2] << std::endl;
+            std::cout << "Make that the schema is registered in the registry" << std::endl;
             return;
         }
 
@@ -95,15 +95,15 @@ namespace daqser
     {
         if (g_activeSchema == nullptr)
         {
-            std::cerr << "daqser::No active schema." << std::endl;
-            std::cerr << "Please ensure that you call daqser::initalize(), then set a schema before making any daqser method calls!" << std::endl;
+            std::cout << "daqser::No active schema." << std::endl;
+            std::cout << "Please ensure that you call daqser::initalize(), then set a schema before making any daqser method calls!" << std::endl;
             return false;
         }
 
         if (g_activeSchema->schemaName == "")
         {
-            std::cerr << "daqser::Something went wrong when parsing your schema!" << std::endl;
-            std::cerr << "Please correct your schema file!" << std::endl;
+            std::cout << "daqser::Something went wrong when parsing your schema!" << std::endl;
+            std::cout << "Please correct your schema file!" << std::endl;
             return false;
         }
 
@@ -160,7 +160,7 @@ namespace daqser
         // make sure that the field exists
         if (!g_activeSchema->frameTemplate->isField(field))
         {
-            std::cerr << "Field does not exist: " << field << std::endl;
+            std::cout << "Field does not exist: " << field << std::endl;
             return;
         }
 
@@ -177,7 +177,7 @@ namespace daqser
         // make sure that the field exists
         if (!g_activeSchema->frameTemplate->isField(field))
         {
-            std::cerr << "Field does not exist: " << field << std::endl;
+            std::cout << "Field does not exist: " << field << std::endl;
             return T();
         }
 

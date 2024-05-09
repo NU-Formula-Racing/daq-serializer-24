@@ -183,7 +183,11 @@ bool Parser::_isScopeClosed(const std::vector<Token> &tokens, int openingScopeIn
 {
     TokenType openType = tokens[openingScopeIndex].type;
     if (openType != TOKEN_L_BRACE && openType != TOKEN_L_PARENTHESES)
-        throw std::invalid_argument("Invalid opening scope type");
+    {
+        // throw std::invalid_argument("Invalid opening scope type");
+        std::cout << "Invalid opening scope type" << std::endl;
+        return false;
+    }
 
     int scopeCount = 0;
     bool isParentheses = openType == TOKEN_L_PARENTHESES;

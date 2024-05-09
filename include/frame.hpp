@@ -53,7 +53,9 @@ namespace daqser::impl
             {
                 std::stringstream err;
                 err << "Field does not exist in frame template: " << fieldName;
-                throw std::invalid_argument(err.str());
+                // throw std::invalid_argument(err.str());
+                std::cout << err.str() << std::endl;
+                return;
             }
 
             // Get the index of the field
@@ -77,7 +79,9 @@ namespace daqser::impl
             {
                 std::stringstream err;
                 err << "Field does not exist in frame template: " << fieldName;
-                throw std::invalid_argument(err.str());
+                // throw std::invalid_argument(err.str());
+                std::cout << err.str() << std::endl;
+                return T();
             }
 
             // std::cout << "Field exists" << std::endl;
@@ -150,7 +154,9 @@ namespace daqser::impl
             {
                 std::stringstream err;
                 err << "Field does not exist in frame template: " << fieldName;
-                throw std::invalid_argument(err.str());
+                // throw std::invalid_argument(err.str());
+                std::cout << err.str() << std::endl;
+                return Field();
             }
             
             return _baseType->getMember(fieldName).getField();

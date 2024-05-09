@@ -36,7 +36,7 @@ std::vector<Token> Tokenizer::tokenize()
 #ifdef USE_LITTLEFS_ESP32
     if (!SPIFFS.begin(true))
     {
-        std::cerr << "Error mounting SPIFFS" << std::endl;
+        std::cout << "Error mounting SPIFFS" << std::endl;
         return {};
     }
 
@@ -47,7 +47,7 @@ std::vector<Token> Tokenizer::tokenize()
 #ifdef USE_LITTLEFS_TEENSY
     if (!g_littleFS.begin(chipSelect))
     {
-        std::cerr << "Error mounting LITTLEFS" << std::endl;
+        std::cout << "Error mounting LITTLEFS" << std::endl;
         return {};
     }
 
@@ -62,13 +62,15 @@ std::vector<Token> Tokenizer::tokenize()
     {
         std::stringstream err;
         err << "Error opening file: " << _fileName << std::endl;
-        throw std::invalid_argument(err.str());
+        // throw std::invalid_argument(err.str());
+        std::cout << err.str();
+        return {};
     }
 #else
     File f = g_littleFS.open(_fileName.c_str(), FILE_READ);
     if (!f)
     {
-        std::cerr << "Error opening file: " << _fileName << std::endl;
+        std::cout << "Error opening file: " << _fileName << std::endl;
         return {};
     }
     std::stringstream ss;

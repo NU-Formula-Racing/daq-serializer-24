@@ -60,7 +60,9 @@ namespace daqser::impl
         {
             if (std::is_same<T, Value>::value)
             {
-                throw std::invalid_argument("Cannot create a Value from a Value");
+                // throw std::invalid_argument("Cannot create a Value from a Value");
+                std::cout << "Cannot create a Value from a Value" << std::endl;
+                return;
             }
 
             this->valuePtr = std::make_shared<T>(value);
@@ -312,7 +314,9 @@ namespace daqser::impl
             field.predefined = true;
             if (sizeof(T) > sizeof(Value))
             {
-                throw std::invalid_argument("Invalid type for predefined field (value is larger than 16 bytes) -- must be int, float, bool, string or version");
+                // throw std::invalid_argument("Invalid type for predefined field (value is larger than 16 bytes) -- must be int, float, bool, string or version");
+                std::cout << "Invalid type for predefined field (value is larger than 16 bytes) -- must be int, float, bool, string or version" << std::endl;
+                return field;
             }
 
             field.value = value;
@@ -357,7 +361,9 @@ namespace daqser::impl
             }
             else
             {
-                throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
+                // throw std::invalid_argument("Unrecognized type for predefined field -- must be int, float, bool, string or version");
+                std::cout << "Unrecognized type for predefined field -- must be int, float, bool, string or version" << std::endl;
+                return field;
             }
 
             return field;

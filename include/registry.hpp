@@ -57,8 +57,8 @@ namespace daqser::impl
                 }
                 else
                 {
-                    std::cerr << "Error parsing schema file: " << schemaFile << std::endl;
-                    std::cerr << res.message.str() << std::endl;
+                    std::cout << "Error parsing schema file: " << schemaFile << std::endl;
+                    std::cout << res.message.str() << std::endl;
                 }
             }
 
@@ -71,7 +71,7 @@ namespace daqser::impl
 
             if (schemaRegistry.find(metadata) == schemaRegistry.end())
             {
-                std::cerr << "Schema not found: " << schemaName << " v" << versionNumber << std::endl;
+                std::cout << "Schema not found: " << schemaName << " v" << versionNumber << std::endl;
                 return Schema();
             }
 
@@ -88,8 +88,8 @@ namespace daqser::impl
             }
             else
             {
-                std::cerr << "Error parsing schema file: " << schemaFile << std::endl;
-                std::cerr << res.message.str() << std::endl;
+                std::cout << "Error parsing schema file: " << schemaFile << std::endl;
+                std::cout << res.message.str() << std::endl;
                 return Schema();
             }
         }
@@ -108,8 +108,8 @@ namespace daqser::impl
             }
             else
             {
-                std::cerr << "Error parsing schema file: " << LATEST_SCHEMA_FILE << std::endl;
-                std::cerr << res.message.str() << std::endl;
+                std::cout << "Error parsing schema file: " << LATEST_SCHEMA_FILE << std::endl;
+                std::cout << res.message.str() << std::endl;
                 return Schema();
             }
 
