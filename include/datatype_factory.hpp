@@ -243,7 +243,7 @@ namespace daqser::impl
         /// @return std::vector<std::uint8_t>
         std::vector<std::uint8_t> toBinary() const
         {
-            std::cout << "Value::toBinary()" << std::endl;
+            // std::cout << "Value::toBinary()" << std::endl;
             std::vector<std::uint8_t> binary;
             if (this->valuePtr.get() == nullptr)
             {

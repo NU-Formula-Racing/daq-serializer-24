@@ -234,7 +234,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
         Token currentToken = tokenQueue.front();
         tokenQueue.pop();
 
-        std::cout << "Evaluting token in global scope: " << Tokenizer::tokenTypeToString(currentToken.type) << std::endl;
+        // std::cout << "Evaluting token in global scope: " << Tokenizer::tokenTypeToString(currentToken.type) << std::endl;
 
         // scope checking
         switch (currentToken.type)
@@ -326,7 +326,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             Token definition = tokenQueue.front();
             tokenQueue.pop();
             std::string definitionStr = definition.value;
-            std::cout << "Reading data type: " << definitionStr << std::endl;
+            // std::cout << "Reading data type: " << definitionStr << std::endl;
 
             // check if the data type has already been defined
             if (dataTypes.find(definitionStr) != dataTypes.end())
@@ -355,13 +355,13 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                 tokenQueue.pop();
                 std::string nameStr = name.value;
 
-                std::cout << "Data type eval: " << typeNameStr << " " << nameStr << std::endl;
+                // std::cout << "Data type eval: " << typeNameStr << " " << nameStr << std::endl;
 
                 // check if this is a primitive type
                 if (this->_isPrimative(typeNameStr))
                 {
                     // add the primitive type to the data type
-                    std::cout << "Adding primative field to data type " << definitionStr << " : " << nameStr << std::endl;
+                    // std::cout << "Adding primative field to data type " << definitionStr << " : " << nameStr << std::endl;
                     Field field = this->_createPrimativeField(typeNameStr, nameStr);
                     dataType.addField(field);
                 }
@@ -404,7 +404,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             Token frameName = tokenQueue.front();
             tokenQueue.pop();
             std::string frameNameStr = frameName.value;
-            std::cout << "Reading frame: " << frameNameStr << std::endl;
+            // std::cout << "Reading frame: " << frameNameStr << std::endl;
 
             // lets see if the type has been defined
             if (dataTypes.find(frameNameStr) == dataTypes.end())
@@ -419,7 +419,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             // add in all the types that have no dependencies into the depCopy
             for (auto &dataType : dataTypes)
             {
-                std::cout << "Adding data type to depCopy: " << dataType.first << std::endl;
+                // std::cout << "Adding data type to depCopy: " << dataType.first << std::endl;
                 if (depCopy.find(dataType.first) == depCopy.end())
                     depCopy[dataType.first] = std::vector<std::tuple<std::string, std::string>>();
             }
@@ -451,7 +451,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                         leastDependentCount = dep.second.size();
                     }
                 }
-                std::cout << "Least dependent: " << leastDependent << std::endl;
+                // std::cout << "Least dependent: " << leastDependent << std::endl;
                 // std::cout << "Least dependent count: " << leastDependentCount << std::endl;
 
                 if (leastDependentCount != 0)
@@ -484,14 +484,14 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     depCopy[dep.first] = dependencyList;
                 }
 
-                std::cout << "Adding " << leastDependent << " to ordered dependencies" << std::endl;
+                // std::cout << "Adding " << leastDependent << " to ordered dependencies" << std::endl;
 
                 orderedDependencies.push_back(leastDependent);
                 if (depCopy.find(leastDependent) != depCopy.end())
                     depCopy.erase(leastDependent);
             }
 
-            std::cout << "Ordered dependencies! " << std::endl;
+            // std::cout << "Ordered dependencies! " << std::endl;
 
             for (auto &dep : orderedDependencies)
                 std::cout << dep << std::endl;
@@ -514,7 +514,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     std::string dependencyName = std::get<1>(dependency);
 
                     DataType dependencyDataType = dataTypes.at(dependencyType);
-                    std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
+                    // std::cout << "Resolving dependency for " << dependentType << ": " << dependencyType << " " << dependencyName << std::endl;
                     dependentDataType.addCustomField(dependencyName, dependencyDataType);
 
                     // std::cout << dependentDataType.toString() << std::endl;
