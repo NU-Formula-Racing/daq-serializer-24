@@ -1,0 +1,5 @@
+./daqser_can_test_template.hpp
+.
+1
+2
+done

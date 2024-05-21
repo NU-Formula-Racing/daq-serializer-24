@@ -78,6 +78,10 @@ class CANMessage:
             if signal.name == signal_name:
                 return signal
         return None
+    
+    @property
+    def byte_size(self):
+        return int(sum([signal.size for signal in self.signals]) / 8)
 
 def query_boards(dbc_file_path):
     available_boards = all_boards(dbc_file_path)
@@ -333,6 +337,100 @@ def gen_cpp(dbc_file_path):
     for board in selected_boards:
         board_macros += f"#define {board_env_name(board)}\n"
     print(board_macros)
+
+def gen_cpp_test(dbc_file_path):
+    template_file = input("Enter the path to the template file: ")
+    while not os.path.exists(template_file):
+        print("Invalid path. Please enter a valid path")
+        template_file = input("Enter the path to the template file: ")
+
+    output_file = input("Enter the path to save the output file: ")
+    while not os.path.isdir(output_file):
+        print("Invalid path. Please enter a valid path")
+        output_file = input("Enter the path to save the output file: ")
+
+    messages = parse_dbc(dbc_file_path)
+
+    board_to_messages = {}
+    for message in messages:
+        print(f"Message: {message.name}")
+        print(f"Sender: {message.sender}")
+        if message.sender in board_to_messages:
+            board_to_messages[message.sender].append(message)
+        else:
+            board_to_messages[message.sender] = [message]
+
+    # generate the insertion points for the template file
+    # generate signals
+    signals = ""
+    for board, messages in board_to_messages.items():
+        cap_board = board_env_name(board)
+        signals += f"#ifdef {cap_board}\n"
+        for message in messages:
+            signals += f"    // {message.name} Signals\n"
+            for signal in message.signals:
+                signals += f"    MakeSignedCANSignal({signal.get_data_type()}, {signal.start_bit}, {signal.size}, {signal.factor}, {signal.offset}) s_{signal.name}{{}};\n"
+        signals += f"#endif\n"
+
+    # insert the signals into the template file
+    template_content = ""
+    with open(template_file, "r") as template:
+        template_content = template.read()
+        template_content = template_content.replace("    // <INSERT_SIGNALS_HERE>", signals)
+
+    # generate the messages
+    message_definitions = ""
+    for board, messages in board_to_messages.items():
+        # wrap in an ifdef
+        cap_board = board_env_name(board)
+        message_definitions += f"#ifdef {cap_board}\n"
+        for message in messages:
+            num_signals = len(message.signals)
+            message_definitions += f"    // {message.name}\n"
+            message_definitions += f"    CANTXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, {message.byte_size}, 100, g_timerGroup { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+
+        message_definitions += f"#endif\n"
+
+    # insert the messages into the template file
+    template_content = template_content.replace("    // <INSERT_MESSAGES_HERE>", message_definitions)
+
+    # generate the sendSignal function
+    send_signals_content = ""
+    signal_index = 0
+    for board, messages in board_to_messages.items():
+        cap_board = board_env_name(board)
+        # wrap in an ifdef
+        send_signals_content += f"#ifdef {cap_board}\n"
+        for message in messages:
+            send_signals_content += f"    // {message.name}\n"
+            # now set the signals
+            for signal in message.signals:
+                send_signals_content += f"    s_{signal.name} = ({signal.get_data_type()}){signal_index};\n"
+                signal_index += 1
+        send_signals_content += f"#endif\n"
+
+    # insert the map content into the template file
+    template_content = template_content.replace("        // <INSERT_SEND_SIGNALS_HERE>", send_signals_content)
+
+    # write the output file
+    output_file_path = os.path.join(output_file, "daqser_can_test.hpp")
+    with open(output_file_path, "w") as output_file:
+        output_file.write(template_content)
+
+    print(f"Generated daqser_can_test.hpp at {output_file_path}")
+    # Now query the user for the boards to include in the schema, and output something they can copy-paste into their code
+    selected_boards = query_boards(dbc_file_path)
+    print("Selected boards:")
+    for board in selected_boards:
+        print(board)
+
+    print("\n")
+    print("To include the boards in your code, add the following to your code, ideally in your main.cpp:\n")
+    board_macros = ""
+    for board in selected_boards:
+        board_macros += f"#define {board_env_name(board)}\n"
+    print(board_macros)
+
         
 # main
 def main():
@@ -345,7 +443,7 @@ def main():
     # the user can also specify the csv file to use for either command
 
     parser = argparse.ArgumentParser(description="Generate DAQ Serializer code")
-    parser.add_argument("command", help="Command to execute", choices=["gen-drive", "gen-cpp"])
+    parser.add_argument("command", help="Command to execute", choices=["gen-drive", "gen-cpp", "gen-cpp-test"])
     parser.add_argument("-f", "--file", help="CSV file to use for generating the code")
     args = parser.parse_args()
 
@@ -365,6 +463,8 @@ def main():
         gen_drive(dbc_file_path)
     elif args.command == "gen-cpp":
         gen_cpp(dbc_file_path)
+    elif args.command == "gen-cpp-test":
+        gen_cpp_test(dbc_file_path)
 
 
 if __name__ == "__main__":
