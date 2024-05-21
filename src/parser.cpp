@@ -475,7 +475,7 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
                     if (dep.first == leastDependent) // these cyclic dependencies have already detected
                         continue;
 
-                    std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
+                    // std::cout << "Removing " << leastDependent << " from " << dep.first << std::endl;
 
                     dependencyList.erase(std::remove_if(dependencyList.begin(), dependencyList.end(), [leastDependent](std::tuple<std::string, std::string> &dep)
                                                         { return std::get<0>(dep) == leastDependent; }),
@@ -492,9 +492,6 @@ Parser::ParsingResult Parser::buildSchema(const std::vector<Token> &tokens, Sche
             }
 
             // std::cout << "Ordered dependencies! " << std::endl;
-
-            for (auto &dep : orderedDependencies)
-                std::cout << dep << std::endl;
 
             // now we can resolve the dependencies in the correct order
             for (std::string dependentType : orderedDependencies)
