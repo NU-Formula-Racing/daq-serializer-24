@@ -298,7 +298,7 @@ def gen_cpp(dbc_file_path):
             num_signals = len(message.signals)
             message_definitions += f"    // {message.name}\n"
             # message_definitions += f"    CANMessage<{num_signals}> {message.name}Message({message.id}, {message.cycle_time}, {num_signals});\n"
-            message_definitions += f"    CANRXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, [](){{}}, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+            message_definitions += f"    CANRXMessage<{num_signals}> m_{message.name} {{ g_canBus, 0x{message.id}, [](){{}}, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
         message_definitions += f"#endif\n"
 
     # insert the messages into the template file
