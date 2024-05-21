@@ -22,7 +22,7 @@
 namespace daqser
 {
     VirtualTimerGroup g_timerGroup;
-    CAN g_canBus{};
+    CAN g_canBus{40}; // 40 defines the message buffer size btw
 
     // auto generated signals!
     // <INSERT_SIGNALS_HERE>
@@ -30,9 +30,20 @@ namespace daqser
     // auto generated messages!
     // <INSERT_MESSAGES_HERE>
 
+    void initializeCAN()
+    {
+        g_canBus.Initialize(ICAN::BaudRate::kBaud1M);
+        g_timerGroup.AddTimer(10, [](){ g_canBus.Tick();});
+    }
+
     void updateSignals()
     {
         // <INSERT_UPDATE_SIGNALS_HERE>
+    }
+
+    void tickCAN()
+    {
+        g_timerGroup.Tick(millis());
     }
 
 }
