@@ -17,7 +17,11 @@ namespace daqser::impl
 #if defined(NATIVE)
         std::string LATEST_SCHEMA_FILE = "./test/static/test_ultimate.drive";
 #else
-        std::string LATEST_SCHEMA_FILE = "latest_schema.drive";
+#ifdef CUR_SCHEMA
+        std::string LATEST_SCHEMA_FILE = CUR_SCHEMA
+#else
+        std::string LATEST_SCHEMA_FILE = "test_ultimate.drive";
+#endif
 #endif
 
 #if defined(NATIVE)
@@ -30,13 +34,20 @@ namespace daqser::impl
             "./test/static/test_api_logger_sim.drive",
         };
 #else
-        std::vector<std::string> REGISTERED_SCHEMA_FILES = {"schema.drive"};
+#ifdef REGISTERED_DRIVE_FILES
+        std::vector<std::string> REGISTERED_SCHEMA_FILES = REGISTERED_DRIVE_FILES;
+#else
+        std::vector<std::string> REGISTERED_SCHEMA_FILES = {
+            "demo.drive",
+        };
+#endif
 #endif
 
         Registry() = default;
 
         void initialize()
         {
+            std::cout << "Initializing schema registry..." << std::endl;
             schemaRegistry.clear();
 
             // also add the latest schema file, just in case
@@ -45,6 +56,7 @@ namespace daqser::impl
             Parser parser;
             for (std::string schemaFile : REGISTERED_SCHEMA_FILES)
             {
+                std::cout << "Registering schema: " << schemaFile << std::endl;
                 Tokenizer tokenizer(schemaFile);
                 std::vector<Token> tokens = tokenizer.tokenize();
                 Schema schema;

@@ -14,7 +14,7 @@
 #define USE_LITTLEFS_ESP32
 #include <FS.h>
 #ifdef USE_LITTLEFS_ESP32
-#define SPIFFS LITTLEFS
+#define SPIFFS LittleFS
 #include <LITTLEFS.h>
 #else
 #include <SPIFFS.h>
