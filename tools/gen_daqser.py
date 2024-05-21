@@ -387,7 +387,7 @@ def gen_cpp_test(dbc_file_path):
         for message in messages:
             num_signals = len(message.signals)
             message_definitions += f"    // {message.name}\n"
-            message_definitions += f"    CANTXMessage<{num_signals}> m_{message.name} {{ 0x{message.id}, {message.byte_size}, 100, g_timerGroup { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
+            message_definitions += f"    CANTXMessage<{num_signals}> m_{message.name} {{ g_canBus, 0x{message.id}, {message.byte_size}, 100, g_timerGroup, { ', '.join([f's_{signal.name}' for signal in message.signals])} }};\n"
 
         message_definitions += f"#endif\n"
 
