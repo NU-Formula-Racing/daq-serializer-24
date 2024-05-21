@@ -19,7 +19,7 @@ class CANSignal:
         self.name = name
         self.start_bit = start_bit
         self.size = size
-        self.factor = factor
+        self.factor = factor if factor != 0 else 1
         self.offset = offset
         self.min_val = min_val
         self.max_val = max_val
