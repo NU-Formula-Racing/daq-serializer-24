@@ -402,10 +402,10 @@ def gen_cpp_test(dbc_file_path):
         # wrap in an ifdef
         send_signals_content += f"#ifdef {cap_board}\n"
         for message in messages:
-            send_signals_content += f"    // {message.name}\n"
+            send_signals_content += f"        // {message.name}\n"
             # now set the signals
             for signal in message.signals:
-                send_signals_content += f"    s_{signal.name} = ({signal.get_data_type()}){signal_index};\n"
+                send_signals_content += f"        s_{signal.name} = ({signal.get_data_type()}){signal_index};\n"
                 signal_index += 1
         send_signals_content += f"#endif\n"
 
