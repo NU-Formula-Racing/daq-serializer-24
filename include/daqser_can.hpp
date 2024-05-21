@@ -403,121 +403,121 @@ namespace daqser
     // auto generated messages!
 #ifdef RX_IMD
     // IMD
-    CANRXMessage<2> m_IMD { 0x300, [](){}, s_IMD_transmit_resistance, s_IMD_transmit_status };
+    CANRXMessage<2> m_IMD { g_canBus, 0x300, [](){}, s_IMD_transmit_resistance, s_IMD_transmit_status };
 #endif
 #ifdef RX_BMS
     // BMS_Voltages_0
-    CANRXMessage<8> m_BMS_Voltages_0 { 0x200, [](){}, s_BMS_Voltages_0_Cell_V_0, s_BMS_Voltages_0_Cell_V_1, s_BMS_Voltages_0_Cell_V_2, s_BMS_Voltages_0_Cell_V_3, s_BMS_Voltages_0_Cell_V_4, s_BMS_Voltages_0_Cell_V_5, s_BMS_Voltages_0_Cell_V_6, s_BMS_Voltages_0_Cell_OCV_Offset_0 };
+    CANRXMessage<8> m_BMS_Voltages_0 { g_canBus, 0x200, [](){}, s_BMS_Voltages_0_Cell_V_0, s_BMS_Voltages_0_Cell_V_1, s_BMS_Voltages_0_Cell_V_2, s_BMS_Voltages_0_Cell_V_3, s_BMS_Voltages_0_Cell_V_4, s_BMS_Voltages_0_Cell_V_5, s_BMS_Voltages_0_Cell_V_6, s_BMS_Voltages_0_Cell_OCV_Offset_0 };
     // BMS_Voltages_1
-    CANRXMessage<8> m_BMS_Voltages_1 { 0x201, [](){}, s_BMS_Voltages_1_Cell_V_7, s_BMS_Voltages_1_Cell_V_8, s_BMS_Voltages_1_Cell_V_9, s_BMS_Voltages_1_Cell_V_10, s_BMS_Voltages_1_Cell_V_11, s_BMS_Voltages_1_Cell_V_12, s_BMS_Voltages_1_Cell_V_13, s_BMS_Voltages_1_Cell_OCV_Offset_1 };
+    CANRXMessage<8> m_BMS_Voltages_1 { g_canBus, 0x201, [](){}, s_BMS_Voltages_1_Cell_V_7, s_BMS_Voltages_1_Cell_V_8, s_BMS_Voltages_1_Cell_V_9, s_BMS_Voltages_1_Cell_V_10, s_BMS_Voltages_1_Cell_V_11, s_BMS_Voltages_1_Cell_V_12, s_BMS_Voltages_1_Cell_V_13, s_BMS_Voltages_1_Cell_OCV_Offset_1 };
     // BMS_Voltages_2
-    CANRXMessage<8> m_BMS_Voltages_2 { 0x202, [](){}, s_BMS_Voltages_2_Cell_V_14, s_BMS_Voltages_2_Cell_V_15, s_BMS_Voltages_2_Cell_V_16, s_BMS_Voltages_2_Cell_V_17, s_BMS_Voltages_2_Cell_V_18, s_BMS_Voltages_2_Cell_V_19, s_BMS_Voltages_2_Cell_V_20, s_BMS_Voltages_2_Cell_OCV_Offset_2 };
+    CANRXMessage<8> m_BMS_Voltages_2 { g_canBus, 0x202, [](){}, s_BMS_Voltages_2_Cell_V_14, s_BMS_Voltages_2_Cell_V_15, s_BMS_Voltages_2_Cell_V_16, s_BMS_Voltages_2_Cell_V_17, s_BMS_Voltages_2_Cell_V_18, s_BMS_Voltages_2_Cell_V_19, s_BMS_Voltages_2_Cell_V_20, s_BMS_Voltages_2_Cell_OCV_Offset_2 };
     // BMS_Voltages_3
-    CANRXMessage<8> m_BMS_Voltages_3 { 0x203, [](){}, s_BMS_Voltages_3_Cell_V_21, s_BMS_Voltages_3_Cell_V_22, s_BMS_Voltages_3_Cell_V_23, s_BMS_Voltages_3_Cell_V_24, s_BMS_Voltages_3_Cell_V_25, s_BMS_Voltages_3_Cell_V_26, s_BMS_Voltages_3_Cell_V_27, s_BMS_Voltages_3_Cell_OCV_Offset_3 };
+    CANRXMessage<8> m_BMS_Voltages_3 { g_canBus, 0x203, [](){}, s_BMS_Voltages_3_Cell_V_21, s_BMS_Voltages_3_Cell_V_22, s_BMS_Voltages_3_Cell_V_23, s_BMS_Voltages_3_Cell_V_24, s_BMS_Voltages_3_Cell_V_25, s_BMS_Voltages_3_Cell_V_26, s_BMS_Voltages_3_Cell_V_27, s_BMS_Voltages_3_Cell_OCV_Offset_3 };
     // BMS_Voltages_4
-    CANRXMessage<8> m_BMS_Voltages_4 { 0x204, [](){}, s_BMS_Voltages_4_Cell_V_28, s_BMS_Voltages_4_Cell_V_29, s_BMS_Voltages_4_Cell_V_30, s_BMS_Voltages_4_Cell_V_31, s_BMS_Voltages_4_Cell_V_32, s_BMS_Voltages_4_Cell_V_33, s_BMS_Voltages_4_Cell_V_34, s_BMS_Voltages_4_Cell_OCV_Offset_4 };
+    CANRXMessage<8> m_BMS_Voltages_4 { g_canBus, 0x204, [](){}, s_BMS_Voltages_4_Cell_V_28, s_BMS_Voltages_4_Cell_V_29, s_BMS_Voltages_4_Cell_V_30, s_BMS_Voltages_4_Cell_V_31, s_BMS_Voltages_4_Cell_V_32, s_BMS_Voltages_4_Cell_V_33, s_BMS_Voltages_4_Cell_V_34, s_BMS_Voltages_4_Cell_OCV_Offset_4 };
     // BMS_Voltages_5
-    CANRXMessage<8> m_BMS_Voltages_5 { 0x205, [](){}, s_BMS_Voltages_5_Cell_V_35, s_BMS_Voltages_5_Cell_V_36, s_BMS_Voltages_5_Cell_V_37, s_BMS_Voltages_5_Cell_V_38, s_BMS_Voltages_5_Cell_V_39, s_BMS_Voltages_5_Cell_V_40, s_BMS_Voltages_5_Cell_V_41, s_BMS_Voltages_5_Cell_OCV_Offset_5 };
+    CANRXMessage<8> m_BMS_Voltages_5 { g_canBus, 0x205, [](){}, s_BMS_Voltages_5_Cell_V_35, s_BMS_Voltages_5_Cell_V_36, s_BMS_Voltages_5_Cell_V_37, s_BMS_Voltages_5_Cell_V_38, s_BMS_Voltages_5_Cell_V_39, s_BMS_Voltages_5_Cell_V_40, s_BMS_Voltages_5_Cell_V_41, s_BMS_Voltages_5_Cell_OCV_Offset_5 };
     // BMS_Voltages_6
-    CANRXMessage<8> m_BMS_Voltages_6 { 0x206, [](){}, s_BMS_Voltages_6_Cell_V_42, s_BMS_Voltages_6_Cell_V_43, s_BMS_Voltages_6_Cell_V_44, s_BMS_Voltages_6_Cell_V_45, s_BMS_Voltages_6_Cell_V_46, s_BMS_Voltages_6_Cell_V_47, s_BMS_Voltages_6_Cell_V_48, s_BMS_Voltages_6_Cell_OCV_Offset_6 };
+    CANRXMessage<8> m_BMS_Voltages_6 { g_canBus, 0x206, [](){}, s_BMS_Voltages_6_Cell_V_42, s_BMS_Voltages_6_Cell_V_43, s_BMS_Voltages_6_Cell_V_44, s_BMS_Voltages_6_Cell_V_45, s_BMS_Voltages_6_Cell_V_46, s_BMS_Voltages_6_Cell_V_47, s_BMS_Voltages_6_Cell_V_48, s_BMS_Voltages_6_Cell_OCV_Offset_6 };
     // BMS_Voltages_7
-    CANRXMessage<8> m_BMS_Voltages_7 { 0x207, [](){}, s_BMS_Voltages_7_Cell_V_49, s_BMS_Voltages_7_Cell_V_50, s_BMS_Voltages_7_Cell_V_51, s_BMS_Voltages_7_Cell_V_52, s_BMS_Voltages_7_Cell_V_53, s_BMS_Voltages_7_Cell_V_54, s_BMS_Voltages_7_Cell_V_55, s_BMS_Voltages_7_Cell_OCV_Offset_7 };
+    CANRXMessage<8> m_BMS_Voltages_7 { g_canBus, 0x207, [](){}, s_BMS_Voltages_7_Cell_V_49, s_BMS_Voltages_7_Cell_V_50, s_BMS_Voltages_7_Cell_V_51, s_BMS_Voltages_7_Cell_V_52, s_BMS_Voltages_7_Cell_V_53, s_BMS_Voltages_7_Cell_V_54, s_BMS_Voltages_7_Cell_V_55, s_BMS_Voltages_7_Cell_OCV_Offset_7 };
     // BMS_Voltages_8
-    CANRXMessage<8> m_BMS_Voltages_8 { 0x208, [](){}, s_BMS_Voltages_8_Cell_V_56, s_BMS_Voltages_8_Cell_V_57, s_BMS_Voltages_8_Cell_V_58, s_BMS_Voltages_8_Cell_V_59, s_BMS_Voltages_8_Cell_V_60, s_BMS_Voltages_8_Cell_V_61, s_BMS_Voltages_8_Cell_V_62, s_BMS_Voltages_8_Cell_OCV_Offset_8 };
+    CANRXMessage<8> m_BMS_Voltages_8 { g_canBus, 0x208, [](){}, s_BMS_Voltages_8_Cell_V_56, s_BMS_Voltages_8_Cell_V_57, s_BMS_Voltages_8_Cell_V_58, s_BMS_Voltages_8_Cell_V_59, s_BMS_Voltages_8_Cell_V_60, s_BMS_Voltages_8_Cell_V_61, s_BMS_Voltages_8_Cell_V_62, s_BMS_Voltages_8_Cell_OCV_Offset_8 };
     // BMS_Voltages_9
-    CANRXMessage<8> m_BMS_Voltages_9 { 0x209, [](){}, s_BMS_Voltages_9_Cell_V_63, s_BMS_Voltages_9_Cell_V_64, s_BMS_Voltages_9_Cell_V_65, s_BMS_Voltages_9_Cell_V_66, s_BMS_Voltages_9_Cell_V_67, s_BMS_Voltages_9_Cell_V_68, s_BMS_Voltages_9_Cell_V_69, s_BMS_Voltages_9_Cell_OCV_Offset_9 };
+    CANRXMessage<8> m_BMS_Voltages_9 { g_canBus, 0x209, [](){}, s_BMS_Voltages_9_Cell_V_63, s_BMS_Voltages_9_Cell_V_64, s_BMS_Voltages_9_Cell_V_65, s_BMS_Voltages_9_Cell_V_66, s_BMS_Voltages_9_Cell_V_67, s_BMS_Voltages_9_Cell_V_68, s_BMS_Voltages_9_Cell_V_69, s_BMS_Voltages_9_Cell_OCV_Offset_9 };
     // BMS_Voltages_10
-    CANRXMessage<8> m_BMS_Voltages_10 { 0x20a, [](){}, s_BMS_Voltages_10_Cell_V_70, s_BMS_Voltages_10_Cell_V_71, s_BMS_Voltages_10_Cell_V_72, s_BMS_Voltages_10_Cell_V_73, s_BMS_Voltages_10_Cell_V_74, s_BMS_Voltages_10_Cell_V_75, s_BMS_Voltages_10_Cell_V_76, s_BMS_Voltages_10_Cell_OCV_Offset_110 };
+    CANRXMessage<8> m_BMS_Voltages_10 { g_canBus, 0x20a, [](){}, s_BMS_Voltages_10_Cell_V_70, s_BMS_Voltages_10_Cell_V_71, s_BMS_Voltages_10_Cell_V_72, s_BMS_Voltages_10_Cell_V_73, s_BMS_Voltages_10_Cell_V_74, s_BMS_Voltages_10_Cell_V_75, s_BMS_Voltages_10_Cell_V_76, s_BMS_Voltages_10_Cell_OCV_Offset_110 };
     // BMS_Voltages_11
-    CANRXMessage<8> m_BMS_Voltages_11 { 0x20b, [](){}, s_BMS_Voltages_11_Cell_V_77, s_BMS_Voltages_11_Cell_V_78, s_BMS_Voltages_11_Cell_V_79, s_BMS_Voltages_11_Cell_V_80, s_BMS_Voltages_11_Cell_V_81, s_BMS_Voltages_11_Cell_V_82, s_BMS_Voltages_11_Cell_V_83, s_BMS_Voltages_11_Cell_OCV_Offset_211 };
+    CANRXMessage<8> m_BMS_Voltages_11 { g_canBus, 0x20b, [](){}, s_BMS_Voltages_11_Cell_V_77, s_BMS_Voltages_11_Cell_V_78, s_BMS_Voltages_11_Cell_V_79, s_BMS_Voltages_11_Cell_V_80, s_BMS_Voltages_11_Cell_V_81, s_BMS_Voltages_11_Cell_V_82, s_BMS_Voltages_11_Cell_V_83, s_BMS_Voltages_11_Cell_OCV_Offset_211 };
     // BMS_Voltages_12
-    CANRXMessage<8> m_BMS_Voltages_12 { 0x20c, [](){}, s_BMS_Voltages_12_Cell_V_84, s_BMS_Voltages_12_Cell_V_85, s_BMS_Voltages_12_Cell_V_86, s_BMS_Voltages_12_Cell_V_87, s_BMS_Voltages_12_Cell_V_88, s_BMS_Voltages_12_Cell_V_89, s_BMS_Voltages_12_Cell_V_90, s_BMS_Voltages_12_Cell_OCV_Offset_212 };
+    CANRXMessage<8> m_BMS_Voltages_12 { g_canBus, 0x20c, [](){}, s_BMS_Voltages_12_Cell_V_84, s_BMS_Voltages_12_Cell_V_85, s_BMS_Voltages_12_Cell_V_86, s_BMS_Voltages_12_Cell_V_87, s_BMS_Voltages_12_Cell_V_88, s_BMS_Voltages_12_Cell_V_89, s_BMS_Voltages_12_Cell_V_90, s_BMS_Voltages_12_Cell_OCV_Offset_212 };
     // BMS_Voltages_13
-    CANRXMessage<8> m_BMS_Voltages_13 { 0x20d, [](){}, s_BMS_Voltages_13_Cell_V_91, s_BMS_Voltages_13_Cell_V_92, s_BMS_Voltages_13_Cell_V_93, s_BMS_Voltages_13_Cell_V_94, s_BMS_Voltages_13_Cell_V_95, s_BMS_Voltages_13_Cell_V_96, s_BMS_Voltages_13_Cell_V_97, s_BMS_Voltages_13_Cell_OCV_Offset_213 };
+    CANRXMessage<8> m_BMS_Voltages_13 { g_canBus, 0x20d, [](){}, s_BMS_Voltages_13_Cell_V_91, s_BMS_Voltages_13_Cell_V_92, s_BMS_Voltages_13_Cell_V_93, s_BMS_Voltages_13_Cell_V_94, s_BMS_Voltages_13_Cell_V_95, s_BMS_Voltages_13_Cell_V_96, s_BMS_Voltages_13_Cell_V_97, s_BMS_Voltages_13_Cell_OCV_Offset_213 };
     // BMS_Voltages_14
-    CANRXMessage<8> m_BMS_Voltages_14 { 0x20e, [](){}, s_BMS_Voltages_14_Cell_V_98, s_BMS_Voltages_14_Cell_V_99, s_BMS_Voltages_14_Cell_V_100, s_BMS_Voltages_14_Cell_V_101, s_BMS_Voltages_14_Cell_V_102, s_BMS_Voltages_14_Cell_V_103, s_BMS_Voltages_14_Cell_V_104, s_BMS_Voltages_14_Cell_OCV_Offset_214 };
+    CANRXMessage<8> m_BMS_Voltages_14 { g_canBus, 0x20e, [](){}, s_BMS_Voltages_14_Cell_V_98, s_BMS_Voltages_14_Cell_V_99, s_BMS_Voltages_14_Cell_V_100, s_BMS_Voltages_14_Cell_V_101, s_BMS_Voltages_14_Cell_V_102, s_BMS_Voltages_14_Cell_V_103, s_BMS_Voltages_14_Cell_V_104, s_BMS_Voltages_14_Cell_OCV_Offset_214 };
     // BMS_Voltages_15
-    CANRXMessage<8> m_BMS_Voltages_15 { 0x20f, [](){}, s_BMS_Voltages_15_Cell_V_105, s_BMS_Voltages_15_Cell_V_106, s_BMS_Voltages_15_Cell_V_107, s_BMS_Voltages_15_Cell_V_108, s_BMS_Voltages_15_Cell_V_109, s_BMS_Voltages_15_Cell_V_110, s_BMS_Voltages_15_Cell_V_111, s_BMS_Voltages_15_Cell_OCV_Offset_115 };
+    CANRXMessage<8> m_BMS_Voltages_15 { g_canBus, 0x20f, [](){}, s_BMS_Voltages_15_Cell_V_105, s_BMS_Voltages_15_Cell_V_106, s_BMS_Voltages_15_Cell_V_107, s_BMS_Voltages_15_Cell_V_108, s_BMS_Voltages_15_Cell_V_109, s_BMS_Voltages_15_Cell_V_110, s_BMS_Voltages_15_Cell_V_111, s_BMS_Voltages_15_Cell_OCV_Offset_115 };
     // BMS_Voltages_16
-    CANRXMessage<8> m_BMS_Voltages_16 { 0x210, [](){}, s_BMS_Voltages_16_Cell_V_112, s_BMS_Voltages_16_Cell_V_113, s_BMS_Voltages_16_Cell_V_114, s_BMS_Voltages_16_Cell_V_115, s_BMS_Voltages_16_Cell_V_116, s_BMS_Voltages_16_Cell_V_117, s_BMS_Voltages_16_Cell_V_118, s_BMS_Voltages_16_Cell_OCV_Offset_216 };
+    CANRXMessage<8> m_BMS_Voltages_16 { g_canBus, 0x210, [](){}, s_BMS_Voltages_16_Cell_V_112, s_BMS_Voltages_16_Cell_V_113, s_BMS_Voltages_16_Cell_V_114, s_BMS_Voltages_16_Cell_V_115, s_BMS_Voltages_16_Cell_V_116, s_BMS_Voltages_16_Cell_V_117, s_BMS_Voltages_16_Cell_V_118, s_BMS_Voltages_16_Cell_OCV_Offset_216 };
     // BMS_Voltages_17
-    CANRXMessage<8> m_BMS_Voltages_17 { 0x211, [](){}, s_BMS_Voltages_17_Cell_V_119, s_BMS_Voltages_17_Cell_V_120, s_BMS_Voltages_17_Cell_V_121, s_BMS_Voltages_17_Cell_V_122, s_BMS_Voltages_17_Cell_V_123, s_BMS_Voltages_17_Cell_V_124, s_BMS_Voltages_17_Cell_V_125, s_BMS_Voltages_17_Cell_OCV_Offset_217 };
+    CANRXMessage<8> m_BMS_Voltages_17 { g_canBus, 0x211, [](){}, s_BMS_Voltages_17_Cell_V_119, s_BMS_Voltages_17_Cell_V_120, s_BMS_Voltages_17_Cell_V_121, s_BMS_Voltages_17_Cell_V_122, s_BMS_Voltages_17_Cell_V_123, s_BMS_Voltages_17_Cell_V_124, s_BMS_Voltages_17_Cell_V_125, s_BMS_Voltages_17_Cell_OCV_Offset_217 };
     // BMS_Voltages_18
-    CANRXMessage<8> m_BMS_Voltages_18 { 0x212, [](){}, s_BMS_Voltages_18_Cell_V_126, s_BMS_Voltages_18_Cell_V_127, s_BMS_Voltages_18_Cell_V_128, s_BMS_Voltages_18_Cell_V_129, s_BMS_Voltages_18_Cell_V_130, s_BMS_Voltages_18_Cell_V_131, s_BMS_Voltages_18_Cell_V_132, s_BMS_Voltages_18_Cell_OCV_Offset_218 };
+    CANRXMessage<8> m_BMS_Voltages_18 { g_canBus, 0x212, [](){}, s_BMS_Voltages_18_Cell_V_126, s_BMS_Voltages_18_Cell_V_127, s_BMS_Voltages_18_Cell_V_128, s_BMS_Voltages_18_Cell_V_129, s_BMS_Voltages_18_Cell_V_130, s_BMS_Voltages_18_Cell_V_131, s_BMS_Voltages_18_Cell_V_132, s_BMS_Voltages_18_Cell_OCV_Offset_218 };
     // BMS_Voltages_19
-    CANRXMessage<8> m_BMS_Voltages_19 { 0x213, [](){}, s_BMS_Voltages_19_Cell_V_133, s_BMS_Voltages_19_Cell_V_134, s_BMS_Voltages_19_Cell_V_135, s_BMS_Voltages_19_Cell_V_136, s_BMS_Voltages_19_Cell_V_137, s_BMS_Voltages_19_Cell_V_138, s_BMS_Voltages_19_Cell_V_139, s_BMS_Voltages_19_Cell_OCV_Offset_219 };
+    CANRXMessage<8> m_BMS_Voltages_19 { g_canBus, 0x213, [](){}, s_BMS_Voltages_19_Cell_V_133, s_BMS_Voltages_19_Cell_V_134, s_BMS_Voltages_19_Cell_V_135, s_BMS_Voltages_19_Cell_V_136, s_BMS_Voltages_19_Cell_V_137, s_BMS_Voltages_19_Cell_V_138, s_BMS_Voltages_19_Cell_V_139, s_BMS_Voltages_19_Cell_OCV_Offset_219 };
     // BMS_Temperatures_0
-    CANRXMessage<7> m_BMS_Temperatures_0 { 0x220, [](){}, s_BMS_Temperatures_0_Cell_T_0, s_BMS_Temperatures_0_Cell_T_1, s_BMS_Temperatures_0_Cell_T_2, s_BMS_Temperatures_0_Cell_T_3, s_BMS_Temperatures_0_Cell_T_4, s_BMS_Temperatures_0_Cell_T_5, s_BMS_Temperatures_0_Cell_T_6 };
+    CANRXMessage<7> m_BMS_Temperatures_0 { g_canBus, 0x220, [](){}, s_BMS_Temperatures_0_Cell_T_0, s_BMS_Temperatures_0_Cell_T_1, s_BMS_Temperatures_0_Cell_T_2, s_BMS_Temperatures_0_Cell_T_3, s_BMS_Temperatures_0_Cell_T_4, s_BMS_Temperatures_0_Cell_T_5, s_BMS_Temperatures_0_Cell_T_6 };
     // BMS_Temperatures_1
-    CANRXMessage<7> m_BMS_Temperatures_1 { 0x221, [](){}, s_BMS_Temperatures_1_Cell_T_7, s_BMS_Temperatures_1_Cell_T_8, s_BMS_Temperatures_1_Cell_T_9, s_BMS_Temperatures_1_Cell_T_10, s_BMS_Temperatures_1_Cell_T_11, s_BMS_Temperatures_1_Cell_T_12, s_BMS_Temperatures_1_Cell_T_13 };
+    CANRXMessage<7> m_BMS_Temperatures_1 { g_canBus, 0x221, [](){}, s_BMS_Temperatures_1_Cell_T_7, s_BMS_Temperatures_1_Cell_T_8, s_BMS_Temperatures_1_Cell_T_9, s_BMS_Temperatures_1_Cell_T_10, s_BMS_Temperatures_1_Cell_T_11, s_BMS_Temperatures_1_Cell_T_12, s_BMS_Temperatures_1_Cell_T_13 };
     // BMS_Temperatures_2
-    CANRXMessage<7> m_BMS_Temperatures_2 { 0x222, [](){}, s_BMS_Temperatures_2_Cell_T_14, s_BMS_Temperatures_2_Cell_T_15, s_BMS_Temperatures_2_Cell_T_16, s_BMS_Temperatures_2_Cell_T_17, s_BMS_Temperatures_2_Cell_T_18, s_BMS_Temperatures_2_Cell_T_19, s_BMS_Temperatures_2_Cell_T_20 };
+    CANRXMessage<7> m_BMS_Temperatures_2 { g_canBus, 0x222, [](){}, s_BMS_Temperatures_2_Cell_T_14, s_BMS_Temperatures_2_Cell_T_15, s_BMS_Temperatures_2_Cell_T_16, s_BMS_Temperatures_2_Cell_T_17, s_BMS_Temperatures_2_Cell_T_18, s_BMS_Temperatures_2_Cell_T_19, s_BMS_Temperatures_2_Cell_T_20 };
     // BMS_Temperatures_3
-    CANRXMessage<7> m_BMS_Temperatures_3 { 0x223, [](){}, s_BMS_Temperatures_3_Cell_T_21, s_BMS_Temperatures_3_Cell_T_22, s_BMS_Temperatures_3_Cell_T_23, s_BMS_Temperatures_3_Cell_T_24, s_BMS_Temperatures_3_Cell_T_25, s_BMS_Temperatures_3_Cell_T_26, s_BMS_Temperatures_3_Cell_T_27 };
+    CANRXMessage<7> m_BMS_Temperatures_3 { g_canBus, 0x223, [](){}, s_BMS_Temperatures_3_Cell_T_21, s_BMS_Temperatures_3_Cell_T_22, s_BMS_Temperatures_3_Cell_T_23, s_BMS_Temperatures_3_Cell_T_24, s_BMS_Temperatures_3_Cell_T_25, s_BMS_Temperatures_3_Cell_T_26, s_BMS_Temperatures_3_Cell_T_27 };
     // BMS_Temperatures_4
-    CANRXMessage<7> m_BMS_Temperatures_4 { 0x224, [](){}, s_BMS_Temperatures_4_Cell_T_28, s_BMS_Temperatures_4_Cell_T_29, s_BMS_Temperatures_4_Cell_T_30, s_BMS_Temperatures_4_Cell_T_31, s_BMS_Temperatures_4_Cell_T_32, s_BMS_Temperatures_4_Cell_T_33, s_BMS_Temperatures_4_Cell_T_34 };
+    CANRXMessage<7> m_BMS_Temperatures_4 { g_canBus, 0x224, [](){}, s_BMS_Temperatures_4_Cell_T_28, s_BMS_Temperatures_4_Cell_T_29, s_BMS_Temperatures_4_Cell_T_30, s_BMS_Temperatures_4_Cell_T_31, s_BMS_Temperatures_4_Cell_T_32, s_BMS_Temperatures_4_Cell_T_33, s_BMS_Temperatures_4_Cell_T_34 };
     // BMS_Temperatures_5
-    CANRXMessage<7> m_BMS_Temperatures_5 { 0x225, [](){}, s_BMS_Temperatures_5_Cell_T_35, s_BMS_Temperatures_5_Cell_T_36, s_BMS_Temperatures_5_Cell_T_37, s_BMS_Temperatures_5_Cell_T_38, s_BMS_Temperatures_5_Cell_T_39, s_BMS_Temperatures_5_Cell_T_40, s_BMS_Temperatures_5_Cell_T_41 };
+    CANRXMessage<7> m_BMS_Temperatures_5 { g_canBus, 0x225, [](){}, s_BMS_Temperatures_5_Cell_T_35, s_BMS_Temperatures_5_Cell_T_36, s_BMS_Temperatures_5_Cell_T_37, s_BMS_Temperatures_5_Cell_T_38, s_BMS_Temperatures_5_Cell_T_39, s_BMS_Temperatures_5_Cell_T_40, s_BMS_Temperatures_5_Cell_T_41 };
     // BMS_Temperatures_6
-    CANRXMessage<7> m_BMS_Temperatures_6 { 0x226, [](){}, s_BMS_Temperatures_6_Cell_T_42, s_BMS_Temperatures_6_Cell_T_43, s_BMS_Temperatures_6_Cell_T_44, s_BMS_Temperatures_6_Cell_T_45, s_BMS_Temperatures_6_Cell_T_46, s_BMS_Temperatures_6_Cell_T_47, s_BMS_Temperatures_6_Cell_T_48 };
+    CANRXMessage<7> m_BMS_Temperatures_6 { g_canBus, 0x226, [](){}, s_BMS_Temperatures_6_Cell_T_42, s_BMS_Temperatures_6_Cell_T_43, s_BMS_Temperatures_6_Cell_T_44, s_BMS_Temperatures_6_Cell_T_45, s_BMS_Temperatures_6_Cell_T_46, s_BMS_Temperatures_6_Cell_T_47, s_BMS_Temperatures_6_Cell_T_48 };
     // BMS_Temperatures_7
-    CANRXMessage<7> m_BMS_Temperatures_7 { 0x227, [](){}, s_BMS_Temperatures_7_Cell_T_49, s_BMS_Temperatures_7_Cell_T_50, s_BMS_Temperatures_7_Cell_T_51, s_BMS_Temperatures_7_Cell_T_52, s_BMS_Temperatures_7_Cell_T_53, s_BMS_Temperatures_7_Cell_T_54, s_BMS_Temperatures_7_Cell_T_55 };
+    CANRXMessage<7> m_BMS_Temperatures_7 { g_canBus, 0x227, [](){}, s_BMS_Temperatures_7_Cell_T_49, s_BMS_Temperatures_7_Cell_T_50, s_BMS_Temperatures_7_Cell_T_51, s_BMS_Temperatures_7_Cell_T_52, s_BMS_Temperatures_7_Cell_T_53, s_BMS_Temperatures_7_Cell_T_54, s_BMS_Temperatures_7_Cell_T_55 };
     // BMS_Temperatures_8
-    CANRXMessage<7> m_BMS_Temperatures_8 { 0x228, [](){}, s_BMS_Temperatures_8_Cell_T_56, s_BMS_Temperatures_8_Cell_T_57, s_BMS_Temperatures_8_Cell_T_58, s_BMS_Temperatures_8_Cell_T_59, s_BMS_Temperatures_8_Cell_T_60, s_BMS_Temperatures_8_Cell_T_61, s_BMS_Temperatures_8_Cell_T_62 };
+    CANRXMessage<7> m_BMS_Temperatures_8 { g_canBus, 0x228, [](){}, s_BMS_Temperatures_8_Cell_T_56, s_BMS_Temperatures_8_Cell_T_57, s_BMS_Temperatures_8_Cell_T_58, s_BMS_Temperatures_8_Cell_T_59, s_BMS_Temperatures_8_Cell_T_60, s_BMS_Temperatures_8_Cell_T_61, s_BMS_Temperatures_8_Cell_T_62 };
     // BMS_Temperatures_9
-    CANRXMessage<7> m_BMS_Temperatures_9 { 0x229, [](){}, s_BMS_Temperatures_9_Cell_T_63, s_BMS_Temperatures_9_Cell_T_64, s_BMS_Temperatures_9_Cell_T_65, s_BMS_Temperatures_9_Cell_T_66, s_BMS_Temperatures_9_Cell_T_67, s_BMS_Temperatures_9_Cell_T_68, s_BMS_Temperatures_9_Cell_T_69 };
+    CANRXMessage<7> m_BMS_Temperatures_9 { g_canBus, 0x229, [](){}, s_BMS_Temperatures_9_Cell_T_63, s_BMS_Temperatures_9_Cell_T_64, s_BMS_Temperatures_9_Cell_T_65, s_BMS_Temperatures_9_Cell_T_66, s_BMS_Temperatures_9_Cell_T_67, s_BMS_Temperatures_9_Cell_T_68, s_BMS_Temperatures_9_Cell_T_69 };
     // BMS_Temperatures_10
-    CANRXMessage<7> m_BMS_Temperatures_10 { 0x22a, [](){}, s_BMS_Temperatures_10_Cell_T_70, s_BMS_Temperatures_10_Cell_T_71, s_BMS_Temperatures_10_Cell_T_72, s_BMS_Temperatures_10_Cell_T_73, s_BMS_Temperatures_10_Cell_T_74, s_BMS_Temperatures_10_Cell_T_75, s_BMS_Temperatures_10_Cell_T_76 };
+    CANRXMessage<7> m_BMS_Temperatures_10 { g_canBus, 0x22a, [](){}, s_BMS_Temperatures_10_Cell_T_70, s_BMS_Temperatures_10_Cell_T_71, s_BMS_Temperatures_10_Cell_T_72, s_BMS_Temperatures_10_Cell_T_73, s_BMS_Temperatures_10_Cell_T_74, s_BMS_Temperatures_10_Cell_T_75, s_BMS_Temperatures_10_Cell_T_76 };
     // BMS_Temperatures_11
-    CANRXMessage<7> m_BMS_Temperatures_11 { 0x22b, [](){}, s_BMS_Temperatures_11_Cell_T_77, s_BMS_Temperatures_11_Cell_T_78, s_BMS_Temperatures_11_Cell_T_79, s_BMS_Temperatures_11_Cell_T_80, s_BMS_Temperatures_11_Cell_T_81, s_BMS_Temperatures_11_Cell_T_82, s_BMS_Temperatures_11_Cell_T_83 };
+    CANRXMessage<7> m_BMS_Temperatures_11 { g_canBus, 0x22b, [](){}, s_BMS_Temperatures_11_Cell_T_77, s_BMS_Temperatures_11_Cell_T_78, s_BMS_Temperatures_11_Cell_T_79, s_BMS_Temperatures_11_Cell_T_80, s_BMS_Temperatures_11_Cell_T_81, s_BMS_Temperatures_11_Cell_T_82, s_BMS_Temperatures_11_Cell_T_83 };
     // BMS_Temperatures_12
-    CANRXMessage<7> m_BMS_Temperatures_12 { 0x22c, [](){}, s_BMS_Temperatures_12_Cell_T_84, s_BMS_Temperatures_12_Cell_T_85, s_BMS_Temperatures_12_Cell_T_86, s_BMS_Temperatures_12_Cell_T_87, s_BMS_Temperatures_12_Cell_T_88, s_BMS_Temperatures_12_Cell_T_89, s_BMS_Temperatures_12_Cell_T_90 };
+    CANRXMessage<7> m_BMS_Temperatures_12 { g_canBus, 0x22c, [](){}, s_BMS_Temperatures_12_Cell_T_84, s_BMS_Temperatures_12_Cell_T_85, s_BMS_Temperatures_12_Cell_T_86, s_BMS_Temperatures_12_Cell_T_87, s_BMS_Temperatures_12_Cell_T_88, s_BMS_Temperatures_12_Cell_T_89, s_BMS_Temperatures_12_Cell_T_90 };
     // BMS_Temperatures_13
-    CANRXMessage<7> m_BMS_Temperatures_13 { 0x22d, [](){}, s_BMS_Temperatures_13_Cell_T_91, s_BMS_Temperatures_13_Cell_T_92, s_BMS_Temperatures_13_Cell_T_93, s_BMS_Temperatures_13_Cell_T_94, s_BMS_Temperatures_13_Cell_T_95, s_BMS_Temperatures_13_Cell_T_96, s_BMS_Temperatures_13_Cell_T_97 };
+    CANRXMessage<7> m_BMS_Temperatures_13 { g_canBus, 0x22d, [](){}, s_BMS_Temperatures_13_Cell_T_91, s_BMS_Temperatures_13_Cell_T_92, s_BMS_Temperatures_13_Cell_T_93, s_BMS_Temperatures_13_Cell_T_94, s_BMS_Temperatures_13_Cell_T_95, s_BMS_Temperatures_13_Cell_T_96, s_BMS_Temperatures_13_Cell_T_97 };
     // BMS_Temperatures_14
-    CANRXMessage<7> m_BMS_Temperatures_14 { 0x22e, [](){}, s_BMS_Temperatures_14_Cell_T_98, s_BMS_Temperatures_14_Cell_T_99, s_BMS_Temperatures_14_Cell_T_100, s_BMS_Temperatures_14_Cell_T_101, s_BMS_Temperatures_14_Cell_T_102, s_BMS_Temperatures_14_Cell_T_103, s_BMS_Temperatures_14_Cell_T_104 };
+    CANRXMessage<7> m_BMS_Temperatures_14 { g_canBus, 0x22e, [](){}, s_BMS_Temperatures_14_Cell_T_98, s_BMS_Temperatures_14_Cell_T_99, s_BMS_Temperatures_14_Cell_T_100, s_BMS_Temperatures_14_Cell_T_101, s_BMS_Temperatures_14_Cell_T_102, s_BMS_Temperatures_14_Cell_T_103, s_BMS_Temperatures_14_Cell_T_104 };
     // BMS_Temperatures_15
-    CANRXMessage<7> m_BMS_Temperatures_15 { 0x22f, [](){}, s_BMS_Temperatures_15_Cell_T_105, s_BMS_Temperatures_15_Cell_T_106, s_BMS_Temperatures_15_Cell_T_107, s_BMS_Temperatures_15_Cell_T_108, s_BMS_Temperatures_15_Cell_T_109, s_BMS_Temperatures_15_Cell_T_110, s_BMS_Temperatures_15_Cell_T_111 };
+    CANRXMessage<7> m_BMS_Temperatures_15 { g_canBus, 0x22f, [](){}, s_BMS_Temperatures_15_Cell_T_105, s_BMS_Temperatures_15_Cell_T_106, s_BMS_Temperatures_15_Cell_T_107, s_BMS_Temperatures_15_Cell_T_108, s_BMS_Temperatures_15_Cell_T_109, s_BMS_Temperatures_15_Cell_T_110, s_BMS_Temperatures_15_Cell_T_111 };
     // BMS_SOE
-    CANRXMessage<5> m_BMS_SOE { 0x240, [](){}, s_BMS_SOE_Max_Discharge_Current, s_BMS_SOE_Max_Regen_Current, s_BMS_SOE_Battery_Voltage, s_BMS_SOE_Battery_Temperature, s_BMS_SOE_Battery_Current };
+    CANRXMessage<5> m_BMS_SOE { g_canBus, 0x240, [](){}, s_BMS_SOE_Max_Discharge_Current, s_BMS_SOE_Max_Regen_Current, s_BMS_SOE_Battery_Voltage, s_BMS_SOE_Battery_Temperature, s_BMS_SOE_Battery_Current };
     // BMS_Faults
-    CANRXMessage<8> m_BMS_Faults { 0x250, [](){}, s_BMS_Faults_Fault_Summary, s_BMS_Faults_Undervoltage_Fault, s_BMS_Faults_Overvoltage_Fault, s_BMS_Faults_Undertemperature_Fault, s_BMS_Faults_Overtemperature_Fault, s_BMS_Faults_Overcurrent_Fault, s_BMS_Faults_External_Kill_Fault, s_BMS_Faults_Open_Wire_Fault };
+    CANRXMessage<8> m_BMS_Faults { g_canBus, 0x250, [](){}, s_BMS_Faults_Fault_Summary, s_BMS_Faults_Undervoltage_Fault, s_BMS_Faults_Overvoltage_Fault, s_BMS_Faults_Undertemperature_Fault, s_BMS_Faults_Overtemperature_Fault, s_BMS_Faults_Overcurrent_Fault, s_BMS_Faults_External_Kill_Fault, s_BMS_Faults_Open_Wire_Fault };
     // BMS_Status
-    CANRXMessage<5> m_BMS_Status { 0x241, [](){}, s_BMS_Status_Max_Cell_Temp, s_BMS_Status_Min_Cell_Temp, s_BMS_Status_Max_Cell_Voltage, s_BMS_Status_Min_Cell_Voltage, s_BMS_Status_BMS_SOC };
+    CANRXMessage<5> m_BMS_Status { g_canBus, 0x241, [](){}, s_BMS_Status_Max_Cell_Temp, s_BMS_Status_Min_Cell_Temp, s_BMS_Status_Max_Cell_Voltage, s_BMS_Status_Min_Cell_Voltage, s_BMS_Status_BMS_SOC };
 #endif
 #ifdef RX_PDM
     // PDM_Current_Sensing
-    CANRXMessage<2> m_PDM_Current_Sensing { 0x, [](){}, s_PDM_Current_Sensing_Unreg_A, s_PDM_Current_Sensing_FiveVolt_A };
+    CANRXMessage<2> m_PDM_Current_Sensing { g_canBus, 0x, [](){}, s_PDM_Current_Sensing_Unreg_A, s_PDM_Current_Sensing_FiveVolt_A };
 #endif
 #ifdef RX_WHEEL
     // Wheel_Message
-    CANRXMessage<2> m_Wheel_Message { 0x410, [](){}, s_Wheel_Message_Wheel_Temp, s_Wheel_Message_Wheel_Speed };
+    CANRXMessage<2> m_Wheel_Message { g_canBus, 0x410, [](){}, s_Wheel_Message_Wheel_Temp, s_Wheel_Message_Wheel_Speed };
 #endif
 #ifdef RX_SHUTDOWN
     // Shutdown_Status
-    CANRXMessage<1> m_Shutdown_Status { 0x310, [](){}, s_Shutdown_Status_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_Status { g_canBus, 0x310, [](){}, s_Shutdown_Status_Voltage_Sag };
     // Shutdown_1
-    CANRXMessage<1> m_Shutdown_1 { 0x310, [](){}, s_Shutdown_1_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_1 { g_canBus, 0x310, [](){}, s_Shutdown_1_Voltage_Sag };
     // Shutdown_2
-    CANRXMessage<1> m_Shutdown_2 { 0x310, [](){}, s_Shutdown_2_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_2 { g_canBus, 0x310, [](){}, s_Shutdown_2_Voltage_Sag };
     // Shutdown_3
-    CANRXMessage<1> m_Shutdown_3 { 0x310, [](){}, s_Shutdown_3_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_3 { g_canBus, 0x310, [](){}, s_Shutdown_3_Voltage_Sag };
     // Shutdown_4
-    CANRXMessage<1> m_Shutdown_4 { 0x310, [](){}, s_Shutdown_4_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_4 { g_canBus, 0x310, [](){}, s_Shutdown_4_Voltage_Sag };
     // Shutdown_5
-    CANRXMessage<1> m_Shutdown_5 { 0x310, [](){}, s_Shutdown_5_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_5 { g_canBus, 0x310, [](){}, s_Shutdown_5_Voltage_Sag };
     // Shutdown_6
-    CANRXMessage<1> m_Shutdown_6 { 0x310, [](){}, s_Shutdown_6_Voltage_Sag };
+    CANRXMessage<1> m_Shutdown_6 { g_canBus, 0x310, [](){}, s_Shutdown_6_Voltage_Sag };
 #endif
 #ifdef RX_ETC
     // throttle_tx
-    CANRXMessage<2> m_throttle_tx { 0x010, [](){}, s_throttle_tx_Throttle_percent, s_throttle_tx_Throttle_active };
+    CANRXMessage<2> m_throttle_tx { g_canBus, 0x010, [](){}, s_throttle_tx_Throttle_percent, s_throttle_tx_Throttle_active };
     // brake_tx
-    CANRXMessage<1> m_brake_tx { 0x011, [](){}, s_brake_tx_Brake_pedal };
+    CANRXMessage<1> m_brake_tx { g_canBus, 0x011, [](){}, s_brake_tx_Brake_pedal };
 #endif
 #ifdef RX_VCU
     // Drive_Status
-    CANRXMessage<1> m_Drive_Status { 0x000, [](){}, s_Drive_Status_Drive_State };
+    CANRXMessage<1> m_Drive_Status { g_canBus, 0x000, [](){}, s_Drive_Status_Drive_State };
 #endif
 
 
