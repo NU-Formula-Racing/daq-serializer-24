@@ -18,7 +18,7 @@ namespace daqser::impl
         std::string LATEST_SCHEMA_FILE = "./test/static/test_ultimate.drive";
 #else
 #ifdef CUR_SCHEMA
-        std::string LATEST_SCHEMA_FILE = CUR_SCHEMA
+        std::string LATEST_SCHEMA_FILE = CUR_SCHEMA;
 #else
         std::string LATEST_SCHEMA_FILE = "test_ultimate.drive";
 #endif
@@ -51,7 +51,8 @@ namespace daqser::impl
             schemaRegistry.clear();
 
             // also add the latest schema file, just in case
-            REGISTERED_SCHEMA_FILES.push_back(LATEST_SCHEMA_FILE);
+            if (std::find(REGISTERED_SCHEMA_FILES.begin(), REGISTERED_SCHEMA_FILES.end(), LATEST_SCHEMA_FILE) == REGISTERED_SCHEMA_FILES.end())
+                REGISTERED_SCHEMA_FILES.push_back(LATEST_SCHEMA_FILE);
 
             Parser parser;
             for (std::string schemaFile : REGISTERED_SCHEMA_FILES)
@@ -66,6 +67,7 @@ namespace daqser::impl
                 {
                     SchemaMetadata metadata = {schema.schemaName, schema.versionNumber};
                     schemaRegistry[metadata] = schemaFile;
+                    std::cout << "Registered schema: " << schema.schemaName << " v" << schema.versionNumber[0] << "." << schema.versionNumber[1] <<  "." << schema.versionNumber[2] << std::endl;   
                 }
                 else
                 {

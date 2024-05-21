@@ -41,7 +41,7 @@ std::vector<Token> Tokenizer::tokenize()
     }
 
     // also modify the _fileName for spiffs mounting, which is under the /spiffs directory
-    _fileName = "/spiffs/" + _fileName;
+    _fileName = "/" + _fileName;
 #endif
 
 #ifdef USE_LITTLEFS_TEENSY
@@ -55,17 +55,20 @@ std::vector<Token> Tokenizer::tokenize()
 
 #endif
 
-    std::vector<Token> tokens;
 #ifndef USE_LITTLEFS_TEENSY
-    std::ifstream file(_fileName);
-    if (!file.is_open())
+    fs::File driveFile = SPIFFS.open(_fileName.c_str(), "r");
+    if (!driveFile.available())
     {
         std::stringstream err;
         err << "Error opening file: " << _fileName << std::endl;
-        // throw std::invalid_argument(err.str());
         std::cout << err.str();
         return {};
     }
+
+    // put the file content into a stringstream
+    std::stringstream file;
+    file << driveFile.readString().c_str();
+    driveFile.close();
 #else
     File f = g_littleFS.open(_fileName.c_str(), FILE_READ);
     if (!f)
@@ -79,19 +82,15 @@ std::vector<Token> Tokenizer::tokenize()
     std::istringstream file(fileContent);
 #endif
 
+    std::vector<Token> tokens;
     while (file.good())
     {
         Token token = getNextToken(file);
         tokens.push_back(token);
+        // std::cout << Tokenizer::tokenTypeToString(token.type) << " : " << token.value << std::endl;
         if (token.type == TOKEN_END_OF_FILE)
             break;
     }
-
-#ifndef USE_LITTLEFS_TEENSY
-    file.close();
-#else
-    f.close();
-#endif
     return tokens;
 }
 
@@ -227,7 +226,7 @@ bool Tokenizer::isLiteral(const std::string &word, TokenType &type)
     }
 
     // String Literal
-    if (std::regex_match(word, std::regex("^\".*\"$")))
+    if (std::regex_match(word, std::regex("^\".*\"$")) || std::regex_match(word, std::regex("^'.*'$")))
     {
         type = TOKEN_STRING_LITERAL;
         return true;

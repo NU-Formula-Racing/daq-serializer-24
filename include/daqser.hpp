@@ -42,6 +42,9 @@ namespace daqser
 
         int version[] = VERSION(major, minor, patch);
 
+        std::cout << "Setting schema: " << schemaName << " ";
+        std::cout << version[0] << "." << version[1] << "." << version[2] << std::endl;
+
         Schema schema = g_registry.getSchema(schemaName, version);
 
         if (schema.schemaName == "")
