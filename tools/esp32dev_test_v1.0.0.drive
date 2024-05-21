@@ -1,0 +1,64 @@
+meta {
+	.schema: 'esp32dev_test';
+	.version: 1.0.0;
+}
+
+# IMD Messages
+def IMD {
+	float transmit_resistance; # IMD output decoding;
+	bool transmit_status; # 1_is_good_0_is_bad;
+}
+
+# SHUTDOWN Messages
+def Shutdown_Status {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_1 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_2 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_3 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_4 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_5 {
+	bool Voltage_Sag; # Boolean;
+}
+
+def Shutdown_6 {
+	bool Voltage_Sag; # Boolean;
+}
+
+# ETC Messages
+def throttle_tx {
+	bool Throttle_percent; # %;
+	bool Throttle_active; # boolean;
+}
+
+def brake_tx {
+	bool Brake_pedal; # boolean;
+}
+
+def Car_Data {
+	IMD IMD;
+	Shutdown_Status Shutdown_Status;
+	Shutdown_1 Shutdown_1;
+	Shutdown_2 Shutdown_2;
+	Shutdown_3 Shutdown_3;
+	Shutdown_4 Shutdown_4;
+	Shutdown_5 Shutdown_5;
+	Shutdown_6 Shutdown_6;
+	throttle_tx throttle_tx;
+	brake_tx brake_tx;
+}
+
+frame(Car_Data);
