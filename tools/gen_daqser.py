@@ -51,7 +51,7 @@ class CANSignal:
         return self.data_type
     
     def generate_signal_func(self):
-        func = f'    daqser::set("{FRAME_NAME}.{self.message_name}.{self.signal_name}", ({self.get_data_type()})s_{self.name});\n'
+        func = f'    daqser::set("{self.message_name}.{self.signal_name}", ({self.get_data_type()})s_{self.name});\n'
         return func
     
 class CANMessage:
@@ -230,7 +230,7 @@ def gen_drive(dbc_file_path):
                 if message.sender == board:
                     drive_file.write(f"def {message.name} {{\n")
                     for signal in message.signals:
-                        drive_file.write(f"\t{signal.get_data_type()} {signal.name}; # {signal.unit};\n")
+                        drive_file.write(f"\t{signal.get_data_type()} {signal.signal_name}; # {signal.unit};\n")
                     drive_file.write(f"}}\n\n")
 
         # now write the final definition, which includes all the messages
