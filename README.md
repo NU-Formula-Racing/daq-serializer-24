@@ -248,7 +248,7 @@ void setup()
   daqser::initialize();
   // Tell daqser what schema we are using to serialize the data
   daqser::setSchema(SCHEMA_NAME, SCHEMA_VERSION);
-  daqser::g_canBus.Initialize(ICAN::BaudRate::kBaud1M);
+  daqser::initializeCAN();
   // Tell daqser to record/send data from these boards
   timerGroup.AddTimer(100, recordData);
   timerGroup.AddTimer(1000, reportData);
