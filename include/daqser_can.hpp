@@ -22,7 +22,7 @@
 namespace daqser
 {
     VirtualTimerGroup g_timerGroup;
-    CAN g_canBus{};
+    CAN g_canBus{40}; // 40 defines the message buffer size btw
 
     // auto generated signals!
 #ifdef RX_IMD
@@ -521,6 +521,12 @@ namespace daqser
 #endif
 
 
+    void initializeCAN()
+    {
+        g_canBus.Initialize(ICAN::BaudRate::kBaud1M);
+        g_timerGroup.AddTimer(10, [](){ g_canBus.Tick();});
+    }
+
     void updateSignals()
     {
 #ifdef RX_IMD
@@ -897,6 +903,11 @@ namespace daqser
     daqser::set("Drive_Status.Drive_State", (bool)s_Drive_Status_Drive_State);
 #endif
 
+    }
+
+    void tickCAN()
+    {
+        g_timerGroup.Tick(millis());
     }
 
 }
