@@ -26,7 +26,6 @@
 #include <LITTLEFS.h>
 LittleFS_Program g_littleFS;
 #define chipSelect 6
-
 #endif
 
 using namespace daqser::impl;
@@ -55,7 +54,7 @@ std::vector<Token> Tokenizer::tokenize()
 
 #endif
 
-#ifndef USE_LITTLEFS_TEENSY
+#ifdef USE_LITTLEFS_ESP32
     fs::File driveFile = SPIFFS.open(_fileName.c_str(), "r");
     if (!driveFile.available())
     {
@@ -69,7 +68,7 @@ std::vector<Token> Tokenizer::tokenize()
     std::stringstream file;
     file << driveFile.readString().c_str();
     driveFile.close();
-#else
+#elif defined(USE_LITTLEFS_TEENSY)
     File f = g_littleFS.open(_fileName.c_str(), FILE_READ);
     if (!f)
     {
@@ -80,6 +79,13 @@ std::vector<Token> Tokenizer::tokenize()
     ss << f.readString();
     std::string fileContent = ss.str();
     std::istringstream file(fileContent);
+#else
+    std::ifstream file(_fileName);
+    if (!file.is_open())
+    {
+        std::cout << "Error opening file: " << _fileName << std::endl;
+        return {};
+    }
 #endif
 
     std::vector<Token> tokens;

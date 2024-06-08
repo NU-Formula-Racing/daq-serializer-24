@@ -94,6 +94,7 @@ namespace daqser
         g_activeSchema = std::make_shared<Schema>(schema);
     }
 
+
     bool _validateRequest()
     {
         if (g_activeSchema == nullptr)
@@ -199,6 +200,15 @@ namespace daqser
         return g_activeSchema->frameTemplate->serializeFrame();
     }
 
+    std::string serializeFrameToJson(bool includeFieldNames = true, bool includeTypeNames = true)
+    {
+        bool valid = _validateRequest();
+        if (!valid)
+            return "";
+
+        return g_activeSchema->frameTemplate->serializeFrameToJson(includeFieldNames, includeTypeNames);
+    }
+
     void deserializeFrame(std::vector<std::uint8_t> frame)
     {
         bool valid = _validateRequest();
@@ -206,6 +216,12 @@ namespace daqser
             return;
 
         g_activeSchema->frameTemplate->deserializeFrame(frame);
+    }
+
+    bool hasSchema(std::string version, int major, int minor, int patch)
+    {
+        if (!_validateRequest()) return false;
+        return g_registry.hasSchema(version, major, minor, patch);
     }
 }
 

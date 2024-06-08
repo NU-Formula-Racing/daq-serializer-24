@@ -1,0 +1,7 @@
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/unity.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/edit_cache.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/rebuild_cache.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/list_install_components.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/install.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/install/local.dir
+D:/Documents/Code/School/NFR_23-24/daq-serializer-24/build/CMakeFiles/install/strip.dir

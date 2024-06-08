@@ -405,6 +405,10 @@ namespace daqser::impl
         /// @brief Returns a byte representation of the Field
         /// @return A byte representation of the Field
         std::vector<std::uint8_t> toBinary() const;
+
+        /// @brief Returns a human readable representation of the Field
+        /// @return A human readable representation of the Field
+        std::string toHumanReadable() const;
     };
 
 #pragma endregion Node Types

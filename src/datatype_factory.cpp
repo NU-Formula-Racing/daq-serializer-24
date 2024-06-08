@@ -36,6 +36,7 @@ Field Field::emptyField(const std::string &name, FieldType type)
         field.size = sizeof(uint8_t *);
         break;
     case FieldType::VERSION:
+        field.value = Value(new int[3]{0, 0, 0});
         field.size = sizeof(int[3]);
         break;
     case FieldType::LONG:
@@ -123,6 +124,32 @@ std::vector<std::uint8_t> Field::toBinary() const
 {
     // convert the value to binary
     return value.toBinary();
+}
+
+std::string Field::toHumanReadable() const
+{
+    switch (type)
+    {
+    case FieldType::INT:
+        return std::to_string(value.get<int>());
+    case FieldType::FLOAT:
+        return std::to_string(value.get<float>());
+    case FieldType::BOOL:
+        return value.get<bool>() ? "true" : "false";
+    case FieldType::STRING:
+        return "\""  + value.get<std::string>() + "\"";
+    case FieldType::VERSION:
+    {
+        int *version = value.get<int *>();
+        return std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]);
+    }
+    case FieldType::LONG:
+        return std::to_string(value.get<long>());
+    default:
+        // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
+        std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;
+        return "invalid";
+    }
 }
 
 #pragma endregion

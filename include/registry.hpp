@@ -135,6 +135,13 @@ namespace daqser::impl
             return schemaRegistry.size();
         }
 
+        bool hasSchema(std::string schemaName, int major, int minor, int patch)
+        {
+            int version[]{major, minor, patch};
+            SchemaMetadata metadata = {schemaName, version};
+            return schemaRegistry.find(metadata) != schemaRegistry.end();
+        }
+
     private:
         struct SchemaMetadata
         {

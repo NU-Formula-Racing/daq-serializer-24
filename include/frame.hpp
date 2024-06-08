@@ -107,6 +107,57 @@ namespace daqser::impl
             return frame;
         }
 
+        /// @brief Serializes the frame template into a json string
+        /// @return The json string
+        std::string serializeFrameToJson(bool includeFieldNames = true, bool includeTypeNames = true) const
+        {
+            std::stringstream json;
+            json << "\"Frame\" : {\n";
+            if (includeFieldNames)
+            {
+                json << "  \"Fields\" : [";
+                for (int i = 0; i < this->_fieldNames.size(); i++)
+                {
+                    json << "\"" << this->_fieldNames[i] << "\"";
+                    if (i < this->_fieldNames.size() - 1)
+                    {
+                        json << ", ";
+                    }
+                }
+                json << "]\n";
+            }
+
+            if (includeTypeNames)
+            {
+                json << "  \"Types\" : [";
+                for (int i = 0; i < this->_fieldNames.size(); i++)
+                {
+                    Field field = this->getField(this->_fieldNames[i]);
+                    std::string typeName = Field::fieldTypeToString(field.type);
+                    json << "\"" << typeName << "\"";
+                    if (i < this->_fieldNames.size() - 1)
+                    {
+                        json << ", ";
+                    }
+                }
+                json << "]\n";
+            }
+
+            json << "  \"Values\" : {\n";
+            for (int i = 0; i < this->_fieldNames.size(); i++)
+            {
+                std::string fieldName = this->_fieldNames[i];
+                Field field = this->getField(fieldName);
+                field.value = this->_values[i];
+                json << "    \"" << fieldName << "\":";
+                json << field.toHumanReadable() << "\n";
+            }
+            json << "  }\n";
+            json << "}\n";
+
+            return json.str();
+        }
+
         /// @brief Deserializes a binary frame into the frame template
         /// @param frame The binary frame to deserialize
         void deserializeFrame(std::vector<std::uint8_t> frame)
@@ -121,6 +172,12 @@ namespace daqser::impl
                 Value f = this->_values[index];
                 // Get the size of the field
                 int size = f.valueSize;
+
+                // TODO: When a field is a string, the size can be dynamic
+                // because we aren't actually serializing strings like this, we can ignore this for now
+                // but ideally we store a the size of the string in the frame
+                // unless fixed -- this is going to be a design decision
+
                 // Get the bytes for the field
                 std::vector<std::uint8_t> fieldBytes(frame.begin() + position, frame.begin() + position + size);
                 std::cout << "Field bytes: ";
