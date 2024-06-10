@@ -263,7 +263,6 @@ namespace daqser
     /// @brief Checks if a schema with the given name and version exists in the registry
     bool hasSchema(std::string name, int major, int minor, int patch)
     {
-        if (!_validateRequest()) return false;
         return g_registry.hasSchema(name, major, minor, patch);
     }
 
