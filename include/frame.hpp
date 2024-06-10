@@ -61,6 +61,17 @@ namespace daqser::impl
             // Get the index of the field
             auto index = std::distance(this->_fieldNames.begin(), std::find(this->_fieldNames.begin(), this->_fieldNames.end(), fieldName));
 
+            // check that the value is the correct type
+            Field field = this->getField(fieldName);
+            if (field.size != sizeof(T))
+            {
+                std::stringstream err;
+                err << "Value type does not match field type: " << fieldName;
+                // throw std::invalid_argument(err.str());
+                std::cout << err.str() << std::endl;
+                return;
+            }
+
             // Set the value
             this->_values[index] = value;
         }
@@ -154,6 +165,7 @@ namespace daqser::impl
             }
             json << "  }\n";
             json << "}\n";
+
 
             return json.str();
         }

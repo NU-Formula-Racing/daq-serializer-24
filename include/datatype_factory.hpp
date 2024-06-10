@@ -217,7 +217,7 @@ namespace daqser::impl
         template <typename T>
         T get() const
         {
-            // std::cout << "Value::get<T>()" << std::endl;
+            std::cout << "Value::get<T>()" << std::endl;
             return *(T *)(this->valuePtr.get());
         }
 
@@ -262,13 +262,13 @@ namespace daqser::impl
 
             binary.shrink_to_fit();
 
-            // print out the binary
-            for (std::uint8_t byte : binary)
-            {
-                std::cout << byte << "";
-            }
+            // // print out the binary
+            // for (std::uint8_t byte : binary)
+            // {
+            //     std::cout << byte << "";
+            // }
 
-            std::cout << std::endl;
+            // std::cout << std::endl;
 
             return binary;
         }
