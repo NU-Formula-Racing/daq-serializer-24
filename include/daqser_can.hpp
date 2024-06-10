@@ -170,6 +170,7 @@ namespace daqser
     void tickCAN()
     {
         g_timerGroup.Tick(millis());
+        g_canBus.Tick();
     }
 
 }
