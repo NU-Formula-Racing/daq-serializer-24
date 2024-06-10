@@ -93,7 +93,7 @@ namespace daqser::impl
             std::string schemaFile = schemaRegistry[metadata];
             Parser parser;
             Tokenizer tokenizer(schemaFile);
-            std::vector<Token> tokens = tokenizer.tokenizeFile();
+            std::vector<Token> tokens = (this->isFileBasedSchema(schemaName, versionNumber)) ? tokenizer.tokenizeFile() : tokenizer.tokenizeContent();
             Schema schema;
             Parser::ParsingResult res = parser.buildSchema(tokens, schema, false);
 
@@ -131,19 +131,33 @@ namespace daqser::impl
             return schema;
         }
 
+        void addSchemaFromDrive(std::string schemaName, int* versionNumber, std::string driveFile)
+        {
+            SchemaMetadata metadata = {schemaName, versionNumber};
+            schemaRegistry[metadata] = driveFile;
+            registeredRawSchemas.push_back(metadata);
+        }
+
         std::string getDriveContents(std::string schemaName, int* versionNumber)
         {
             SchemaMetadata metadata = {schemaName, versionNumber};
 
             if (schemaRegistry.find(metadata) == schemaRegistry.end())
             {
-                std::cout << "Schema not found: " << schemaName << " v" << versionNumber << std::endl;
+                std::cout << "Schema not found: " << schemaName << " v" << versionNumber[0] << "."  << versionNumber[1] << "." << versionNumber[2] << std::endl;
                 return "";
             }
 
             std::string schemaFile = schemaRegistry[metadata];
-            std::stringstream contents = Tokenizer::openFile(schemaFile);
-            return contents.str();
+            if (this->isFileBasedSchema(schemaName, versionNumber))
+            {
+                std::stringstream contents = Tokenizer::openFile(schemaFile);
+                return contents.str();
+            }
+            else
+            {
+                return schemaFile;
+            }
         }
 
         int numSchemas()
@@ -172,9 +186,24 @@ namespace daqser::impl
                 }
                 return *versionNumber < *other.versionNumber;
             }
+
+            bool operator==(const SchemaMetadata &other) const
+            {
+                return schemaName == other.schemaName &&
+                        versionNumber[0] == other.versionNumber[0] &&
+                        versionNumber[1] == other.versionNumber[1] &&
+                        versionNumber[2] == other.versionNumber[2];
+            }
         };
 
+        bool isFileBasedSchema(std::string schemaName, int* versionNumber)
+        {
+            SchemaMetadata metadata = {schemaName, versionNumber};
+            return std::find(registeredRawSchemas.begin(), registeredRawSchemas.end(), metadata) == registeredRawSchemas.end();
+        }
+
         std::map<SchemaMetadata, std::string> schemaRegistry;
+        std::vector<SchemaMetadata> registeredRawSchemas; // this is for schemeas added at runtime, not from files
     };
 } // namespace daqser::impl
 

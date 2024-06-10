@@ -117,6 +117,9 @@ namespace daqser
             std::cout << "Error parsing schema file: " << driveFile << std::endl;
             std::cout << res.message.str() << std::endl;
         }
+
+        // add the schema to the registry
+        g_registry.addSchemaFromDrive(schema.schemaName, schema.versionNumber, driveFile);
     }
 
     /// @brief PRIVATE: Validates that the request is valid
