@@ -30,7 +30,7 @@ LittleFS_Program g_littleFS;
 
 using namespace daqser::impl;
 
-std::vector<Token> Tokenizer::tokenize()
+std::vector<Token> Tokenizer::tokenizeFile()
 {
 #ifdef USE_LITTLEFS_ESP32
     if (!SPIFFS.begin(true))
@@ -80,14 +80,29 @@ std::vector<Token> Tokenizer::tokenize()
     std::string fileContent = ss.str();
     std::istringstream file(fileContent);
 #else
-    std::ifstream file(_fileName);
+    std::ifstream file(_source);
     if (!file.is_open())
     {
-        std::cout << "Error opening file: " << _fileName << std::endl;
+        std::cout << "Error opening file: " << _source << std::endl;
         return {};
     }
 #endif
 
+    std::vector<Token> tokens;
+    while (file.good())
+    {
+        Token token = getNextToken(file);
+        tokens.push_back(token);
+        // std::cout << Tokenizer::tokenTypeToString(token.type) << " : " << token.value << std::endl;
+        if (token.type == TOKEN_END_OF_FILE)
+            break;
+    }
+    return tokens;
+}
+
+std::vector<Token> Tokenizer::tokenizeContent()
+{
+    std::istringstream file(_source);
     std::vector<Token> tokens;
     while (file.good())
     {

@@ -49,17 +49,17 @@ namespace daqser::impl
     class Tokenizer
     {
     public:
-        Tokenizer() : _fileName("")
+        Tokenizer() : _source("")
         {
             // nothing
         }
 
-        Tokenizer(const std::string &target) : _fileName(target)
+        Tokenizer(const std::string &target) : _source(target)
         {
             // nothing
         }
 
-        Tokenizer(const Tokenizer &other) : _fileName(other._fileName)
+        Tokenizer(const Tokenizer &other) : _source(other._source)
         {
             // nothing
         }
@@ -104,14 +104,20 @@ namespace daqser::impl
             return ss.str();
         }
 
-        std::vector<Token> tokenize();
+        /// @brief Tokenizes the content passed to the constructor, treating it as a file name
+        /// @return A vector of tokens
+        std::vector<Token> tokenizeFile();
+
+        /// @brief Tokenizes the content passed to the constructor, treating it the source code
+        /// @return A vector of tokens
+        std::vector<Token> tokenizeContent();
         bool isSymbol(const std::string &word, TokenType &type);
         bool isKeyword(const std::string &word, TokenType &type);
         bool isLiteral(const std::string &word, TokenType &type);
         bool isValidIdentifier(const std::string &word);
 
     private:
-        std::string _fileName;
+        std::string _source;
 
         Token getNextToken(std::istream &file);
     };

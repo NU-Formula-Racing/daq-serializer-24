@@ -59,7 +59,7 @@ namespace daqser::impl
             {
                 std::cout << "Registering schema: " << schemaFile << std::endl;
                 Tokenizer tokenizer(schemaFile);
-                std::vector<Token> tokens = tokenizer.tokenize();
+                std::vector<Token> tokens = tokenizer.tokenizeFile();
                 Schema schema;
                 Parser::ParsingResult res = parser.buildSchema(tokens, schema, true);
 
@@ -92,7 +92,7 @@ namespace daqser::impl
             std::string schemaFile = schemaRegistry[metadata];
             Parser parser;
             Tokenizer tokenizer(schemaFile);
-            std::vector<Token> tokens = tokenizer.tokenize();
+            std::vector<Token> tokens = tokenizer.tokenizeFile();
             Schema schema;
             Parser::ParsingResult res = parser.buildSchema(tokens, schema, false);
 
@@ -111,7 +111,7 @@ namespace daqser::impl
         Schema curSchema()
         {
             Tokenizer tokenizer(LATEST_SCHEMA_FILE);
-            std::vector<Token> tokens = tokenizer.tokenize();
+            std::vector<Token> tokens = tokenizer.tokenizeFile();
             Schema schema;
             Parser parser;
             Parser::ParsingResult res = parser.buildSchema(tokens, schema, false);
