@@ -151,7 +151,7 @@ void test_valid_meta(void)
         TOKEN_END_OF_FILE
     };
 
-    std::vector<Token> tokens  = Tokenizer.tokenize();
+    std::vector<Token> tokens  = Tokenizer.tokenizeFile();
     for (int i = 0; i < tokens.size(); i++)
     {
         std::stringstream message;
@@ -172,7 +172,7 @@ void test_full(void)
         TOKEN_FRAME, TOKEN_L_PARENTHESES, TOKEN_IDENTIFIER, TOKEN_R_PARENTHESES, TOKEN_SEMICOLON, TOKEN_END_OF_FILE // frame (CarData)
     };
 
-    std::vector<Token> tokens = Tokenizer.tokenize();
+    std::vector<Token> tokens = Tokenizer.tokenizeFile();
     for (int i = 0; i < tokens.size(); i++)
     {
         std::stringstream message;

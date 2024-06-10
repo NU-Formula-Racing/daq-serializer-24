@@ -23,12 +23,12 @@ namespace daqser::impl
         std::vector<std::uint8_t> serialize()
         {
             // encode the schema name
-            // format is: 
+            // format is:
             // len(name) -- one byte
             // schemaName bytes
             // version number -- 3 bytes
             std::vector<std::uint8_t> data;
-            std::uint8_t len = schemaName.length();   
+            std::uint8_t len = schemaName.length();
             data.push_back(len);
 
             for (auto c : this->schemaName)
@@ -47,7 +47,7 @@ namespace daqser::impl
             return data;
         }
 
-        static std::tuple<std::string, int*> deserialize(std::vector<std::uint8_t> data)
+        static std::tuple<std::string, int *> deserialize(std::vector<std::uint8_t> data)
         {
             std::string schemaName;
             int versionNumber[3];
@@ -259,7 +259,9 @@ namespace daqser::impl
             {"long", [](std::string name)
              { return Field::emptyField(name, FieldType::LONG); }},
             {"version", [](std::string name)
-             { return Field::emptyField(name, FieldType::VERSION); }}};
+             { return Field::emptyField(name, FieldType::VERSION); }},
+            {"byte", [](std::string name)
+             { return Field::emptyField(name, FieldType::BYTE); }}};
 
         std::map<std::string, DataType> _dataTypes;
 

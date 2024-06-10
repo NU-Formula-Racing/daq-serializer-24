@@ -145,6 +145,8 @@ std::string Field::toHumanReadable() const
     }
     case FieldType::LONG:
         return std::to_string(value.get<long>());
+    case FieldType::BYTE:
+        return std::to_string(value.get<uint8_t>());
     default:
         // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
         std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;

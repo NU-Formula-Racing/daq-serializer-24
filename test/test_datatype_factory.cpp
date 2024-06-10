@@ -38,6 +38,14 @@ void test_value_string(void)
     TEST_ASSERT_TRUE(value.isValid());
 }
 
+void test_value_byte(void)
+{
+    Value value = (std::uint8_t)0x12;
+    TEST_ASSERT_TRUE(value == (std::uint8_t)0x12);
+    TEST_ASSERT_TRUE(value.get<std::uint8_t>() == (std::uint8_t)0x12);
+    TEST_ASSERT_TRUE(value.isValid());
+}
+
 void test_value_version(void)
 {
     int version[3] = {1, 2, 3};
@@ -92,6 +100,16 @@ void test_field_predefined_version(void)
     TEST_ASSERT_EQUAL_INT(sizeof(int[3]), field.size);
 }
 
+void test_field_predefined_byte(void)
+{
+    std::uint8_t byte = 0x12;
+    Field field = Field::predfinedField("test", byte);
+    TEST_ASSERT_TRUE(field.value == byte);
+    TEST_ASSERT_TRUE(field.value.isValid());
+    TEST_ASSERT_EQUAL_INT(sizeof(std::uint8_t), field.size);
+
+}
+
 void test_field_not_predefined_int(void)
 {
     Field field = Field::emptyField("test", FieldType::INT);
@@ -127,6 +145,15 @@ void test_field_not_predefined_string(void)
     TEST_ASSERT_FALSE(field.predefined);
     TEST_ASSERT_FALSE(field.value.isValid());
     TEST_ASSERT_EQUAL_INT(sizeof(char *), field.size);
+}
+
+void test_field_not_predefined_byte(void)
+{
+    Field field = Field::emptyField("test", FieldType::BYTE);
+    TEST_ASSERT_TRUE(field.value == 0);
+    TEST_ASSERT_FALSE(field.predefined);
+    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_EQUAL_INT(sizeof(std::uint8_t), field.size);
 }
 
 void test_value_copy_constructor(void)
@@ -297,6 +324,11 @@ void TestingSuite::runDataTypeFactoryTests()
     RUN_TEST(test_field_not_predefined_string);
     RUN_TEST(test_field_copy_constructor);
     RUN_TEST(test_value_copy_constructor);
+
+    // new byte tests
+    RUN_TEST(test_value_byte);
+    RUN_TEST(test_field_predefined_byte);
+    RUN_TEST(test_field_not_predefined_byte);
 
     // data type tests
     RUN_TEST(test_flat_data_type);

@@ -14,7 +14,7 @@ void test_sequence(std::string filename)
 {
     Tokenizer tokenizer(filename);
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Parser::ParsingResult result = parser.isValidSequence(tokens);
     std::stringstream ss;
     ss << "TOKENS:\n " << Tokenizer::dumpTokens(tokens, " ") << std::endl;
@@ -36,7 +36,7 @@ void test_simple(void)
 {
     Tokenizer tokenizer("./test/static/test_valid_meta.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -61,7 +61,7 @@ void test_nested(void)
 {
     Tokenizer tokenizer("./test/static/test_full.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -94,7 +94,7 @@ void test_multiple_single_layer(void)
 {
     Tokenizer tokenizer("./test/static/test_multiple_single_layer.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -139,7 +139,7 @@ void test_multiple_double_layer(void)
 {
     Tokenizer tokenizer("./test/static/test_multiple_double_layer.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -187,7 +187,7 @@ void test_multiple_double_layer_backward(void)
     // same as above test, but DateTime is declared after CarData
     Tokenizer tokenizer("./test/static/test_multiple_double_layer_backward.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -234,7 +234,7 @@ void test_ultimate(void)
 {
     Tokenizer tokenizer("./test/static/test_ultimate.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -318,7 +318,7 @@ void test_cyclic_simple(void)
     // parsing should fail
     Tokenizer tokenizer("./test/static/test_cyclic_simple.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -332,7 +332,7 @@ void test_cyclic_two_layer(void)
     // parsing should fail
     Tokenizer tokenizer("./test/static/test_cyclic_two_layer.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -346,7 +346,7 @@ void test_cyclic_advanced(void)
     // parsing should fail
     Tokenizer tokenizer("./test/static/test_cyclic_advanced.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out);
 
@@ -359,7 +359,7 @@ void test_only_parse_meta(void)
     // just parse the meta information from test_ulimate.drive
     Tokenizer tokenizer("./test/static/test_ultimate.drive");
     Parser parser;
-    std::vector<Token> tokens = tokenizer.tokenize();
+    std::vector<Token> tokens = tokenizer.tokenizeFile();
     Schema out;
     Parser::ParsingResult result = parser.buildSchema(tokens, out, true);
 

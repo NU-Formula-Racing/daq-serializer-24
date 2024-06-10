@@ -29,6 +29,7 @@ namespace daqser::impl
         BOOL,
         STRING,
         VERSION,
+        BYTE
     };
 
 #pragma region Node types
@@ -358,6 +359,11 @@ namespace daqser::impl
             {
                 field.type = FieldType::VERSION;
                 field.size = sizeof(int[3]);
+            }
+            else if (std::is_same<T, std::uint8_t>::value)
+            {
+                field.type = FieldType::BYTE;
+                field.size = sizeof(std::uint8_t);
             }
             else
             {
