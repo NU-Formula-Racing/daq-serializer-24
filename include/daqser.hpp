@@ -104,7 +104,7 @@ namespace daqser
     void setSchema(const std::string &driveFile)
     {
         Tokenizer tokenizer(driveFile);
-        std::vector<Token> tokens = tokenizer.tokenizeFile();
+        std::vector<Token> tokens = tokenizer.tokenizeContent();
         Schema schema;
         Parser::ParsingResult res = g_parser.buildSchema(tokens, schema, false);
 

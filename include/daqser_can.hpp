@@ -22,7 +22,7 @@
 namespace daqser
 {
     VirtualTimerGroup g_timerGroup;
-    CAN g_canBus{40}; // 40 defines the message buffer size btw
+    CAN g_canBus{}; // 40 defines the message buffer size btw
 
     // auto generated signals!
 #ifdef RX_PDM

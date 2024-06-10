@@ -96,7 +96,7 @@ Token Tokenizer::getNextToken(std::istream &file)
         word.push_back(c);
     }
 
-    if (file.eof() && word.empty())
+    if (word.empty())
     {
         token.type = TOKEN_END_OF_FILE;
         token.value = "EOF";
