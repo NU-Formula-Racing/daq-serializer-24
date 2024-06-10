@@ -1,0 +1,81 @@
+meta {
+	.schema: "daq-schema";
+	.version: 1.0.0;
+}
+
+# PDM Messages
+def PDM_Current {
+	float Unreg_Amps; # A;
+	float FiveVolt_Amps; # A;
+}
+
+# WHEEL Messages
+def Wheel_Temp_Front {
+	float Wheel_Temp_FrontL1; # °C;
+	float Wheel_Temp_FrontL2; # °C;
+	float Wheel_Temp_FrontR1; # °C;
+	float Wheel_Temp_FrontR2; # °C;
+}
+
+def Wheel_Speed_Front {
+	float Wheel_Speed_FrontL; # rot/s;
+	float Wheel_Speed_FrontR; # rot/s;
+}
+
+def Wheel_Temp_Back {
+	float Wheel_Temp_BackL1; # °C;
+	float Wheel_Temp_BackL2; # °C;
+	float Wheel_Temp_BackR1; # °C;
+	float Wheel_Temp_BackR2; # °C;
+}
+
+# COOLANT Messages
+def Coolant_Temp_Message {
+	float Coolant_Temp; # °C;
+}
+
+def Coolant_Flow_Message {
+	float Coolant_Flow; # mL/s;
+}
+
+# SHUTDOWN Messages
+def Shutdown_Status {
+	bool Voltage_Sag; # bitset, lsbit is shutdown 1, support from 1-6;
+}
+
+# ETC Messages
+def Throttle_tx {
+	float Throttle_percent; # % but 0-32767;
+	bool Throttle_active; # boolean;
+}
+
+def Brake_tx {
+	bool Brake_pedal; # boolean;
+}
+
+# VCU Messages
+def Drive_Status {
+	bool Drive_State; # boolean;
+}
+
+# SUSPENSION Messages
+def Sus_Pots {
+	float Sus_Front; # cm;
+}
+
+def Car_Data {
+	long timestamp;
+	PDM_Current PDM_Current;
+	Wheel_Temp_Front Wheel_Temp_Front;
+	Wheel_Speed_Front Wheel_Speed_Front;
+	Wheel_Temp_Back Wheel_Temp_Back;
+	Coolant_Temp_Message Coolant_Temp_Message;
+	Coolant_Flow_Message Coolant_Flow_Message;
+	Shutdown_Status Shutdown_Status;
+	Throttle_tx Throttle_tx;
+	Brake_tx Brake_tx;
+	Drive_Status Drive_Status;
+	Sus_Pots Sus_Pots;
+}
+
+frame(Car_Data);
