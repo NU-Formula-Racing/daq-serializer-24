@@ -14,8 +14,8 @@
 #define USE_LITTLEFS_ESP32
 #include <FS.h>
 #ifdef USE_LITTLEFS_ESP32
-#define SPIFFS LittleFS
-#include <LITTLEFS.h>
+#define SPIFFS LITTLEFS
+#include <LittleFS.h>
 #else
 #include <SPIFFS.h>
 #endif
@@ -131,24 +131,28 @@ Token Tokenizer::getNextToken(std::istream &file)
     return token;
 }
 
-std::stringstream Tokenizer::openFile(const std::string &filename)
+std::stringstream Tokenizer::openFile(std::string filename)
 {
 #ifdef USE_LITTLEFS_ESP32
     if (!SPIFFS.begin(true))
     {
         std::cout << "Error mounting SPIFFS" << std::endl;
-        return {};
+        std::stringstream err;
+        err << "Error mounting SPIFFS" << std::endl;
+        return err;
     }
 
     // also modify the _source for spiffs mounting, which is under the /spiffs directory
-    _source = "/" + _source;
+    filename = "/" + filename;
 #endif
 
 #ifdef USE_LITTLEFS_TEENSY
     if (!g_littleFS.begin(chipSelect))
     {
         std::cout << "Error mounting LITTLEFS" << std::endl;
-        return {};
+        std::stringstream err;
+        err << "Error mounting LITTLEFS" << std::endl;
+        return;
     }
 
     g_littleFS.quickFormat();
@@ -162,7 +166,7 @@ std::stringstream Tokenizer::openFile(const std::string &filename)
         std::stringstream err;
         err << "Error opening file: " << filename << std::endl;
         std::cout << err.str();
-        return {};
+        return err;
     }
 
     // put the file content into a stringstream
@@ -174,7 +178,9 @@ std::stringstream Tokenizer::openFile(const std::string &filename)
     if (!f)
     {
         std::cout << "Error opening file: " << filename << std::endl;
-        return {};
+        std::stringstream err;
+        err << "Error opening file: " << filename << std::endl;
+        return err;
     }
     std::stringstream ss;
     ss << f.readString();
@@ -184,8 +190,10 @@ std::stringstream Tokenizer::openFile(const std::string &filename)
     std::ifstream fileStream(filename);
     if (!fileStream.is_open())
     {
-        std::cout << "Error opening file: " << filename<< std::endl;
-        return {};
+        std::cout << "Error opening file: " << filename << std::endl;
+        std::stringstream err;
+        err << "Error opening file: " << filename << std::endl;
+        return err;
     }
 
     std::stringstream file;

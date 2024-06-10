@@ -115,7 +115,7 @@ namespace daqser::impl
         bool isKeyword(const std::string &word, TokenType &type);
         bool isLiteral(const std::string &word, TokenType &type);
         bool isValidIdentifier(const std::string &word);
-        static std::stringstream openFile(const std::string &filename);
+        static std::stringstream openFile(std::string filename);
 
     private:
         std::string _source;
