@@ -39,8 +39,8 @@ std::vector<Token> Tokenizer::tokenizeFile()
         return {};
     }
 
-    // also modify the _fileName for spiffs mounting, which is under the /spiffs directory
-    _fileName = "/" + _fileName;
+    // also modify the _source for spiffs mounting, which is under the /spiffs directory
+    _source = "/" + _source;
 #endif
 
 #ifdef USE_LITTLEFS_TEENSY
@@ -55,11 +55,11 @@ std::vector<Token> Tokenizer::tokenizeFile()
 #endif
 
 #ifdef USE_LITTLEFS_ESP32
-    fs::File driveFile = SPIFFS.open(_fileName.c_str(), "r");
+    fs::File driveFile = SPIFFS.open(_source.c_str(), "r");
     if (!driveFile.available())
     {
         std::stringstream err;
-        err << "Error opening file: " << _fileName << std::endl;
+        err << "Error opening file: " << _source << std::endl;
         std::cout << err.str();
         return {};
     }
@@ -69,10 +69,10 @@ std::vector<Token> Tokenizer::tokenizeFile()
     file << driveFile.readString().c_str();
     driveFile.close();
 #elif defined(USE_LITTLEFS_TEENSY)
-    File f = g_littleFS.open(_fileName.c_str(), FILE_READ);
+    File f = g_littleFS.open(_source.c_str(), FILE_READ);
     if (!f)
     {
-        std::cout << "Error opening file: " << _fileName << std::endl;
+        std::cout << "Error opening file: " << _source << std::endl;
         return {};
     }
     std::stringstream ss;
