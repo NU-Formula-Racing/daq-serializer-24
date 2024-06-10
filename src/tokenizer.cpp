@@ -32,63 +32,8 @@ using namespace daqser::impl;
 
 std::vector<Token> Tokenizer::tokenizeFile()
 {
-#ifdef USE_LITTLEFS_ESP32
-    if (!SPIFFS.begin(true))
-    {
-        std::cout << "Error mounting SPIFFS" << std::endl;
-        return {};
-    }
-
-    // also modify the _source for spiffs mounting, which is under the /spiffs directory
-    _source = "/" + _source;
-#endif
-
-#ifdef USE_LITTLEFS_TEENSY
-    if (!g_littleFS.begin(chipSelect))
-    {
-        std::cout << "Error mounting LITTLEFS" << std::endl;
-        return {};
-    }
-
-    g_littleFS.quickFormat();
-
-#endif
-
-#ifdef USE_LITTLEFS_ESP32
-    fs::File driveFile = SPIFFS.open(_source.c_str(), "r");
-    if (!driveFile.available())
-    {
-        std::stringstream err;
-        err << "Error opening file: " << _source << std::endl;
-        std::cout << err.str();
-        return {};
-    }
-
-    // put the file content into a stringstream
-    std::stringstream file;
-    file << driveFile.readString().c_str();
-    driveFile.close();
-#elif defined(USE_LITTLEFS_TEENSY)
-    File f = g_littleFS.open(_source.c_str(), FILE_READ);
-    if (!f)
-    {
-        std::cout << "Error opening file: " << _source << std::endl;
-        return {};
-    }
-    std::stringstream ss;
-    ss << f.readString();
-    std::string fileContent = ss.str();
-    std::istringstream file(fileContent);
-#else
-    std::ifstream file(_source);
-    if (!file.is_open())
-    {
-        std::cout << "Error opening file: " << _source << std::endl;
-        return {};
-    }
-#endif
-
     std::vector<Token> tokens;
+    std::stringstream file = openFile(_source);
     while (file.good())
     {
         Token token = getNextToken(file);
@@ -184,6 +129,70 @@ Token Tokenizer::getNextToken(std::istream &file)
     token.type = TOKEN_INVALID;
     token.value = word;
     return token;
+}
+
+std::stringstream Tokenizer::openFile(const std::string &filename)
+{
+#ifdef USE_LITTLEFS_ESP32
+    if (!SPIFFS.begin(true))
+    {
+        std::cout << "Error mounting SPIFFS" << std::endl;
+        return {};
+    }
+
+    // also modify the _source for spiffs mounting, which is under the /spiffs directory
+    _source = "/" + _source;
+#endif
+
+#ifdef USE_LITTLEFS_TEENSY
+    if (!g_littleFS.begin(chipSelect))
+    {
+        std::cout << "Error mounting LITTLEFS" << std::endl;
+        return {};
+    }
+
+    g_littleFS.quickFormat();
+
+#endif
+
+#ifdef USE_LITTLEFS_ESP32
+    fs::File driveFile = SPIFFS.open(filename.c_str(), "r");
+    if (!driveFile.available())
+    {
+        std::stringstream err;
+        err << "Error opening file: " << filename << std::endl;
+        std::cout << err.str();
+        return {};
+    }
+
+    // put the file content into a stringstream
+    std::stringstream file;
+    file << driveFile.readString().c_str();
+    driveFile.close();
+#elif defined(USE_LITTLEFS_TEENSY)
+    File f = g_littleFS.open(filename.c_str(), FILE_READ);
+    if (!f)
+    {
+        std::cout << "Error opening file: " << filename << std::endl;
+        return {};
+    }
+    std::stringstream ss;
+    ss << f.readString();
+    std::string fileContent = ss.str();
+    std::stringstream file(fileContent);
+#else
+    std::ifstream fileStream(filename);
+    if (!fileStream.is_open())
+    {
+        std::cout << "Error opening file: " << filename<< std::endl;
+        return {};
+    }
+
+    std::stringstream file;
+    file << fileStream.rdbuf();
+#endif
+
+    return file;
 }
 
 bool Tokenizer::isKeyword(const std::string &word, TokenType &type)

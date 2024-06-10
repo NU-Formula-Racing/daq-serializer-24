@@ -56,12 +56,12 @@ public:
     }
 
 private:
-    const bool RUN_TOKENIZER_TESTS = false;
-    const bool RUN_PARSER_TESTS = false;
-    const bool RUN_DATATYPE_FACTORY_TESTS = false;
+    const bool RUN_TOKENIZER_TESTS = true;
+    const bool RUN_PARSER_TESTS = true;
+    const bool RUN_DATATYPE_FACTORY_TESTS = true;
     const bool RUN_FRAME_TESTS = true;
-    const bool RUN_REGISTRY_TESTS = false;
-    const bool RUN_API_TESTS = false;
+    const bool RUN_REGISTRY_TESTS = true;
+    const bool RUN_API_TESTS = true;
     void runTokenizerTests();
     void runParserTests();
     void runDataTypeFactoryTests();

@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #include "parser.hpp"
 #include "tokenizer.hpp"
@@ -128,6 +129,21 @@ namespace daqser::impl
             }
 
             return schema;
+        }
+
+        std::string getDriveContents(std::string schemaName, int* versionNumber)
+        {
+            SchemaMetadata metadata = {schemaName, versionNumber};
+
+            if (schemaRegistry.find(metadata) == schemaRegistry.end())
+            {
+                std::cout << "Schema not found: " << schemaName << " v" << versionNumber << std::endl;
+                return "";
+            }
+
+            std::string schemaFile = schemaRegistry[metadata];
+            std::stringstream contents = Tokenizer::openFile(schemaFile);
+            return contents.str();
         }
 
         int numSchemas()

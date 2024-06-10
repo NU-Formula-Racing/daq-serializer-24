@@ -266,6 +266,13 @@ namespace daqser
         if (!_validateRequest()) return false;
         return g_registry.hasSchema(name, major, minor, patch);
     }
+
+    /// @brief Gets the drive file contents of the current schema
+    std::string getDriveContents()
+    {
+        if (!_validateRequest()) return "";
+        return g_registry.getDriveContents(g_activeSchema->schemaName, g_activeSchema->versionNumber);
+    }
 }
 
 #endif // __DAQSER_H__
