@@ -47,11 +47,9 @@ std::vector<Token> Tokenizer::tokenizeFile()
 
 std::vector<Token> Tokenizer::tokenizeContent()
 {
-    std::istringstream file(_source);
-    std::vector<Token> tokens;
     while (file.good())
     {
-        Token token = getNextToken(file);
+        Token token = getNextToken(_source);
         tokens.push_back(token);
         // std::cout << Tokenizer::tokenTypeToString(token.type) << " : " << token.value << std::endl;
         if (token.type == TOKEN_END_OF_FILE)
@@ -60,18 +58,24 @@ std::vector<Token> Tokenizer::tokenizeContent()
     return tokens;
 }
 
-Token Tokenizer::getNextToken(std::istream &file)
+Token Tokenizer::getNextToken(const std::string &file)
 {
     Token token;
     char c;
     std::string word;
+    int index = 0;
 
-    while (file.get(c))
+    while (index < file.size())
     {
+        c = file[index];
+
         if (c == '#')
         { // Handle comments
-            while (file.get(c) && c != '\n')
-                ; // ignore the rest of the line
+            while (index < file.size() && c != '\n')
+            {
+                c = file[index];
+                index++; // ignore the rest of the line
+            }
             continue;
         }
 
@@ -86,7 +90,7 @@ Token Tokenizer::getNextToken(std::istream &file)
         {                                                                         // Handle symbols
             if (!word.empty())
             {
-                file.unget(); // Push back the symbol to the stream to be able to read it in the next call
+                index--; // we need to reprocess this character
                 break;
             }
             word.push_back(c);
@@ -131,7 +135,7 @@ Token Tokenizer::getNextToken(std::istream &file)
     return token;
 }
 
-std::stringstream Tokenizer::openFile(std::string filename)
+std::string Tokenizer::openFile(std::string filename)
 {
 #ifdef USE_LITTLEFS_ESP32
     if (!SPIFFS.begin(true))
@@ -152,7 +156,7 @@ std::stringstream Tokenizer::openFile(std::string filename)
         std::cout << "Error mounting LITTLEFS" << std::endl;
         std::stringstream err;
         err << "Error mounting LITTLEFS" << std::endl;
-        return;
+        return err.str();
     }
 
     g_littleFS.quickFormat();
@@ -166,13 +170,13 @@ std::stringstream Tokenizer::openFile(std::string filename)
         std::stringstream err;
         err << "Error opening file: " << filename << std::endl;
         std::cout << err.str();
-        return err;
+        return err.str();
     }
 
     // put the file content into a stringstream
-    std::stringstream file;
-    file << driveFile.readString().c_str();
+    std::string file = driveFile.readString().c_str();
     driveFile.close();
+
 #elif defined(USE_LITTLEFS_TEENSY)
     File f = g_littleFS.open(filename.c_str(), FILE_READ);
     if (!f)
@@ -180,12 +184,9 @@ std::stringstream Tokenizer::openFile(std::string filename)
         std::cout << "Error opening file: " << filename << std::endl;
         std::stringstream err;
         err << "Error opening file: " << filename << std::endl;
-        return err;
+        return err.str();
     }
-    std::stringstream ss;
-    ss << f.readString();
-    std::string fileContent = ss.str();
-    std::stringstream file(fileContent);
+    std::string file = f.readString().c_str();
 #else
     std::ifstream fileStream(filename);
     if (!fileStream.is_open())
@@ -196,8 +197,7 @@ std::stringstream Tokenizer::openFile(std::string filename)
         return err;
     }
 
-    std::stringstream file;
-    file << fileStream.rdbuf();
+    std::string file = fileStream.rdbuf();
 #endif
 
     return file;
