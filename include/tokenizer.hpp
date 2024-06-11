@@ -118,9 +118,9 @@ namespace daqser::impl
         static std::string openFile(std::string filename);
 
     private:
+        std::vector<Token> buildTokenList(const std::string &file);
         std::string _source;
 
-        Token getNextToken(const std::string &file);
     };
 
 } // namespace daqser::impl

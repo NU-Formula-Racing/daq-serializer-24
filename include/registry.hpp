@@ -151,8 +151,8 @@ namespace daqser::impl
             std::string schemaFile = schemaRegistry[metadata];
             if (this->isFileBasedSchema(schemaName, versionNumber))
             {
-                std::stringstream contents = Tokenizer::openFile(schemaFile);
-                return contents.str();
+                std::string contents = Tokenizer::openFile(schemaFile);
+                return contents;
             }
             else
             {

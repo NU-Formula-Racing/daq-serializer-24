@@ -32,107 +32,113 @@ using namespace daqser::impl;
 
 std::vector<Token> Tokenizer::tokenizeFile()
 {
-    std::vector<Token> tokens;
-    std::stringstream file = openFile(_source);
-    while (file.good())
-    {
-        Token token = getNextToken(file);
-        tokens.push_back(token);
-        // std::cout << Tokenizer::tokenTypeToString(token.type) << " : " << token.value << std::endl;
-        if (token.type == TOKEN_END_OF_FILE)
-            break;
-    }
+    std::string fileContents = openFile(_source);
+    std::vector<Token> tokens =  buildTokenList(fileContents);
+
     return tokens;
 }
 
 std::vector<Token> Tokenizer::tokenizeContent()
 {
-    while (file.good())
-    {
-        Token token = getNextToken(_source);
-        tokens.push_back(token);
-        // std::cout << Tokenizer::tokenTypeToString(token.type) << " : " << token.value << std::endl;
-        if (token.type == TOKEN_END_OF_FILE)
-            break;
-    }
-    return tokens;
+    return buildTokenList(_source);
 }
 
-Token Tokenizer::getNextToken(const std::string &file)
+std::vector<Token> Tokenizer::buildTokenList(const std::string &file)
 {
-    Token token;
+    // std::cout << "Building token list..." << std::endl;
+    std::vector<Token> tokens;
     char c;
-    std::string word;
     int index = 0;
 
     while (index < file.size())
     {
-        c = file[index];
+        Token currentToken;
+        std::string word;
+        while (index < file.size())
+        {
+            c = file[index];
+            index++;
 
-        if (c == '#')
-        { // Handle comments
-            while (index < file.size() && c != '\n')
+            // check for comments, that start with #
+            if (c == '#')
             {
-                c = file[index];
-                index++; // ignore the rest of the line
+                if (!word.empty())
+                {
+                    index--;
+                    break;
+                }
+
+                while (index < file.size() && c != '\n')
+                {
+                    c = file[index++];
+                }
+                continue;
             }
+
+            if (std::isspace(c))
+            {
+                if (!word.empty())
+                {
+                    break;
+                }
+                continue;
+            }
+
+            if (c == '{' || c == '}' || c == ';' || c == '(' || c == ')' || c == ':')
+            {
+                if (!word.empty())
+                {
+                    index--;
+                    break;
+                }
+
+                word = c;
+                break;
+            }
+
+            word += c;
+        }
+
+        if (word.empty())
+        {
+            currentToken.type = TOKEN_END_OF_FILE;
+            currentToken.value = "EOF";
+            tokens.emplace_back(currentToken);
             continue;
         }
 
-        if (std::isspace(c))
-        { // If a whitespace character is encountered, then we consider the token as complete
-            if (!word.empty())
-                break; // only break if we've started forming a word
-            continue;  // ignore leading whitespace
-        }
-
-        if (c == '{' || c == '}' || c == ';' || c == '(' || c == ')' || c == ':') // code smelly
-        {                                                                         // Handle symbols
-            if (!word.empty())
-            {
-                index--; // we need to reprocess this character
-                break;
-            }
-            word.push_back(c);
-            break;
-        }
-
-        word.push_back(c);
-    }
-
-    if (word.empty())
-    {
-        token.type = TOKEN_END_OF_FILE;
-        token.value = "EOF";
-        return token;
-    }
-
-    if (isKeyword(word, token.type) ||
-        isSymbol(word, token.type) ||
-        isLiteral(word, token.type))
-    {
-        if (token.type == TOKEN_STRING_LITERAL)
+        if (isKeyword(word, currentToken.type) ||
+            isSymbol(word, currentToken.type) ||
+            isLiteral(word, currentToken.type))
         {
-            // remove the quotes from the string
-            token.value = word.substr(1, word.size() - 2);
-            return token;
+            if (currentToken.type == TOKEN_STRING_LITERAL)
+            {
+                // remove the quotes from the string
+                currentToken.value = word.substr(1, word.size() - 2);
+                tokens.push_back(currentToken);
+                continue;
+            }
+
+            currentToken.value = word;
+            tokens.push_back(currentToken);
+            continue;
         }
 
-        token.value = word;
-        return token;
+        // if it is not a literal, then we are going to assume that it is an identifier, given that it's a valid name
+        if (isValidIdentifier(word))
+        {
+            currentToken.type = TOKEN_IDENTIFIER;
+            currentToken.value = word;
+            tokens.push_back(currentToken);
+            continue;
+        }
+
+        currentToken.type = TOKEN_INVALID;
+        currentToken.value = word;
+        tokens.push_back(currentToken);
     }
 
-    // if it is not a literal, then we are going to assume that it is an identifier, given that it's a valid name
-    if (isValidIdentifier(word))
-    {
-        token.type = TOKEN_IDENTIFIER;
-        token.value = word;
-        return token;
-    }
-
-    token.type = TOKEN_INVALID;
-    token.value = word;
-    return token;
+    return tokens;
 }
 
 std::string Tokenizer::openFile(std::string filename)
@@ -194,12 +200,16 @@ std::string Tokenizer::openFile(std::string filename)
         std::cout << "Error opening file: " << filename << std::endl;
         std::stringstream err;
         err << "Error opening file: " << filename << std::endl;
-        return err;
+        return err.str();
     }
 
-    std::string file = fileStream.rdbuf();
+    std::string file;
+    for (std::string line; std::getline(fileStream, line);)
+    {
+        file += line + "\n";
+    }
 #endif
-
+    // std::cout << "File content: " << file << std::endl;
     return file;
 }
 
