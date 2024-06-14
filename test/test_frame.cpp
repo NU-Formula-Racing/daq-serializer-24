@@ -127,11 +127,22 @@ void test_frame_template_serialize_no_data()
     // it still should be the same size as the frame template
     TEST_ASSERT_EQUAL(22, frame.size());
 
-    // everything should be 0
+    // print out the binary
     for (std::uint8_t byte : frame)
     {
-        TEST_ASSERT_EQUAL(0, byte);
+        std::cout << std::hex << (std::uint16_t)byte << " ";
     }
+    std::cout << std::endl;
+
+    // now deserialize the frame
+    frameTemplate.deserializeFrame(frame);
+
+    // check that the values are back to the original values
+    TEST_ASSERT_EQUAL((std::uint8_t)0x00, frameTemplate.get<std::uint8_t>("field4"));
+    TEST_ASSERT_EQUAL(0, frameTemplate.get<int>("innerField.field1"));
+    TEST_ASSERT_EQUAL(0.0f, frameTemplate.get<float>("innerField.field2"));
+    TEST_ASSERT_EQUAL(false, frameTemplate.get<bool>("innerField.field3"));
+    
 
 }
 

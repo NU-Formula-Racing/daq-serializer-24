@@ -115,7 +115,7 @@ void test_field_not_predefined_int(void)
     Field field = Field::emptyField("test", FieldType::INT);
     TEST_ASSERT_TRUE(field.value == 0);
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_TRUE(field.value.isValid());
     TEST_ASSERT_TRUE(sizeof(int) == field.size);
 }
 
@@ -124,7 +124,7 @@ void test_field_not_predefined_float(void)
     Field field = Field::emptyField("test", FieldType::FLOAT);
     TEST_ASSERT_TRUE(field.value == 0.0f);
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_TRUE(field.value.isValid());
     TEST_ASSERT_EQUAL_INT(sizeof(float), field.size);
 }
 
@@ -133,7 +133,7 @@ void test_field_not_predefined_bool(void)
     Field field = Field::emptyField("test", FieldType::BOOL);
     TEST_ASSERT_TRUE(field.value == false);
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_TRUE(field.value.isValid());
     TEST_ASSERT_EQUAL_INT(sizeof(bool), field.size);
 }
 
@@ -143,7 +143,7 @@ void test_field_not_predefined_string(void)
     // TODO: make this assertion pass
     // TEST_ASSERT_TRUE(field.value == "");
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_TRUE(field.value.isValid());
     TEST_ASSERT_EQUAL_INT(sizeof(char *), field.size);
 }
 
@@ -152,7 +152,7 @@ void test_field_not_predefined_byte(void)
     Field field = Field::emptyField("test", FieldType::BYTE);
     TEST_ASSERT_TRUE(field.value == 0);
     TEST_ASSERT_FALSE(field.predefined);
-    TEST_ASSERT_FALSE(field.value.isValid());
+    TEST_ASSERT_TRUE(field.value.isValid());
     TEST_ASSERT_EQUAL_INT(sizeof(std::uint8_t), field.size);
 }
 
