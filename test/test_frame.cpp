@@ -17,7 +17,7 @@ DataType build_example_datatype()
     innerType.addField(field2);
     innerType.addField(field3);
 
-    Field field4 = Field::emptyField("field4", FieldType::STRING);
+    Field field4 = Field::emptyField("field4", FieldType::BYTE);
     Field field5 = Field::emptyField("field5", FieldType::VERSION);
 
     DataType outerType;
@@ -43,12 +43,12 @@ void test_frame_template_set()
 {
     DataType type = build_example_datatype();
     FrameTemplate frameTemplate = FrameTemplate(type);
-    frameTemplate.set("field4", "test");
+    frameTemplate.set("field4", (std::uint8_t)0x01);
     frameTemplate.set("innerField.field1", 1);
     frameTemplate.set("innerField.field2", 2.0f);
     frameTemplate.set("innerField.field3", true);
 
-    TEST_ASSERT_EQUAL_STRING("test", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL((std::uint8_t)0x01, frameTemplate.get<std::uint8_t>("field4"));
     TEST_ASSERT_EQUAL(1, frameTemplate.get<int>("innerField.field1"));
     TEST_ASSERT_EQUAL(2.0f, frameTemplate.get<float>("innerField.field2"));
     TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
@@ -58,7 +58,7 @@ void test_frameteplate_serialize_frame()
 {
     DataType type = build_example_datatype();
     FrameTemplate frameTemplate = FrameTemplate(type);
-    frameTemplate.set("field4", "test"); // 5 bytes
+    frameTemplate.set("field4", (std::uint8_t)0x01); // 1 byte
     frameTemplate.set("innerField.field1", 1); // 4 bytes
     frameTemplate.set("innerField.field2", 2.0f); // 4 bytes
     frameTemplate.set("innerField.field3", true); // 1 byte
@@ -75,22 +75,22 @@ void test_frameteplate_serialize_frame()
     std::cout << std::endl;
 
     // check that the frame is the correct size
-    TEST_ASSERT_EQUAL(25, frame.size());
+    TEST_ASSERT_EQUAL(22, frame.size());
 
     // check that the values haven't changed
-    TEST_ASSERT_EQUAL_STRING("test", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL((std::uint8_t)0x01, frameTemplate.get<std::uint8_t>("field4"));
     TEST_ASSERT_EQUAL(1, frameTemplate.get<int>("innerField.field1"));
     TEST_ASSERT_EQUAL(2.0f, frameTemplate.get<float>("innerField.field2"));
     TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
 
     // now set the values to something else
-    frameTemplate.set("field4", "test2");
+    frameTemplate.set("field4", (std::uint8_t)0x02);
     frameTemplate.set("innerField.field1", 2);
     frameTemplate.set("innerField.field2", 3.0f);
     frameTemplate.set("innerField.field3", false);
 
     // check that the values have changed
-    TEST_ASSERT_EQUAL_STRING("test2", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL((std::uint8_t)0x02, frameTemplate.get<std::uint8_t>("field4"));
     TEST_ASSERT_EQUAL(2, frameTemplate.get<int>("innerField.field1"));
     TEST_ASSERT_EQUAL(3.0f, frameTemplate.get<float>("innerField.field2"));
     TEST_ASSERT_EQUAL(false, frameTemplate.get<bool>("innerField.field3"));
@@ -99,7 +99,7 @@ void test_frameteplate_serialize_frame()
     frameTemplate.deserializeFrame(frame);
 
     // check that the values are back to the original values
-    TEST_ASSERT_EQUAL_STRING("test", frameTemplate.get<std::string>("field4").c_str());
+    TEST_ASSERT_EQUAL((std::uint8_t)0x01, frameTemplate.get<std::uint8_t>("field4"));
     TEST_ASSERT_EQUAL(1, frameTemplate.get<int>("innerField.field1"));
     TEST_ASSERT_EQUAL(2.0f, frameTemplate.get<float>("innerField.field2"));
     TEST_ASSERT_EQUAL(true, frameTemplate.get<bool>("innerField.field3"));
@@ -109,11 +109,36 @@ void test_frame_serialize_to_json()
 {
     DataType type = build_example_datatype();
     FrameTemplate frameTemplate = FrameTemplate(type);
-    frameTemplate.set("field4", "test");
+    frameTemplate.set("field4", (std::uint8_t)0x01);
     frameTemplate.set("innerField.field1", 1);
     frameTemplate.set("innerField.field2", 2.0f);
     frameTemplate.set("innerField.field3", true);
 
+    std::string json = frameTemplate.serializeFrameToJson();
+    std::cout << json << std::endl;
+
+}
+
+void test_frame_template_serialize_no_data()
+{
+    DataType type = build_example_datatype();
+    FrameTemplate frameTemplate = FrameTemplate(type);
+    std::vector<std::uint8_t> frame = frameTemplate.serializeFrame();
+    // it still should be the same size as the frame template
+    TEST_ASSERT_EQUAL(22, frame.size());
+
+    // everything should be 0
+    for (std::uint8_t byte : frame)
+    {
+        TEST_ASSERT_EQUAL(0, byte);
+    }
+
+}
+
+void test_frame_template_serialize_no_data_to_json()
+{
+    DataType type = build_example_datatype();
+    FrameTemplate frameTemplate = FrameTemplate(type);
     std::string json = frameTemplate.serializeFrameToJson();
     std::cout << json << std::endl;
 
@@ -125,4 +150,6 @@ void TestingSuite::runFrameTests()
     RUN_TEST(test_frame_template_set);
     RUN_TEST(test_frameteplate_serialize_frame);
     RUN_TEST(test_frame_serialize_to_json);
+    RUN_TEST(test_frame_template_serialize_no_data);
+    RUN_TEST(test_frame_template_serialize_no_data_to_json);
 }

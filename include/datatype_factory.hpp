@@ -106,7 +106,7 @@ namespace daqser::impl
         /// @param binary The binary representation of the value
         Value setFromBinary(std::vector<std::uint8_t> binary)
         {
-            std::cout << "Value::setFromBinary()" << std::endl;
+            // std::cout << "Value::setFromBinary()" << std::endl;
             for (std::uint8_t byte : binary)
             {
                 std::cout << (char)byte << "";
@@ -164,6 +164,15 @@ namespace daqser::impl
                 }
             }
 
+            // this is a hack, but im at comp
+            // account for version
+            if (std::is_same<T, int*>::value)
+            {
+                int *valueComp = (int *)(&value);
+                int *valuePtrComp = (int *)(this->valuePtr.get());
+                return valueComp[0] == valuePtrComp[0] && valueComp[1] == valuePtrComp[1] && valueComp[2] == valuePtrComp[2];
+            }
+
             if (sizeof(T) != valueSize)
             {
                 return false;
@@ -171,7 +180,7 @@ namespace daqser::impl
 
             // compare the values
             // cast the valuePtr to a pointer of type T
-            std::cout << "Comparing valuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << " to value: " << value << std::endl;
+            // std::cout << "Comparing valuePtr: " << std::hex << *(int *)(this->valuePtr.get()) << " to value: " << value << std::endl;
             T valueComp = this->get<T>();
             return valueComp == value;
         };
@@ -217,7 +226,8 @@ namespace daqser::impl
         template <typename T>
         T get() const
         {
-            std::cout << "Value::get<T>()" << std::endl;
+            // std::cout << "Value::get<T>()" << std::endl;
+            
             return *(T *)(this->valuePtr.get());
         }
 
@@ -248,6 +258,12 @@ namespace daqser::impl
             std::vector<std::uint8_t> binary;
             if (this->valuePtr.get() == nullptr)
             {
+                std::cout << "Value is null" << std::endl;
+                // return a vector of zeros, of the size of the value
+                for (int i = 0; i < this->valueSize; i++)
+                {
+                    binary.push_back(0);
+                }
                 return binary;
             }
 
@@ -358,7 +374,7 @@ namespace daqser::impl
             else if (std::is_same<T, int *>::value)
             {
                 field.type = FieldType::VERSION;
-                field.size = sizeof(int[3]);
+                field.size = 3 * sizeof(int);
             }
             else if (std::is_same<T, std::uint8_t>::value)
             {
@@ -371,6 +387,8 @@ namespace daqser::impl
                 std::cout << "Unrecognized type for predefined field -- must be int, float, bool, string or version" << std::endl;
                 return field;
             }
+
+            field.value.valueSize = field.size;
 
             return field;
         };

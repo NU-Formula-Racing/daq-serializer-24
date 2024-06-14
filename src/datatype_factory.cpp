@@ -24,23 +24,32 @@ Field Field::emptyField(const std::string &name, FieldType type)
     switch (type)
     {
     case FieldType::INT:
+        field.value = 0;
         field.size = sizeof(int);
         break;
     case FieldType::FLOAT:
+        field.value = 0.0f;
         field.size = sizeof(float);
         break;
     case FieldType::BOOL:
+        field.value = false;
         field.size = sizeof(bool);
         break;
     case FieldType::STRING:
-        field.size = sizeof(uint8_t *);
+        field.value = std::string("");
+        field.size = 1; // default size of string
         break;
     case FieldType::VERSION:
         field.value = Value(new int[3]{0, 0, 0});
         field.size = sizeof(int[3]);
         break;
     case FieldType::LONG:
+        field.value = 0L;
         field.size = sizeof(long);
+        break;
+    case FieldType::BYTE:
+        field.value = (uint8_t)0;
+        field.size = sizeof(uint8_t);
         break;
     default:
         // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
@@ -48,6 +57,7 @@ Field Field::emptyField(const std::string &name, FieldType type)
         std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;
     }
 
+    field.value.valueSize = field.size;
     return field;
 }
 
@@ -67,6 +77,8 @@ std::string Field::fieldTypeToString(FieldType type)
         return "version";
     case FieldType::LONG:
         return "long";
+    case FieldType::BYTE:
+        return "byte";
     default:
         // throw std::invalid_argument("Invalid type for field -- must be int, float, bool, string, version or custom");
         std::cout << "Invalid type for field -- must be int, float, bool, string, version or custom" << std::endl;
@@ -128,6 +140,11 @@ std::vector<std::uint8_t> Field::toBinary() const
 
 std::string Field::toHumanReadable() const
 {
+    if (value.isValid() == false)
+    {
+        return "ERROR";
+    }
+
     switch (type)
     {
     case FieldType::INT:
